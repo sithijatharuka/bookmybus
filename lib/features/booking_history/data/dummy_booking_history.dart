@@ -1,0 +1,105 @@
+import '../models/booking_history_model.dart';
+
+class DummyBookingHistory {
+  DummyBookingHistory._();
+
+  static const buses = ['All Buses', 'Bus 01', 'Bus 02', 'Bus 03'];
+
+  static const routes = [
+    'All Routes',
+    'Trincomalee → Wellawatte',
+    'Wellawatte → Trincomalee',
+    'Colombo → Jaffna',
+    'Jaffna → Colombo',
+  ];
+
+  static const statuses = ['All Bookings', 'Confirmed Only', 'Cancelled Only'];
+
+  static const List<BookingHistoryModel> bookings = [
+    BookingHistoryModel(
+      ticketRef: '7BA2531C',
+      busName: 'Lion Super Line',
+      busNumber: 'NC 5025',
+      route: 'Trincomalee → Wellawatte',
+      from: 'Trincomalee',
+      to: 'Wellawatte',
+      passengerName: 'Rasakulendran Sanchajan',
+      passengerPhone: '+94 755 430 361',
+      travelDate: '02 Jul 2026',
+      seats: ['33 (Male)'],
+      pickup: 'Trincomalee',
+      drop: 'Colombo',
+      bookedOn: '01 Jul 2026 • 8:52 PM',
+      fare: 2010.45,
+      status: 'confirmed',
+    ),
+    BookingHistoryModel(
+      ticketRef: '3FC9812A',
+      busName: 'Lion Super Line',
+      busNumber: 'NC 3041',
+      route: 'Colombo → Jaffna',
+      from: 'Colombo',
+      to: 'Jaffna',
+      passengerName: 'Amal Perera',
+      passengerPhone: '+94 771 234 567',
+      travelDate: '05 Jul 2026',
+      seats: ['12 (Male)', '13 (Female)'],
+      pickup: 'Colombo Fort',
+      drop: 'Jaffna Bus Stand',
+      bookedOn: '03 Jul 2026 • 10:15 AM',
+      fare: 3500.00,
+      status: 'confirmed',
+    ),
+    BookingHistoryModel(
+      ticketRef: 'A1D4720E',
+      busName: 'Lion Super Line',
+      busNumber: 'NC 7788',
+      route: 'Jaffna → Colombo',
+      from: 'Jaffna',
+      to: 'Colombo',
+      passengerName: 'Nirosha Fernando',
+      passengerPhone: '+94 712 987 654',
+      travelDate: '10 Jul 2026',
+      seats: ['8 (Female)'],
+      pickup: 'Jaffna Bus Stand',
+      drop: 'Pettah',
+      bookedOn: '08 Jul 2026 • 3:30 PM',
+      fare: 1800.00,
+      status: 'cancelled',
+    ),
+    BookingHistoryModel(
+      ticketRef: 'B8E3301F',
+      busName: 'Lion Super Line',
+      busNumber: 'NC 5025',
+      route: 'Wellawatte → Trincomalee',
+      from: 'Wellawatte',
+      to: 'Trincomalee',
+      passengerName: 'Kumaran Selvam',
+      passengerPhone: '+94 760 112 233',
+      travelDate: '15 Jul 2026',
+      seats: ['22 (Male)', '23 (Male)'],
+      pickup: 'Wellawatte Junction',
+      drop: 'Trincomalee',
+      bookedOn: '12 Jul 2026 • 6:00 PM',
+      fare: 4200.00,
+      status: 'pending',
+    ),
+    BookingHistoryModel(
+      ticketRef: 'C5A9004D',
+      busName: 'Lion Super Line',
+      busNumber: 'NC 3041',
+      route: 'Colombo → Jaffna',
+      from: 'Colombo',
+      to: 'Jaffna',
+      passengerName: 'Priya Subramaniam',
+      passengerPhone: '+94 778 445 990',
+      travelDate: '20 Jul 2026',
+      seats: ['5 (Female)'],
+      pickup: 'Colombo Fort',
+      drop: 'Jaffna Bus Stand',
+      bookedOn: '18 Jul 2026 • 9:10 AM',
+      fare: 1750.00,
+      status: 'confirmed',
+    ),
+  ];
+}

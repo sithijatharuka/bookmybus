@@ -28,7 +28,6 @@ class AppTheme {
       backgroundColor: AppColors.primary,
       foregroundColor: Colors.white,
       elevation: 0,
-      centerTitle: true,
     ),
   );
 }
