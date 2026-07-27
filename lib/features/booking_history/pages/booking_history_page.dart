@@ -8,6 +8,7 @@ import '../data/dummy_booking_history.dart';
 import '../models/booking_history_model.dart';
 import '../widgets/booking_cards.dart';
 import '../widgets/booking_history_card.dart';
+import '../widgets/bus_seat_layout_view.dart';
 import 'booking_details_page.dart';
 
 class BookingHistoryPage extends StatefulWidget {
@@ -44,10 +45,14 @@ class _BookingHistoryPageState extends State<BookingHistoryPage> {
       '${d.day.toString().padLeft(2, '0')} ${_months[d.month - 1]} ${d.year}';
 
   void _onView() {
-    setState(() => _results = _applyFilters(
-          bus: _viewBus,
-          date: _viewDate,
-        ));
+    final filtered = _applyFilters(bus: _viewBus, date: _viewDate);
+    setState(() => _results = filtered);
+    BusSeatLayoutView.show(
+      context,
+      busNumber: _viewBus == 'All Buses' ? 'All Buses' : _viewBus,
+      travelDate: _fmtDisplay(_viewDate),
+      bookings: filtered,
+    );
   }
 
   void _onOverviewFilterChanged() {
@@ -82,10 +87,14 @@ class _BookingHistoryPageState extends State<BookingHistoryPage> {
     DateTime? to,
   }) {
     return DummyBookingHistory.bookings.where((b) {
-      if (bus != 'All Buses' && b.busName != bus) return false;
+      if (bus != 'All Buses' && b.busNumber != bus) return false;
       if (route != 'All Routes' && b.route != route) return false;
       if (status == 'Confirmed Only' && b.status != 'confirmed') return false;
       if (status == 'Cancelled Only' && b.status != 'cancelled') return false;
+      if (date != null) {
+        final d = _fmtDisplay(date);
+        if (b.travelDate != d) return false;
+      }
       return true;
     }).toList();
   }

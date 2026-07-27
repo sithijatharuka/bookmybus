@@ -7,12 +7,16 @@ class BookingHistoryModel {
   final String to;
   final String passengerName;
   final String passengerPhone;
+  final String passengerNic;
+  final String passengerEmail;
   final String travelDate;
+  final String departureTime;
   final List<String> seats; // e.g. ['33 (Male)', '34 (Female)']
   final String pickup;
   final String drop;
-  final String bookedOn; // e.g. '01 Jul 2026 • 8:52 PM'
+  final String bookedOn;
   final double fare;
+  final String paymentMethod;
   final String status; // 'confirmed', 'cancelled', 'pending'
 
   const BookingHistoryModel({
@@ -24,12 +28,16 @@ class BookingHistoryModel {
     required this.to,
     required this.passengerName,
     required this.passengerPhone,
+    required this.passengerNic,
+    required this.passengerEmail,
     required this.travelDate,
+    required this.departureTime,
     required this.seats,
     required this.pickup,
     required this.drop,
     required this.bookedOn,
     required this.fare,
+    required this.paymentMethod,
     required this.status,
   });
 }

@@ -3,7 +3,7 @@ import '../models/booking_history_model.dart';
 class DummyBookingHistory {
   DummyBookingHistory._();
 
-  static const buses = ['All Buses', 'Bus 01', 'Bus 02', 'Bus 03'];
+  static const buses = ['All Buses', 'NC 5025', 'NC 3041', 'NC 7788'];
 
   static const routes = [
     'All Routes',
@@ -25,12 +25,16 @@ class DummyBookingHistory {
       to: 'Wellawatte',
       passengerName: 'Rasakulendran Sanchajan',
       passengerPhone: '+94 755 430 361',
+      passengerNic: '982341567V',
+      passengerEmail: 'sanchajan@example.com',
       travelDate: '02 Jul 2026',
+      departureTime: '06:30 AM',
       seats: ['33 (Male)'],
       pickup: 'Trincomalee',
       drop: 'Colombo',
       bookedOn: '01 Jul 2026 • 8:52 PM',
       fare: 2010.45,
+      paymentMethod: 'Online Payment',
       status: 'confirmed',
     ),
     BookingHistoryModel(
@@ -42,12 +46,16 @@ class DummyBookingHistory {
       to: 'Jaffna',
       passengerName: 'Amal Perera',
       passengerPhone: '+94 771 234 567',
+      passengerNic: '901234567V',
+      passengerEmail: 'amal.perera@example.com',
       travelDate: '05 Jul 2026',
+      departureTime: '07:00 AM',
       seats: ['12 (Male)', '13 (Female)'],
       pickup: 'Colombo Fort',
       drop: 'Jaffna Bus Stand',
       bookedOn: '03 Jul 2026 • 10:15 AM',
       fare: 3500.00,
+      paymentMethod: 'Cash',
       status: 'confirmed',
     ),
     BookingHistoryModel(
@@ -59,12 +67,16 @@ class DummyBookingHistory {
       to: 'Colombo',
       passengerName: 'Nirosha Fernando',
       passengerPhone: '+94 712 987 654',
+      passengerNic: '956789012V',
+      passengerEmail: 'nirosha.f@example.com',
       travelDate: '10 Jul 2026',
+      departureTime: '08:30 AM',
       seats: ['8 (Female)'],
       pickup: 'Jaffna Bus Stand',
       drop: 'Pettah',
       bookedOn: '08 Jul 2026 • 3:30 PM',
       fare: 1800.00,
+      paymentMethod: 'Online Payment',
       status: 'cancelled',
     ),
     BookingHistoryModel(
@@ -76,12 +88,16 @@ class DummyBookingHistory {
       to: 'Trincomalee',
       passengerName: 'Kumaran Selvam',
       passengerPhone: '+94 760 112 233',
+      passengerNic: '880567234V',
+      passengerEmail: 'kumaran.s@example.com',
       travelDate: '15 Jul 2026',
+      departureTime: '05:45 AM',
       seats: ['22 (Male)', '23 (Male)'],
       pickup: 'Wellawatte Junction',
       drop: 'Trincomalee',
       bookedOn: '12 Jul 2026 • 6:00 PM',
       fare: 4200.00,
+      paymentMethod: 'Bank Transfer',
       status: 'pending',
     ),
     BookingHistoryModel(
@@ -93,12 +109,16 @@ class DummyBookingHistory {
       to: 'Jaffna',
       passengerName: 'Priya Subramaniam',
       passengerPhone: '+94 778 445 990',
+      passengerNic: '927654321V',
+      passengerEmail: 'priya.sub@example.com',
       travelDate: '20 Jul 2026',
+      departureTime: '07:00 AM',
       seats: ['5 (Female)'],
       pickup: 'Colombo Fort',
       drop: 'Jaffna Bus Stand',
       bookedOn: '18 Jul 2026 • 9:10 AM',
       fare: 1750.00,
+      paymentMethod: 'Online Payment',
       status: 'confirmed',
     ),
   ];
