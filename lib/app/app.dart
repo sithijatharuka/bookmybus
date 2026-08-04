@@ -2,6 +2,7 @@ import 'package:bookmybus/features/dashboard/pages/operator_dashboard_screen.dar
 import 'package:flutter/material.dart';
 import 'theme/app_theme.dart';
 import '../features/booking_history/pages/booking_history_page.dart';
+import '../features/addbus/pages/add_bus_page.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -12,7 +13,7 @@ class App extends StatelessWidget {
       title: 'BookMyBus',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
-      home: const OperatorDashboardScreen(),
+      home: const AddBusPage(),
     );
   }
 }
