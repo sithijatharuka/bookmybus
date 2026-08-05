@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../../app/theme/app_spacing.dart';
-import 'image_drop_zone.dart';
-import 'image_preview_card.dart';
-import 'upload_progress_bar.dart';
+import '../../../../app/theme/app_spacing.dart';
+import 'widgets/image_drop_zone.dart';
+import 'widgets/image_preview_card.dart';
+import 'widgets/upload_progress_bar.dart';
 
-class Step1UploadImagesView extends StatelessWidget {
-  const Step1UploadImagesView({super.key});
+class Step1UploadImagesPage extends StatelessWidget {
+  const Step1UploadImagesPage({super.key});
 
   static const _images = [
     (label: 'Exterior Front', icon: Icons.directions_bus_outlined),
@@ -22,7 +22,6 @@ class Step1UploadImagesView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Header ──────────────────────────────────────────
           Text('Step 1: Upload Bus Images', style: tt.titleMedium),
           const SizedBox(height: AppSpacing.xs),
           Text(
@@ -30,12 +29,8 @@ class Step1UploadImagesView extends StatelessWidget {
             style: tt.bodyMedium,
           ),
           const SizedBox(height: AppSpacing.xl),
-
-          // ── Drag & Drop Area ─────────────────────────────────
           const ImageDropZone(),
           const SizedBox(height: AppSpacing.xxl),
-
-          // ── Preview Gallery Header ───────────────────────────
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -44,8 +39,6 @@ class Step1UploadImagesView extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.md),
-
-          // ── Image Cards ──────────────────────────────────────
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -56,25 +49,15 @@ class Step1UploadImagesView extends StatelessWidget {
               mainAxisSpacing: AppSpacing.md,
               childAspectRatio: 1.1,
             ),
-            itemBuilder: (_, i) => ImagePreviewCard(
-              label: _images[i].label,
-              icon: _images[i].icon,
-            ),
+            itemBuilder: (_, i) => ImagePreviewCard(label: _images[i].label, icon: _images[i].icon),
           ),
           const SizedBox(height: AppSpacing.xxl),
-
-          // ── Upload Progress ──────────────────────────────────
-          const UploadProgressBar(
-            fileName: 'bus_exterior.jpg',
-            progress: 0.75,
-          ),
+          const UploadProgressBar(fileName: 'bus_exterior.jpg', progress: 0.75),
         ],
       ),
     );
   }
 }
-
-// ── Count Badge ───────────────────────────────────────────────────────────────
 
 class _CountBadge extends StatelessWidget {
   const _CountBadge({required this.count});
@@ -83,14 +66,8 @@ class _CountBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.xs,
-      ),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF2F3FF),
-        borderRadius: BorderRadius.circular(999),
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
+      decoration: BoxDecoration(color: const Color(0xFFF2F3FF), borderRadius: BorderRadius.circular(999)),
       child: Text(
         '$count images selected',
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(

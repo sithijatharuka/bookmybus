@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../../shared/widgets/common_app_bar.dart';
-import '../widgets/step1_upload_images_view.dart';
-import '../widgets/step2_basic_info_view.dart';
+import '../steps/step1_upload_images/step1_upload_images_page.dart';
+import '../steps/step2_basic_info/step2_basic_info_page.dart';
+import '../steps/step3_schedule/step3_schedule_page.dart';
+import '../steps/step4_review/step4_review_page.dart';
 import '../widgets/step_indicator.dart';
 import '../widgets/step_nav_bar.dart';
 
@@ -24,9 +26,11 @@ class _AddBusPageState extends State<AddBusPage> {
   ];
 
   Widget get _stepView => switch (_currentStep) {
-        0 => const Step1UploadImagesView(),
-        1 => const Step2BasicInfoView(),
-        _ => _ComingSoon(label: _steps[_currentStep].label),
+        0 => const Step1UploadImagesPage(),
+        1 => const Step2BasicInfoPage(),
+        2 => const Step3SchedulePage(),
+        3 => const Step4ReviewPage(),
+        _ => const SizedBox.shrink(),
       };
 
   @override
@@ -43,33 +47,6 @@ class _AddBusPageState extends State<AddBusPage> {
             totalSteps: _steps.length,
             onBack: () => setState(() => _currentStep--),
             onNext: () => setState(() => _currentStep++),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ── Coming Soon placeholder ───────────────────────────────────────────────────
-
-class _ComingSoon extends StatelessWidget {
-  const _ComingSoon({required this.label});
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.construction_outlined, size: 48, color: AppColors.textHint),
-          const SizedBox(height: 12),
-          Text(
-            '$label — coming soon',
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium
-                ?.copyWith(color: AppColors.textSecondary),
           ),
         ],
       ),

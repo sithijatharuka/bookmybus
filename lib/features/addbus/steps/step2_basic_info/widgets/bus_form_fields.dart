@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../../app/theme/app_colors.dart';
-import '../../../app/theme/app_radius.dart';
-import '../../../app/theme/app_spacing.dart';
-
-// ── Field Label ───────────────────────────────────────────────────────────────
+import '../../../../../app/theme/app_colors.dart';
+import '../../../../../app/theme/app_radius.dart';
+import '../../../../../app/theme/app_spacing.dart';
 
 class BusFieldLabel extends StatelessWidget {
   const BusFieldLabel(this.text, {super.key});
@@ -25,8 +23,6 @@ class BusFieldLabel extends StatelessWidget {
     );
   }
 }
-
-// ── Text Input Field ──────────────────────────────────────────────────────────
 
 class BusFormField extends StatelessWidget {
   const BusFormField({
@@ -55,21 +51,14 @@ class BusFormField extends StatelessWidget {
       keyboardType: keyboardType,
       inputFormatters: inputFormatters,
       textCapitalization: textCapitalization,
-      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            color: AppColors.textPrimary,
-          ),
+      style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: AppColors.textPrimary),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppColors.textHint,
-            ),
+        hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textHint),
         suffixIcon: Icon(suffixIcon, size: 18, color: AppColors.textHint),
         filled: true,
         fillColor: _fillColor,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.lg,
-          vertical: AppSpacing.md,
-        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.md),
           borderSide: const BorderSide(color: AppColors.border),
@@ -87,8 +76,6 @@ class BusFormField extends StatelessWidget {
   }
 }
 
-// ── Phone Field ───────────────────────────────────────────────────────────────
-
 class BusPhoneField extends StatelessWidget {
   const BusPhoneField({super.key, required this.controller});
 
@@ -102,22 +89,13 @@ class BusPhoneField extends StatelessWidget {
     return TextField(
       controller: controller,
       keyboardType: TextInputType.phone,
-      inputFormatters: [
-        FilteringTextInputFormatter.allow(RegExp(r'[\d\s\-]')),
-      ],
-      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            color: AppColors.textPrimary,
-          ),
+      inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[\d\s\-]'))],
+      style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: AppColors.textPrimary),
       decoration: InputDecoration(
         hintText: 'e.g. 77 123 4567',
-        hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppColors.textHint,
-            ),
+        hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textHint),
         prefixIcon: Container(
-          margin: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.sm,
-            vertical: AppSpacing.xs,
-          ),
+          margin: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
           decoration: BoxDecoration(
             color: AppColors.section,
@@ -142,10 +120,7 @@ class BusPhoneField extends StatelessWidget {
         suffixIcon: const Icon(Icons.phone, size: 20, color: _whatsappGreen),
         filled: true,
         fillColor: _fillColor,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.lg,
-          vertical: AppSpacing.md,
-        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.md),
           borderSide: const BorderSide(color: AppColors.border),

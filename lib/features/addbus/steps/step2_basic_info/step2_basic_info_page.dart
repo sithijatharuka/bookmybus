@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../../app/theme/app_spacing.dart';
-import 'bus_form_fields.dart';
+import '../../../../app/theme/app_spacing.dart';
+import 'widgets/bus_form_fields.dart';
 
-class Step2BasicInfoView extends StatefulWidget {
-  const Step2BasicInfoView({super.key});
+class Step2BasicInfoPage extends StatefulWidget {
+  const Step2BasicInfoPage({super.key});
 
   @override
-  State<Step2BasicInfoView> createState() => _Step2BasicInfoViewState();
+  State<Step2BasicInfoPage> createState() => _Step2BasicInfoPageState();
 }
 
-class _Step2BasicInfoViewState extends State<Step2BasicInfoView> {
+class _Step2BasicInfoPageState extends State<Step2BasicInfoPage> {
   final _busName = TextEditingController();
   final _regNumber = TextEditingController();
   final _totalSeats = TextEditingController();
@@ -36,25 +36,13 @@ class _Step2BasicInfoViewState extends State<Step2BasicInfoView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Header ──────────────────────────────────────────
           Text('Step 2: Basic Information', style: tt.titleMedium),
           const SizedBox(height: AppSpacing.xs),
-          Text(
-            'Provide the essential details for your bus entry.',
-            style: tt.bodyMedium,
-          ),
+          Text('Provide the essential details for your bus entry.', style: tt.bodyMedium),
           const SizedBox(height: AppSpacing.xl),
-
-          // ── Bus Name ─────────────────────────────────────────
           const BusFieldLabel('Bus Name'),
-          BusFormField(
-            controller: _busName,
-            hint: 'e.g. Southern Express',
-            suffixIcon: Icons.directions_bus_outlined,
-          ),
+          BusFormField(controller: _busName, hint: 'e.g. Southern Express', suffixIcon: Icons.directions_bus_outlined),
           const SizedBox(height: AppSpacing.lg),
-
-          // ── Registration Number ──────────────────────────────
           const BusFieldLabel('Registration Number'),
           BusFormField(
             controller: _regNumber,
@@ -63,8 +51,6 @@ class _Step2BasicInfoViewState extends State<Step2BasicInfoView> {
             textCapitalization: TextCapitalization.characters,
           ),
           const SizedBox(height: AppSpacing.lg),
-
-          // ── Seats + Price row ────────────────────────────────
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -102,8 +88,6 @@ class _Step2BasicInfoViewState extends State<Step2BasicInfoView> {
             ],
           ),
           const SizedBox(height: AppSpacing.lg),
-
-          // ── WhatsApp Phone ───────────────────────────────────
           const BusFieldLabel('WhatsApp Phone Number'),
           BusPhoneField(controller: _phone),
         ],

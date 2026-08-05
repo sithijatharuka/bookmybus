@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../app/theme/app_colors.dart';
-import '../../../app/theme/app_radius.dart';
-import '../../../app/theme/app_spacing.dart';
+import '../../../../../app/theme/app_colors.dart';
+import '../../../../../app/theme/app_radius.dart';
+import '../../../../../app/theme/app_spacing.dart';
 
 class ImagePreviewCard extends StatelessWidget {
   const ImagePreviewCard({
@@ -26,13 +26,10 @@ class ImagePreviewCard extends StatelessWidget {
         color: AppColors.white,
         borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(color: AppColors.border),
-        boxShadow: const [
-          BoxShadow(color: AppColors.shadow, blurRadius: 8, offset: Offset(0, 2)),
-        ],
+        boxShadow: const [BoxShadow(color: AppColors.shadow, blurRadius: 8, offset: Offset(0, 2))],
       ),
       child: Stack(
         children: [
-          // Thumbnail placeholder
           Positioned.fill(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(AppRadius.md),
@@ -42,17 +39,12 @@ class ImagePreviewCard extends StatelessWidget {
               ),
             ),
           ),
-
-          // Label at bottom
           Positioned(
             left: 0,
             right: 0,
             bottom: 0,
             child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.sm,
-                vertical: AppSpacing.xs,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
               decoration: BoxDecoration(
                 color: AppColors.primary.withOpacity(0.85),
                 borderRadius: const BorderRadius.only(
@@ -62,25 +54,19 @@ class ImagePreviewCard extends StatelessWidget {
               ),
               child: Text(
                 label,
-                style: tt.bodyMedium?.copyWith(
-                  color: AppColors.white,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: tt.bodyMedium?.copyWith(color: AppColors.white, fontSize: 11, fontWeight: FontWeight.w600),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
           ),
-
-          // Action icons
           Positioned(
             top: AppSpacing.xs,
             right: AppSpacing.xs,
             child: Row(
               children: [
-                _CardActionIcon(icon: Icons.edit_outlined, onTap: onEdit ?? () {}),
+                _ActionIcon(icon: Icons.edit_outlined, onTap: onEdit ?? () {}),
                 const SizedBox(width: AppSpacing.xs),
-                _CardActionIcon(icon: Icons.delete_outline, onTap: onDelete ?? () {}),
+                _ActionIcon(icon: Icons.delete_outline, onTap: onDelete ?? () {}),
               ],
             ),
           ),
@@ -90,8 +76,8 @@ class ImagePreviewCard extends StatelessWidget {
   }
 }
 
-class _CardActionIcon extends StatelessWidget {
-  const _CardActionIcon({required this.icon, required this.onTap});
+class _ActionIcon extends StatelessWidget {
+  const _ActionIcon({required this.icon, required this.onTap});
 
   final IconData icon;
   final VoidCallback onTap;

@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../../app/theme/app_colors.dart';
-import '../../../app/theme/app_radius.dart';
-import '../../../app/theme/app_spacing.dart';
+import '../../../../../app/theme/app_colors.dart';
+import '../../../../../app/theme/app_radius.dart';
+import '../../../../../app/theme/app_spacing.dart';
 
 class UploadProgressBar extends StatelessWidget {
-  const UploadProgressBar({
-    super.key,
-    required this.fileName,
-    required this.progress,
-  });
+  const UploadProgressBar({super.key, required this.fileName, required this.progress});
 
   final String fileName;
   final double progress;
@@ -23,9 +19,7 @@ class UploadProgressBar extends StatelessWidget {
         color: AppColors.white,
         borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(color: AppColors.border),
-        boxShadow: const [
-          BoxShadow(color: AppColors.shadow, blurRadius: 8, offset: Offset(0, 2)),
-        ],
+        boxShadow: const [BoxShadow(color: AppColors.shadow, blurRadius: 8, offset: Offset(0, 2))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,27 +29,17 @@ class UploadProgressBar extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  const Icon(
-                    Icons.insert_drive_file_outlined,
-                    size: 16,
-                    color: AppColors.info,
-                  ),
+                  const Icon(Icons.insert_drive_file_outlined, size: 16, color: AppColors.info),
                   const SizedBox(width: AppSpacing.xs),
                   Text(
                     'Uploading $fileName',
-                    style: tt.bodyMedium?.copyWith(
-                      color: AppColors.textPrimary,
-                      fontWeight: FontWeight.w500,
-                    ),
+                    style: tt.bodyMedium?.copyWith(color: AppColors.textPrimary, fontWeight: FontWeight.w500),
                   ),
                 ],
               ),
               Text(
                 '${(progress * 100).toInt()}%',
-                style: tt.bodyMedium?.copyWith(
-                  color: AppColors.info,
-                  fontWeight: FontWeight.w700,
-                ),
+                style: tt.bodyMedium?.copyWith(color: AppColors.info, fontWeight: FontWeight.w700),
               ),
             ],
           ),
