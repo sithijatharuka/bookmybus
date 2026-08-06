@@ -213,7 +213,13 @@ class _Header extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Lion Super Line', style: tt.bodyMedium),
+        Text(
+          'Lion Super Line',
+          style: tt.bodyMedium?.copyWith(
+            color: AppColors.primary,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
         const SizedBox(height: AppSpacing.xs),
         Text('Booking History', style: tt.titleLarge),
         const SizedBox(height: AppSpacing.xs),
@@ -243,28 +249,39 @@ class _FilterSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tt = Theme.of(context).textTheme;
-
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-        color: AppColors.section,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(AppRadius.md),
+        border: Border.all(color: AppColors.border),
         boxShadow: AppShadows.card,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Selected Filters',
-            style: tt.labelLarge?.copyWith(color: AppColors.primary),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.md,
+            ),
+            child: Text(
+              'Selected Filters',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
           ),
-          const SizedBox(height: AppSpacing.sm),
-          _SummaryRow(label: 'Bus', value: bus),
-          _SummaryRow(label: 'Route', value: route),
-          _SummaryRow(label: 'Status', value: status),
-          _SummaryRow(label: 'Date', value: date),
+          const Divider(color: AppColors.divider, height: 1),
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _SummaryRow(label: 'Bus', value: bus),
+                _SummaryRow(label: 'Route', value: route),
+                _SummaryRow(label: 'Status', value: status),
+                _SummaryRow(label: 'Date', value: date),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -281,13 +298,25 @@ class _SummaryRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final tt = Theme.of(context).textTheme;
     return Padding(
-      padding: const EdgeInsets.only(top: AppSpacing.xs),
+      padding: const EdgeInsets.only(bottom: AppSpacing.xs),
       child: Row(
         children: [
-          const Text('• ', style: TextStyle(color: AppColors.primary)),
+          Container(
+            width: 6,
+            height: 6,
+            margin: const EdgeInsets.only(right: AppSpacing.sm, top: 1),
+            decoration: const BoxDecoration(
+              color: AppColors.primary,
+              shape: BoxShape.circle,
+            ),
+          ),
           Text(
             '$label: ',
-            style: tt.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+            style: tt.bodyMedium?.copyWith(
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w600,
+              fontSize: 13,
+            ),
           ),
           Text(value, style: tt.bodyMedium),
         ],
@@ -309,37 +338,64 @@ class _BookingCountBar extends StatelessWidget {
     final tt = Theme.of(context).textTheme;
     final hasBookings = count > 0;
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          '$count ${count == 1 ? 'Booking' : 'Bookings'}',
-          style: tt.titleMedium,
-        ),
-        OutlinedButton.icon(
-          onPressed: onExport,
-          icon: Icon(
-            Icons.download_outlined,
-            size: 18,
-            color: hasBookings ? AppColors.primary : AppColors.textDisabled,
-          ),
-          label: Text('Export'),
-          style: OutlinedButton.styleFrom(
-            foregroundColor:
-                hasBookings ? AppColors.primary : AppColors.textDisabled,
-            side: BorderSide(
-              color: hasBookings ? AppColors.primary : AppColors.textDisabled,
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        border: Border.all(color: AppColors.border),
+        boxShadow: AppShadows.card,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.md,
             ),
+            child: Text('Booking Results', style: tt.titleMedium),
+          ),
+          const Divider(color: AppColors.divider, height: 1),
+          Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.lg,
-              vertical: AppSpacing.sm,
+              vertical: AppSpacing.md,
             ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppRadius.sm),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '$count ${count == 1 ? 'Booking' : 'Bookings'}',
+                  style: tt.titleMedium,
+                ),
+                OutlinedButton.icon(
+                  onPressed: onExport,
+                  icon: Icon(
+                    Icons.download_outlined,
+                    size: 18,
+                    color: hasBookings ? AppColors.primary : AppColors.textDisabled,
+                  ),
+                  label: const Text('Export'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor:
+                        hasBookings ? AppColors.primary : AppColors.textDisabled,
+                    side: BorderSide(
+                      color: hasBookings ? AppColors.primary : AppColors.textDisabled,
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                      vertical: AppSpacing.sm,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

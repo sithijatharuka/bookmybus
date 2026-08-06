@@ -50,7 +50,7 @@ class ViewBookingCard extends StatelessWidget {
                 backgroundColor: AppColors.primary,
                 padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppRadius.sm),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
                 ),
               ),
               child: Text(
@@ -167,7 +167,7 @@ class BookingOverviewCard extends StatelessWidget {
                 side: const BorderSide(color: AppColors.primary),
                 padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppRadius.sm),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
                 ),
               ),
               child: Text(
@@ -192,11 +192,13 @@ class _Card extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tt = Theme.of(context).textTheme;
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: AppColors.card,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(AppRadius.md),
+        border: Border.all(color: AppColors.border),
         boxShadow: AppShadows.card,
       ),
       child: Column(
@@ -206,10 +208,7 @@ class _Card extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(
               AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.md,
             ),
-            child: Text(
-              title,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
+            child: Text(title, style: tt.titleMedium),
           ),
           const Divider(color: AppColors.divider, height: 1),
           Padding(
@@ -227,12 +226,16 @@ class _FieldLabel extends StatelessWidget {
   final String text;
 
   @override
-  Widget build(BuildContext context) => Text(
-        text,
-        style: Theme.of(context)
-            .textTheme
-            .bodyMedium
-            ?.copyWith(fontWeight: FontWeight.w500),
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+        child: Text(
+          text,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
+              ),
+        ),
       );
 }
 
@@ -247,6 +250,8 @@ class _Dropdown extends StatelessWidget {
   final List<String> items;
   final ValueChanged<String> onChanged;
 
+  static const _fillColor = Color(0xFFF8FAFC);
+
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<String>(
@@ -254,24 +259,26 @@ class _Dropdown extends StatelessWidget {
       isDense: true,
       decoration: InputDecoration(
         contentPadding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: AppSpacing.sm,
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.md,
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.sm),
+          borderRadius: BorderRadius.circular(AppRadius.md),
           borderSide: const BorderSide(color: AppColors.border),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.sm),
+          borderRadius: BorderRadius.circular(AppRadius.md),
           borderSide: const BorderSide(color: AppColors.border),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.sm),
-          borderSide: const BorderSide(color: AppColors.primary),
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
         ),
         filled: true,
-        fillColor: AppColors.surface,
+        fillColor: _fillColor,
+        suffixIcon: const Icon(Icons.keyboard_arrow_down_rounded, size: 20, color: AppColors.textHint),
       ),
+      icon: const SizedBox.shrink(),
       style: Theme.of(context)
           .textTheme
           .bodyLarge
@@ -293,6 +300,7 @@ class _DateField extends StatelessWidget {
     'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
   ];
+  static const _fillColor = Color(0xFFF8FAFC);
 
   String _format(DateTime d) =>
       '${d.day.toString().padLeft(2, '0')} ${_months[d.month - 1]} ${d.year}';
@@ -302,7 +310,7 @@ class _DateField extends StatelessWidget {
     final tt = Theme.of(context).textTheme;
 
     return InkWell(
-      borderRadius: BorderRadius.circular(AppRadius.sm),
+      borderRadius: BorderRadius.circular(AppRadius.md),
       onTap: () async {
         final picked = await showDatePicker(
           context: context,
@@ -314,13 +322,13 @@ class _DateField extends StatelessWidget {
       },
       child: Container(
         padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: 10,
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.md,
         ),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: _fillColor,
           border: Border.all(color: AppColors.border),
-          borderRadius: BorderRadius.circular(AppRadius.sm),
+          borderRadius: BorderRadius.circular(AppRadius.md),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -333,8 +341,8 @@ class _DateField extends StatelessWidget {
             ),
             const Icon(
               Icons.calendar_today_outlined,
-              size: 16,
-              color: AppColors.textSecondary,
+              size: 18,
+              color: AppColors.textHint,
             ),
           ],
         ),

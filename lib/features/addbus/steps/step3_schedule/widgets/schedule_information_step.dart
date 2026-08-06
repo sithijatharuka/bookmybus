@@ -188,31 +188,31 @@ class _ScheduleInformationStepState extends State<ScheduleInformationStep> {
             const SizedBox(height: AppSpacing.xl),
 
             // Up Trip
-            // ManualTripCard(
-            //   isUpTrip: true,
-            //   title: '${widget.fromCity} → ${widget.toCity}',
-            //   departureController: _upDep,
-            //   arrivalController: _upArr,
-            //   arrivesNextDay: _upNextDay,
-            //   onArrivesNextDayChanged: (v) =>
-            //       setState(() => _upNextDay = v ?? false),
-            //   onDepartureTap: () => _pickTime(_upDep),
-            //   onArrivalTap: () => _pickTime(_upArr),
-            // ),
-            // const SizedBox(height: AppSpacing.lg),
+            ManualTripCard(
+              isUpTrip: true,
+              title: '${widget.fromCity} → ${widget.toCity}',
+              departureController: _upDep,
+              arrivalController: _upArr,
+              arrivesNextDay: _upNextDay,
+              onArrivesNextDayChanged: (v) =>
+                  setState(() => _upNextDay = v ?? false),
+              onDepartureTap: () => _pickTime(_upDep),
+              onArrivalTap: () => _pickTime(_upArr),
+            ),
+            const SizedBox(height: AppSpacing.lg),
 
             // Down Trip
-            // ManualTripCard(
-            //   isUpTrip: false,
-            //   title: '${widget.toCity} → ${widget.fromCity}',
-            //   departureController: _downDep,
-            //   arrivalController: _downArr,
-            //   arrivesNextDay: _downNextDay,
-            //   onArrivesNextDayChanged: (v) =>
-            //       setState(() => _downNextDay = v ?? false),
-            //   onDepartureTap: () => _pickTime(_downDep),
-            //   onArrivalTap: () => _pickTime(_downArr),
-            // ),
+            ManualTripCard(
+              isUpTrip: false,
+              title: '${widget.toCity} → ${widget.fromCity}',
+              departureController: _downDep,
+              arrivalController: _downArr,
+              arrivesNextDay: _downNextDay,
+              onArrivesNextDayChanged: (v) =>
+                  setState(() => _downNextDay = v ?? false),
+              onDepartureTap: () => _pickTime(_downDep),
+              onArrivalTap: () => _pickTime(_downArr),
+            ),
           ],
         ],
       ),
