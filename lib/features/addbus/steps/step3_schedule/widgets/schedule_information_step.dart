@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'additional_features_input.dart';
 import 'amenities_selector.dart';
 import 'bus_configuration_step.dart';
+import 'pickup_drop_points.dart';
 import '../../../../../app/theme/app_colors.dart';
 import '../../../../../app/theme/app_radius.dart';
 import '../../../../../app/theme/app_spacing.dart';
@@ -226,6 +228,14 @@ class _ScheduleInformationStepState extends State<ScheduleInformationStep> {
           const Divider(color: Color(0xFFE2E8F0)),
           const SizedBox(height: AppSpacing.xl),
           const AmenitiesSelector(),
+          const SizedBox(height: AppSpacing.xl),
+          const Divider(color: Color(0xFFE2E8F0)),
+          const SizedBox(height: AppSpacing.xl),
+          const AdditionalFeaturesInput(),
+          const SizedBox(height: AppSpacing.xl),
+          const Divider(color: Color(0xFFE2E8F0)),
+          const SizedBox(height: AppSpacing.xl),
+          const PickupDropPoints(),
         ],
       ),
     );
