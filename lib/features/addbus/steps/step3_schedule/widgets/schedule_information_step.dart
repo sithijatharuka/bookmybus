@@ -1,3 +1,4 @@
+import 'package:bookmybus/features/addbus/steps/step3_schedule/widgets/bus_configuration_step.dart';
 import 'package:flutter/material.dart';
 import '../../../../../app/theme/app_colors.dart';
 import '../../../../../app/theme/app_radius.dart';
@@ -214,6 +215,12 @@ class _ScheduleInformationStepState extends State<ScheduleInformationStep> {
               onArrivalTap: () => _pickTime(_downArr),
             ),
           ],
+
+          // ── Bus Configuration ─────────────────────────────────────
+          const SizedBox(height: AppSpacing.xl),
+          const Divider(color: Color(0xFFE2E8F0)),
+          const SizedBox(height: AppSpacing.xl),
+          const BusConfigurationStep(),
         ],
       ),
     );
