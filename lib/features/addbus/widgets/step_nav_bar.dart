@@ -10,12 +10,14 @@ class StepNavBar extends StatelessWidget {
     required this.totalSteps,
     required this.onBack,
     required this.onNext,
+    this.onSubmit,
   });
 
   final int currentStep;
   final int totalSteps;
   final VoidCallback onBack;
   final VoidCallback onNext;
+  final VoidCallback? onSubmit;
 
   bool get _isFirst => currentStep == 0;
   bool get _isLast => currentStep == totalSteps - 1;
@@ -54,15 +56,24 @@ class StepNavBar extends StatelessWidget {
           ],
           Expanded(
             child: FilledButton(
-              onPressed: onNext,
+              onPressed: _isLast ? (onSubmit ?? onNext) : onNext,
               style: FilledButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: _isLast ? AppColors.success : AppColors.primary,
                 padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppRadius.sm),
                 ),
               ),
-              child: Text(_isLast ? 'Submit' : 'Next'),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (_isLast) ...[
+                    const Icon(Icons.check_circle_outline_rounded, size: 18),
+                    const SizedBox(width: AppSpacing.xs),
+                  ],
+                  Text(_isLast ? 'Add Bus to System' : 'Next'),
+                ],
+              ),
             ),
           ),
         ],
