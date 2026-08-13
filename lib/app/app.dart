@@ -1,4 +1,5 @@
 import 'package:bookmybus/features/BusOwner/addbus/pages/add_bus_page.dart';
+import 'package:bookmybus/features/BusOwner/manage_bus/pages/manage_bus_page.dart';
 import 'package:bookmybus/features/auth/login/login_page.dart';
 import 'package:flutter/material.dart';
 import 'theme/app_theme.dart';
@@ -12,7 +13,7 @@ class App extends StatelessWidget {
       title: 'BookMyBus',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
-      home: const AddBusPage(),
+      home: const ManageBusPage(),
     );
   }
 }

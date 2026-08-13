@@ -89,6 +89,29 @@ class Step4ReviewPage extends StatelessWidget {
               _ReviewChips(items: ['WiFi', 'AC', 'USB Charging', 'Reclining Seats']),
             ],
           ),
+          const SizedBox(height: AppSpacing.lg),
+
+          // ── Step 3: Additional Features ───────────────────────────
+          _ReviewSection(
+            icon: Icons.add_circle_outline_rounded,
+            title: 'Additional Features',
+            children: const [
+              _ReviewChips(items: ['Premium legroom', 'USB-C ports', 'Curtains']),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.lg),
+
+          // ── Step 3: Pickup / Drop Points ──────────────────────────
+          _ReviewSection(
+            icon: Icons.location_on_outlined,
+            title: 'Pickup / Drop Points',
+            children: const [
+              _ReviewRow(label: 'Start', value: 'Colombo Fort — 06:00 AM'),
+              _ReviewRow(label: 'Stop 1', value: 'Kadawatha — 06:30 AM'),
+              _ReviewRow(label: 'Stop 2', value: 'Ambepussa — 07:15 AM'),
+              _ReviewRow(label: 'End', value: 'Kandy — 09:45 AM'),
+            ],
+          ),
           const SizedBox(height: AppSpacing.xl),
 
           // ── Confirmation notice ───────────────────────────────────
