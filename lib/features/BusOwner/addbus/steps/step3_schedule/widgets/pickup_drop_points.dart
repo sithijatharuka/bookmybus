@@ -6,19 +6,53 @@ import 'package:flutter/material.dart';
 import 'pickup_stop_model.dart';
 
 class PickupDropPoints extends StatefulWidget {
-  const PickupDropPoints({super.key, this.onChanged});
+  const PickupDropPoints({
+    super.key,
+    this.onChanged,
+    this.startPlace,
+    this.startTime,
+    this.endPlace,
+    this.endTime,
+    this.intermediateStops = const [],
+  });
 
   /// Returns ordered list of all stops [start, ...intermediate, end].
   final ValueChanged<List<Map<String, String>>>? onChanged;
+
+  /// Pre-populated start/end values (read-only, platform-controlled).
+  final String? startPlace;
+  final String? startTime;
+  final String? endPlace;
+  final String? endTime;
+
+  /// Pre-populated intermediate stops as [{place, time}, ...].
+  final List<Map<String, String>> intermediateStops;
 
   @override
   State<PickupDropPoints> createState() => _PickupDropPointsState();
 }
 
 class _PickupDropPointsState extends State<PickupDropPoints> {
-  final _start = PickupStop(id: 'start');
-  final _end = PickupStop(id: 'end');
-  final List<PickupStop> _intermediate = [];
+  late final PickupStop _start;
+  late final PickupStop _end;
+  late final List<PickupStop> _intermediate;
+
+  @override
+  void initState() {
+    super.initState();
+    _start = PickupStop(id: 'start')
+      ..placeController.text = widget.startPlace ?? ''
+      ..timeController.text = widget.startTime ?? '';
+    _end = PickupStop(id: 'end')
+      ..placeController.text = widget.endPlace ?? ''
+      ..timeController.text = widget.endTime ?? '';
+    _intermediate = widget.intermediateStops.map((m) {
+      final s = PickupStop();
+      s.placeController.text = m['place'] ?? '';
+      s.timeController.text = m['time'] ?? '';
+      return s;
+    }).toList();
+  }
 
   @override
   void dispose() {
@@ -78,7 +112,10 @@ class _PickupDropPointsState extends State<PickupDropPoints> {
         // ── Header ────────────────────────────────────────────────
         Row(
           children: [
-            Text('Pickup / Drop Points', style: tt.titleMedium),
+            Text('Intermediate Pickup Points', style: tt.titleSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: AppColors.textPrimary,
+            )),
             const SizedBox(width: AppSpacing.sm),
             Container(
               padding: const EdgeInsets.symmetric(
@@ -88,7 +125,7 @@ class _PickupDropPointsState extends State<PickupDropPoints> {
                 borderRadius: BorderRadius.circular(AppSpacing.xs),
               ),
               child: Text(
-                'Optional',
+                'optional',
                 style: tt.bodyMedium?.copyWith(
                   color: AppColors.textSecondary,
                   fontSize: 11,
@@ -98,11 +135,8 @@ class _PickupDropPointsState extends State<PickupDropPoints> {
             ),
           ],
         ),
-        const SizedBox(height: AppSpacing.xs),
-        Text(
-          'Start and end stops are fixed. Add intermediate pickup points as needed.',
-          style: tt.bodyMedium,
-        ),
+        const SizedBox(height: AppSpacing.sm),
+        _AddStopButton(onTap: _addStop),
         const SizedBox(height: AppSpacing.lg),
 
         // ── Start Stop ────────────────────────────────────────────
@@ -111,6 +145,7 @@ class _PickupDropPointsState extends State<PickupDropPoints> {
           accentColor: AppColors.success,
           icon: Icons.trip_origin_rounded,
           stop: _start,
+          readOnly: true,
           onTimeTap: () => _pickTime(_start.timeController),
         ),
 
@@ -133,10 +168,11 @@ class _PickupDropPointsState extends State<PickupDropPoints> {
           accentColor: AppColors.error,
           icon: Icons.location_on_rounded,
           stop: _end,
+          readOnly: true,
           onTimeTap: () => _pickTime(_end.timeController),
         ),
 
-        // ── Add Button ────────────────────────────────────────────
+        // ── Add Button (also shown above list) ─────────────────────────────
         if (_intermediate.isNotEmpty) ...[
           const SizedBox(height: AppSpacing.md),
           _AddStopButton(onTap: _addStop),
@@ -155,6 +191,7 @@ class _FixedStopCard extends StatelessWidget {
     required this.icon,
     required this.stop,
     required this.onTimeTap,
+    this.readOnly = false,
   });
 
   final String label;
@@ -162,6 +199,7 @@ class _FixedStopCard extends StatelessWidget {
   final IconData icon;
   final PickupStop stop;
   final VoidCallback onTimeTap;
+  final bool readOnly;
 
   @override
   Widget build(BuildContext context) {
@@ -214,13 +252,24 @@ class _FixedStopCard extends StatelessWidget {
                     color: accentColor.withOpacity(0.12),
                     borderRadius: BorderRadius.circular(AppRadius.round),
                   ),
-                  child: Text(
-                    'Fixed',
-                    style: tt.bodyMedium?.copyWith(
-                      color: accentColor,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (readOnly)
+                        Padding(
+                          padding: const EdgeInsets.only(right: 3),
+                          child: Icon(Icons.lock_outline_rounded,
+                              size: 10, color: accentColor),
+                        ),
+                      Text(
+                        readOnly ? 'Platform controlled' : 'Fixed',
+                        style: tt.bodyMedium?.copyWith(
+                          color: accentColor,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -229,31 +278,100 @@ class _FixedStopCard extends StatelessWidget {
           // Fields
           Padding(
             padding: const EdgeInsets.all(AppSpacing.lg),
-            child: Row(
-              children: [
-                Expanded(
-                  flex: 3,
-                  child: _StopField(
-                    controller: stop.placeController,
-                    hint: 'Type location...',
-                    icon: Icons.place_outlined,
-                    required: true,
-                    onChanged: (_) {},
+            child: readOnly
+                ? _ReadOnlyStopFields(stop: stop)
+                : Row(
+                    children: [
+                      Expanded(
+                        flex: 3,
+                        child: _StopField(
+                          controller: stop.placeController,
+                          hint: 'Type location...',
+                          icon: Icons.place_outlined,
+                          required: true,
+                          onChanged: (_) {},
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        flex: 2,
+                        child: _TimeField(
+                          controller: stop.timeController,
+                          onTap: onTimeTap,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  flex: 2,
-                  child: _TimeField(
-                    controller: stop.timeController,
-                    onTap: onTimeTap,
-                  ),
-                ),
-              ],
-            ),
           ),
         ],
       ),
+    );
+  }
+}
+
+// ── Read-Only Stop Fields ──────────────────────────────────────────────
+
+class _ReadOnlyStopFields extends StatelessWidget {
+  const _ReadOnlyStopFields({required this.stop});
+  final PickupStop stop;
+
+  @override
+  Widget build(BuildContext context) {
+    final tt = Theme.of(context).textTheme;
+    return Row(
+      children: [
+        Expanded(
+          flex: 3,
+          child: _ReadOnlyItem(
+            label: 'Place',
+            value: stop.placeController.text.isEmpty
+                ? '—'
+                : stop.placeController.text,
+            tt: tt,
+          ),
+        ),
+        const SizedBox(width: AppSpacing.sm),
+        Expanded(
+          flex: 2,
+          child: _ReadOnlyItem(
+            label: 'Time',
+            value: stop.timeController.text.isEmpty
+                ? '—'
+                : stop.timeController.text,
+            tt: tt,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ReadOnlyItem extends StatelessWidget {
+  const _ReadOnlyItem(
+      {required this.label, required this.value, required this.tt});
+  final String label;
+  final String value;
+  final TextTheme tt;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: tt.bodySmall
+              ?.copyWith(color: AppColors.textHint, fontSize: 11),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: tt.bodyMedium?.copyWith(
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -367,7 +485,7 @@ class _IntermediateStopCard extends StatelessWidget {
                 ),
                 const SizedBox(width: AppSpacing.xs),
                 Text(
-                  'Stop ${index + 1}',
+                  'Pickup #${index + 1}',
                   style: tt.bodyMedium?.copyWith(
                     color: AppColors.textSecondary,
                     fontWeight: FontWeight.w600,
@@ -388,17 +506,31 @@ class _IntermediateStopCard extends StatelessWidget {
                   onTap: onMoveDown,
                 ),
                 const SizedBox(width: AppSpacing.xs),
-                // Remove
+                // Delete
                 GestureDetector(
                   onTap: onRemove,
                   child: Container(
-                    padding: const EdgeInsets.all(AppSpacing.xs),
-                    decoration: const BoxDecoration(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.sm, vertical: 4),
+                    decoration: BoxDecoration(
                       color: AppColors.errorLight,
-                      shape: BoxShape.circle,
+                      borderRadius: BorderRadius.circular(AppRadius.xs),
                     ),
-                    child: const Icon(Icons.close_rounded,
-                        size: 14, color: AppColors.error),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.delete_outline_rounded,
+                            size: 13, color: AppColors.error),
+                        const SizedBox(width: 3),
+                        Text(
+                          'Delete',
+                          style: tt.labelSmall?.copyWith(
+                            color: AppColors.error,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -409,22 +541,37 @@ class _IntermediateStopCard extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(AppSpacing.md, AppSpacing.sm,
                 AppSpacing.md, AppSpacing.md),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   flex: 3,
-                  child: _StopField(
-                    controller: stop.placeController,
-                    hint: 'Type location...',
-                    icon: Icons.place_outlined,
-                    onChanged: (_) => onChanged(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _FieldLabel(text: 'Place', required: true),
+                      const SizedBox(height: AppSpacing.xs),
+                      _StopField(
+                        controller: stop.placeController,
+                        hint: 'Type location...',
+                        icon: Icons.place_outlined,
+                        onChanged: (_) => onChanged(),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   flex: 2,
-                  child: _TimeField(
-                    controller: stop.timeController,
-                    onTap: onTimeTap,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _FieldLabel(text: 'Time', required: true),
+                      const SizedBox(height: AppSpacing.xs),
+                      _TimeField(
+                        controller: stop.timeController,
+                        onTap: onTimeTap,
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -576,6 +723,35 @@ class _AddStopButton extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+// ── Field Label ──────────────────────────────────────────────────────────────
+
+class _FieldLabel extends StatelessWidget {
+  const _FieldLabel({required this.text, required this.required});
+  final String text;
+  final bool required;
+
+  @override
+  Widget build(BuildContext context) {
+    final tt = Theme.of(context).textTheme;
+    return Row(
+      children: [
+        Text(
+          text,
+          style: tt.bodySmall?.copyWith(
+            color: AppColors.textSecondary,
+            fontWeight: FontWeight.w600,
+            fontSize: 12,
+          ),
+        ),
+        if (required)
+          Text(' *',
+              style: tt.bodySmall
+                  ?.copyWith(color: AppColors.error, fontWeight: FontWeight.w700)),
+      ],
     );
   }
 }
