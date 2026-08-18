@@ -3,6 +3,7 @@ import 'package:bookmybus/app/theme/app_radius.dart';
 import 'package:bookmybus/app/theme/app_spacing.dart';
 import 'package:flutter/material.dart';
 import '../../../BusOwner/addbus/pages/edit_bus_page.dart';
+import '../../../BusOwner/manage_seats/pages/manage_seat_page.dart';
 import '../models/manage_bus_model.dart';
 import 'bus_view_sheet.dart';
 
@@ -176,7 +177,11 @@ class BusFleetCard extends StatelessWidget {
                 _ActionButton(
                   label: 'Manage Seats',
                   icon: Icons.event_seat_outlined,
-                  onTap: () {},
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => ManageSeatPage(bus: bus),
+                    ),
+                  ),
                   filled: true,
                 ),
               ],
