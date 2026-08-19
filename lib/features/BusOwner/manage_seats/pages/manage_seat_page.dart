@@ -3,6 +3,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../shared/widgets/common_app_bar.dart';
 import '../../../BusOwner/manage_bus/models/manage_bus_model.dart';
+import '../widgets/seat_editing_widget.dart';
 
 class ManageSeatPage extends StatefulWidget {
   const ManageSeatPage({super.key, required this.bus});
@@ -71,6 +72,10 @@ class _ManageSeatPageState extends State<ManageSeatPage> {
                   _buildHeader(),
                   const SizedBox(height: AppSpacing.lg),
                   _buildDateSection(),
+                  if (_seatsLoaded && _dateMode == _DateMode.single) ...[
+                    const SizedBox(height: AppSpacing.lg),
+                    SeatEditingWidget(label: _fmt(_selectedDate!)),
+                  ],
                   const SizedBox(height: AppSpacing.lg),
                   _buildTipsSection(),
                   const SizedBox(height: AppSpacing.xxl),
