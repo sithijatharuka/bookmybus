@@ -18,6 +18,7 @@ class _ManageSeatPageState extends State<ManageSeatPage> {
   _DateMode _dateMode = _DateMode.single;
   DateTime? _selectedDate;
   DateTimeRange? _selectedRange;
+  DateTime? _selectedRangeDate;
   bool _seatsLoaded = false;
 
   Future<void> _pickDate() async {
@@ -50,11 +51,30 @@ class _ManageSeatPageState extends State<ManageSeatPage> {
       );
       return;
     }
-    setState(() => _seatsLoaded = true);
+    setState(() {
+      _seatsLoaded = true;
+      if (_dateMode == _DateMode.range) {
+        _selectedRangeDate = _selectedRange!.start;
+      }
+    });
   }
 
   String _fmt(DateTime d) =>
       '${d.month.toString().padLeft(2, '0')}/${d.day.toString().padLeft(2, '0')}/${d.year}';
+
+  String _fmtIso(DateTime d) =>
+      '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+  List<DateTime> get _rangeDates {
+    if (_selectedRange == null) return [];
+    final dates = <DateTime>[];
+    var cur = _selectedRange!.start;
+    while (!cur.isAfter(_selectedRange!.end)) {
+      dates.add(cur);
+      cur = cur.add(const Duration(days: 1));
+    }
+    return dates;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,6 +95,14 @@ class _ManageSeatPageState extends State<ManageSeatPage> {
                   if (_seatsLoaded && _dateMode == _DateMode.single) ...[
                     const SizedBox(height: AppSpacing.lg),
                     SeatEditingWidget(label: _fmt(_selectedDate!)),
+                  ],
+                  if (_seatsLoaded && _dateMode == _DateMode.range) ...[
+                    const SizedBox(height: AppSpacing.lg),
+                    _buildRangePicker(),
+                    if (_selectedRangeDate != null) ...[
+                      const SizedBox(height: AppSpacing.lg),
+                      SeatEditingWidget(label: _fmtIso(_selectedRangeDate!)),
+                    ],
                   ],
                   const SizedBox(height: AppSpacing.lg),
                   _buildTipsSection(),
@@ -124,6 +152,7 @@ class _ManageSeatPageState extends State<ManageSeatPage> {
                 onTap: () => setState(() {
                   _dateMode = _DateMode.single;
                   _seatsLoaded = false;
+                  _selectedRangeDate = null;
                 }),
               ),
               const SizedBox(width: AppSpacing.sm),
@@ -133,6 +162,7 @@ class _ManageSeatPageState extends State<ManageSeatPage> {
                 onTap: () => setState(() {
                   _dateMode = _DateMode.range;
                   _seatsLoaded = false;
+                  _selectedRangeDate = null;
                 }),
               ),
             ],
@@ -201,6 +231,93 @@ class _ManageSeatPageState extends State<ManageSeatPage> {
               ),
             ),
           ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRangePicker() {
+    final dates = _rangeDates;
+    return _Card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Summary header
+          Row(
+            children: [
+              const Icon(Icons.date_range, size: 16, color: AppColors.primary),
+              const SizedBox(width: AppSpacing.sm),
+              const Text(
+                'Selected range: ',
+                style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+              ),
+              Text(
+                '${_fmtIso(_selectedRange!.start)} → ${_fmtIso(_selectedRange!.end)}',
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          // Horizontally scrollable date chips
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: dates.map((d) {
+                final selected = _selectedRangeDate != null &&
+                    d.year == _selectedRangeDate!.year &&
+                    d.month == _selectedRangeDate!.month &&
+                    d.day == _selectedRangeDate!.day;
+                // Mock counts – replace with real data
+                const booked = 0;
+                const blocked = 17;
+                return GestureDetector(
+                  onTap: () => setState(() => _selectedRangeDate = d),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 160),
+                    margin: const EdgeInsets.only(right: AppSpacing.sm),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+                    decoration: BoxDecoration(
+                      color: selected ? AppColors.primary : AppColors.section,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: selected ? AppColors.primary : AppColors.border,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _fmtIso(d),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: selected
+                                ? AppColors.white
+                                : AppColors.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '$booked booked, $blocked blocked',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: selected
+                                ? AppColors.white.withOpacity(0.85)
+                                : AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
         ],
       ),
     );
