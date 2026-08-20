@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
+import 'release_seats_dialog.dart';
 
 enum _EditLevel { thisDate, permanent }
 
@@ -202,7 +203,7 @@ class _ReleaseButton extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         GestureDetector(
-          onTap: () {},
+          onTap: () => showReleaseSeatsDialog(context),
           child: Container(
             padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
