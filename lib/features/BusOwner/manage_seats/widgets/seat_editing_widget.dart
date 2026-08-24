@@ -1,6 +1,10 @@
+import 'package:bookmybus/shared/widgets/bus_seat_layouts/two_by_two_45_seat_layout.dart';
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
+import '../../../../shared/widgets/bus_seat_layouts/bus_seat_layout.dart';
+import '../../../../shared/widgets/bus_seat_layouts/seat_layout_header.dart';
+import '../../../../shared/widgets/bus_seat_layouts/two_by_two_51_seat_layout.dart';
 import 'release_seats_dialog.dart';
 
 enum _EditLevel { thisDate, permanent }
@@ -20,6 +24,61 @@ class SeatEditingWidget extends StatefulWidget {
 class _SeatEditingWidgetState extends State<SeatEditingWidget> {
   _EditLevel _editLevel = _EditLevel.thisDate;
   _GenderRestriction _gender = _GenderRestriction.none;
+
+  /// Seats the user has tapped in the layout (to block/restrict).
+  List<int> _layoutSelected = [];
+
+  /// Release window set via the Release dialog (permanent mode only).
+  Set<int> _releasedSeats = {};
+  DateTime? _releaseFrom;
+  DateTime? _releaseTo;
+
+  // ── Mock data ──────────────────────────────────────────────────────────────
+  static const _bookedSeats = {3, 4, 7, 8, 11, 12};
+  static const _permanentlyBlocked = {
+    34, 15, 16, 19, 20, 23, 24, 27, 28, 32, 33, 35, 36, 39, 40, 41, 42, 43,
+    44, 45, 14,
+  };
+
+  Map<int, SeatStatus> get _seatStatuses {
+    final map = <int, SeatStatus>{};
+
+    for (final s in _bookedSeats) {
+      map[s] = SeatStatus.booked;
+    }
+
+    if (_editLevel == _EditLevel.permanent) {
+      for (final s in _permanentlyBlocked) {
+        map[s] = _releasedSeats.contains(s)
+            ? SeatStatus.releasedForDate
+            : SeatStatus.permanentlyUnavailable;
+      }
+    }
+
+    // Seats the user has selected get the gender-appropriate blocked status.
+    for (final s in _layoutSelected) {
+      if (map[s] == null || map[s] == SeatStatus.available) {
+        map[s] = switch (_gender) {
+          _GenderRestriction.male => SeatStatus.blockedMale,
+          _GenderRestriction.female => SeatStatus.blockedFemale,
+          _GenderRestriction.none => SeatStatus.blocked,
+        };
+      }
+    }
+
+    return map;
+  }
+
+  Future<void> _openReleaseDialog() async {
+    final result = await showReleaseSeatsDialog(context);
+    if (result != null) {
+      setState(() {
+        _releasedSeats = Set<int>.from(result['seats'] as List);
+        _releaseFrom = result['from'] as DateTime?;
+        _releaseTo = result['to'] as DateTime?;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,26 +124,28 @@ class _SeatEditingWidgetState extends State<SeatEditingWidget> {
           const _SectionLabel(text: 'Edit Level'),
           const SizedBox(height: AppSpacing.sm),
 
-          // ── Edit Level tabs ──────────────────────────────────────
           _SegmentedTabs(
             tabs: const ['This date / range', 'Permanent (all dates)'],
             selectedIndex: _editLevel.index,
             activeColor: AppColors.primary,
-            onChanged: (i) =>
-                setState(() => _editLevel = _EditLevel.values[i]),
+            onChanged: (i) => setState(() {
+              _editLevel = _EditLevel.values[i];
+              _layoutSelected = [];
+            }),
           ),
 
           const SizedBox(height: AppSpacing.lg),
           const _SectionLabel(text: 'Gender Restriction'),
           const SizedBox(height: AppSpacing.sm),
 
-          // ── Gender Restriction tabs ──────────────────────────────
           _SegmentedTabs(
             tabs: const ['No Restriction', '♂ Male Only', '♀ Female Only'],
             selectedIndex: _gender.index,
             activeColor: _genderActiveColor,
-            onChanged: (i) =>
-                setState(() => _gender = _GenderRestriction.values[i]),
+            onChanged: (i) => setState(() {
+              _gender = _GenderRestriction.values[i];
+              _layoutSelected = [];
+            }),
           ),
 
           if (_gender != _GenderRestriction.none) ...[
@@ -104,23 +165,50 @@ class _SeatEditingWidgetState extends State<SeatEditingWidget> {
 
           if (_editLevel == _EditLevel.permanent) ...[
             const SizedBox(height: AppSpacing.lg),
-            const _ReleaseButton(),
+            _ReleaseButton(onTap: _openReleaseDialog),
+            if (_releasedSeats.isNotEmpty && _releaseFrom != null) ...[
+              const SizedBox(height: AppSpacing.sm),
+              _ReleaseInfoChip(
+                seats: _releasedSeats,
+                from: _releaseFrom!,
+                to: _releaseTo!,
+              ),
+            ],
+          ],
+
+          // ── Seat Layout ──────────────────────────────────────────
+          const SizedBox(height: AppSpacing.lg),
+          const _SectionLabel(text: 'Seat Layout'),
+          const SizedBox(height: AppSpacing.md),
+
+          // Responsive header: date info + full 7-item legend
+          SeatLayoutHeader(viewingDate: widget.label),
+
+          const SizedBox(height: AppSpacing.md),
+          // TwoByTwo51SeatLayout(
+          //   seatStatuses: _seatStatuses,
+          //   onSeatSelected: (seats) =>
+          //       setState(() => _layoutSelected = seats),
+          // ),
+
+          TwoByTwo45SeatLayout(
+  seatStatuses: _seatStatuses,
+  onSeatSelected: (seats) => setState(() => _layoutSelected = seats),
+),
+          if (_layoutSelected.isNotEmpty) ...[
+            const SizedBox(height: AppSpacing.md),
+            _SelectedSeatsChip(seats: _layoutSelected, gender: _gender),
           ],
         ],
       ),
     );
   }
 
-  Color get _genderActiveColor {
-    switch (_gender) {
-      case _GenderRestriction.male:
-        return const Color(0xFF1976D2);
-      case _GenderRestriction.female:
-        return const Color(0xFFD81B60);
-      case _GenderRestriction.none:
-        return AppColors.primary;
-    }
-  }
+  Color get _genderActiveColor => switch (_gender) {
+        _GenderRestriction.male => const Color(0xFF1976D2),
+        _GenderRestriction.female => const Color(0xFFD81B60),
+        _GenderRestriction.none => AppColors.primary,
+      };
 }
 
 // ── Private helpers ───────────────────────────────────────────────────────────
@@ -172,8 +260,7 @@ class _SegmentedTabs extends StatelessWidget {
               color: selected ? activeColor : AppColors.section,
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: selected ? activeColor : AppColors.border,
-              ),
+                  color: selected ? activeColor : AppColors.border),
             ),
             child: Text(
               tabs[i],
@@ -191,7 +278,8 @@ class _SegmentedTabs extends StatelessWidget {
 }
 
 class _ReleaseButton extends StatelessWidget {
-  const _ReleaseButton();
+  const _ReleaseButton({required this.onTap});
+  final VoidCallback onTap;
 
   static const _yellow = Color(0xFFB45309);
   static const _yellowBg = Color(0xFFFFFBEB);
@@ -203,7 +291,7 @@ class _ReleaseButton extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         GestureDetector(
-          onTap: () => showReleaseSeatsDialog(context),
+          onTap: onTap,
           child: Container(
             padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
@@ -220,10 +308,9 @@ class _ReleaseButton extends StatelessWidget {
                 Text(
                   'Release for N Days',
                   style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: _yellow,
-                  ),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: _yellow),
                 ),
               ],
             ),
@@ -235,6 +322,72 @@ class _ReleaseButton extends StatelessWidget {
           style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
         ),
       ],
+    );
+  }
+}
+
+class _ReleaseInfoChip extends StatelessWidget {
+  const _ReleaseInfoChip(
+      {required this.seats, required this.from, required this.to});
+
+  final Set<int> seats;
+  final DateTime from;
+  final DateTime to;
+
+  String _fmt(DateTime d) =>
+      '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFFBEB),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFFFCD34D)),
+      ),
+      child: Text(
+        '🔓 ${seats.length} seat${seats.length == 1 ? '' : 's'} released '
+        '${_fmt(from)} → ${_fmt(to)}',
+        style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFFB45309)),
+      ),
+    );
+  }
+}
+
+class _SelectedSeatsChip extends StatelessWidget {
+  const _SelectedSeatsChip({required this.seats, required this.gender});
+  final List<int> seats;
+  final _GenderRestriction gender;
+
+  @override
+  Widget build(BuildContext context) {
+    final genderLabel = switch (gender) {
+      _GenderRestriction.male => ' · Male Only',
+      _GenderRestriction.female => ' · Female Only',
+      _GenderRestriction.none => '',
+    };
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+      decoration: BoxDecoration(
+        color: AppColors.section,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        '${seats.length} seat${seats.length == 1 ? '' : 's'} selected'
+        '$genderLabel: ${seats.join(', ')}',
+        style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textPrimary),
+      ),
     );
   }
 }
@@ -268,10 +421,9 @@ class _GenderInfoChip extends StatelessWidget {
             child: Text(
               message,
               style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: textColor,
-              ),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: textColor),
             ),
           ),
         ],

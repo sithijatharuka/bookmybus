@@ -12,8 +12,8 @@ const _permanentlyBlockedSeats = [
   34, 15, 16, 19, 20, 23, 24, 27, 28, 32, 33, 35, 36, 39, 40, 41, 42, 43, 44, 45, 14
 ];
 
-Future<void> showReleaseSeatsDialog(BuildContext context) {
-  return showDialog(
+Future<Map<String, dynamic>?> showReleaseSeatsDialog(BuildContext context) {
+  return showDialog<Map<String, dynamic>>(
     context: context,
     barrierDismissible: true,
     builder: (_) => const _ReleaseSeatsDialog(),
