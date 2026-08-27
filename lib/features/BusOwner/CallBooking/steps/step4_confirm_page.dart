@@ -11,8 +11,18 @@ class Step4ConfirmPage extends StatelessWidget {
   final CallBookingModel booking;
 
   static const _months = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
   ];
 
   String _fmtDate(DateTime d) =>
@@ -43,16 +53,19 @@ class Step4ConfirmPage extends StatelessWidget {
             ),
             child: Row(
               children: [
-                const Icon(Icons.info_outline_rounded,
-                    size: 20, color: AppColors.info),
+                const Icon(
+                  Icons.info_outline_rounded,
+                  size: 20,
+                  color: AppColors.info,
+                ),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Text(
                     'Please review the booking details before confirming.',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.info,
-                          fontWeight: FontWeight.w500,
-                        ),
+                      color: AppColors.info,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ],
@@ -82,6 +95,12 @@ class Step4ConfirmPage extends StatelessWidget {
               _Row(label: 'Phone', value: booking.passengerPhone),
               if (booking.passengerNic.isNotEmpty)
                 _Row(label: 'NIC', value: booking.passengerNic),
+              if (booking.passengerEmail.isNotEmpty)
+                _Row(label: 'Email', value: booking.passengerEmail),
+              _Row(label: 'Pickup', value: booking.pickupPoint),
+              _Row(label: 'Drop', value: booking.dropPoint),
+              if (booking.passengerNotes.isNotEmpty)
+                _Row(label: 'Notes', value: booking.passengerNotes),
             ],
           ),
           const SizedBox(height: AppSpacing.lg),
@@ -94,7 +113,8 @@ class Step4ConfirmPage extends StatelessWidget {
               _SeatsRow(seats: seats),
               _Row(
                 label: 'Seat Count',
-                value: '${seats.length} ${seats.length == 1 ? 'Seat' : 'Seats'}',
+                value:
+                    '${seats.length} ${seats.length == 1 ? 'Seat' : 'Seats'}',
               ),
               _Row(
                 label: 'Price / Seat',
@@ -144,7 +164,10 @@ class _Section extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(
-              AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.md,
+              AppSpacing.lg,
+              AppSpacing.lg,
+              AppSpacing.lg,
+              AppSpacing.md,
             ),
             child: Row(
               children: [
@@ -247,23 +270,27 @@ class _SeatsRow extends StatelessWidget {
             child: Wrap(
               spacing: AppSpacing.xs,
               runSpacing: AppSpacing.xs,
-              children: seats.map((s) => Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.sm,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.seatBooked,
-                      borderRadius: BorderRadius.circular(AppRadius.xs),
-                    ),
-                    child: Text(
-                      '$s',
-                      style: tt.labelSmall?.copyWith(
-                        color: AppColors.primaryLight,
-                        fontWeight: FontWeight.w700,
+              children: seats
+                  .map(
+                    (s) => Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.sm,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.seatBooked,
+                        borderRadius: BorderRadius.circular(AppRadius.xs),
+                      ),
+                      child: Text(
+                        '$s',
+                        style: tt.labelSmall?.copyWith(
+                          color: AppColors.primaryLight,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
-                  )).toList(),
+                  )
+                  .toList(),
             ),
           ),
         ],

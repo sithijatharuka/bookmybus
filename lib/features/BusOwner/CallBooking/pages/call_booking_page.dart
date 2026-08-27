@@ -24,40 +24,34 @@ class _CallBookingPageState extends State<CallBookingPage> {
 
   static const _steps = [
     (label: 'Bus & Date', icon: Icons.directions_bus_outlined),
-    // (label: 'Seats', icon: Icons.event_seat_outlined),
-    // (label: 'Passenger', icon: Icons.person_outline_rounded),
+    (label: 'Seats', icon: Icons.event_seat_outlined),
+    (label: 'Passenger', icon: Icons.person_outline_rounded),
     // (label: 'Confirm', icon: Icons.check_circle_outline_rounded),
   ];
 
   // ── Validation per step ───────────────────────────────────────────────────
 
   bool get _canProceed => switch (_currentStep) {
-        0 => _booking.travelDate != null && _booking.selectedTrip != null,
-        1 => _booking.selectedSeats.isNotEmpty,
-        2 =>
-          _booking.passengerName.isNotEmpty &&
-              _booking.passengerPhone.isNotEmpty,
-        _ => true,
-      };
+    0 => _booking.travelDate != null && _booking.selectedTrip != null,
+    1 => _booking.selectedSeats.isNotEmpty,
+    2 =>
+      _booking.passengerName.trim().split(RegExp(r'\s+')).length > 1 &&
+          _booking.passengerPhone.isNotEmpty,
+    _ => true,
+  };
 
   // ── Step view ─────────────────────────────────────────────────────────────
 
   Widget get _stepView => switch (_currentStep) {
-        0 => Step1BusDatePage(
-            booking: _booking,
-            onChanged: () => setState(() {}),
-          ),
-        1 => Step2SeatsPage(
-            booking: _booking,
-            onChanged: () => setState(() {}),
-          ),
-        2 => Step3PassengerPage(
-            booking: _booking,
-            onChanged: () => setState(() {}),
-          ),
-        3 => Step4ConfirmPage(booking: _booking),
-        _ => const SizedBox.shrink(),
-      };
+    0 => Step1BusDatePage(booking: _booking, onChanged: () => setState(() {})),
+    1 => Step2SeatsPage(booking: _booking, onChanged: () => setState(() {})),
+    2 => Step3PassengerPage(
+      booking: _booking,
+      onChanged: () => setState(() {}),
+    ),
+    3 => Step4ConfirmPage(booking: _booking),
+    _ => const SizedBox.shrink(),
+  };
 
   // ── Submit ────────────────────────────────────────────────────────────────
 
@@ -79,7 +73,8 @@ class _CallBookingPageState extends State<CallBookingPage> {
       barrierDismissible: false,
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppRadius.lg)),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+        ),
         contentPadding: const EdgeInsets.all(AppSpacing.xxl),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -91,8 +86,11 @@ class _CallBookingPageState extends State<CallBookingPage> {
                 color: AppColors.successLight,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.check_rounded,
-                  size: 36, color: AppColors.success),
+              child: const Icon(
+                Icons.check_rounded,
+                size: 36,
+                color: AppColors.success,
+              ),
             ),
             const SizedBox(height: AppSpacing.lg),
             Text(
@@ -117,7 +115,8 @@ class _CallBookingPageState extends State<CallBookingPage> {
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.success,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppRadius.sm)),
+                    borderRadius: BorderRadius.circular(AppRadius.sm),
+                  ),
                 ),
                 child: const Text('Done'),
               ),
@@ -186,7 +185,10 @@ class _PageHeader extends StatelessWidget {
     return Container(
       color: AppColors.white,
       padding: const EdgeInsets.fromLTRB(
-        AppSpacing.lg, AppSpacing.md, AppSpacing.lg, AppSpacing.md,
+        AppSpacing.lg,
+        AppSpacing.md,
+        AppSpacing.lg,
+        AppSpacing.md,
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -270,7 +272,9 @@ class _CallBookingStepIndicator extends StatelessWidget {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: isDone || isActive ? AppColors.primary : AppColors.section,
+                  color: isDone || isActive
+                      ? AppColors.primary
+                      : AppColors.section,
                   shape: BoxShape.circle,
                   border: isActive
                       ? Border.all(color: AppColors.primaryLight, width: 2)
@@ -279,7 +283,9 @@ class _CallBookingStepIndicator extends StatelessWidget {
                 child: Icon(
                   isDone ? Icons.check_rounded : steps[idx].icon,
                   size: 18,
-                  color: isDone || isActive ? AppColors.white : AppColors.textHint,
+                  color: isDone || isActive
+                      ? AppColors.white
+                      : AppColors.textHint,
                 ),
               ),
               const SizedBox(height: AppSpacing.xs),
@@ -325,7 +331,10 @@ class _CallBookingNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(
-        AppSpacing.lg, AppSpacing.md, AppSpacing.lg, AppSpacing.xl,
+        AppSpacing.lg,
+        AppSpacing.md,
+        AppSpacing.lg,
+        AppSpacing.xl,
       ),
       decoration: const BoxDecoration(
         color: AppColors.white,
@@ -357,7 +366,9 @@ class _CallBookingNavBar extends StatelessWidget {
             child: FilledButton(
               onPressed: canProceed ? (_isLast ? onSubmit : onNext) : null,
               style: FilledButton.styleFrom(
-                backgroundColor: _isLast ? AppColors.success : AppColors.primary,
+                backgroundColor: _isLast
+                    ? AppColors.success
+                    : AppColors.primary,
                 disabledBackgroundColor: AppColors.textDisabled,
                 padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
                 shape: RoundedRectangleBorder(

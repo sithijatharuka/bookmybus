@@ -6,8 +6,11 @@ import 'package:flutter/material.dart';
 import '../models/call_booking_model.dart';
 
 class Step3PassengerPage extends StatefulWidget {
-  const Step3PassengerPage({super.key, required this.booking, required this.onChanged});
-
+  const Step3PassengerPage({
+    super.key,
+    required this.booking,
+    required this.onChanged,
+  });
   final CallBookingModel booking;
   final VoidCallback onChanged;
 
@@ -16,47 +19,78 @@ class Step3PassengerPage extends StatefulWidget {
 }
 
 class _Step3PassengerPageState extends State<Step3PassengerPage> {
-  late final TextEditingController _nameCtrl;
+  late final TextEditingController _firstNameCtrl;
+  late final TextEditingController _lastNameCtrl;
   late final TextEditingController _phoneCtrl;
   late final TextEditingController _nicCtrl;
+  late final TextEditingController _emailCtrl;
+  late final TextEditingController _pickupPointCtrl;
+  late final TextEditingController _dropPointCtrl;
+  late final TextEditingController _notesCtrl;
 
   @override
   void initState() {
     super.initState();
-    _nameCtrl = TextEditingController(text: widget.booking.passengerName);
+    final nameParts = widget.booking.passengerName.trim().split(RegExp(r'\s+'));
+    _firstNameCtrl = TextEditingController(
+      text: widget.booking.passengerName.isEmpty ? '' : nameParts.first,
+    );
+    _lastNameCtrl = TextEditingController(
+      text: nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '',
+    );
     _phoneCtrl = TextEditingController(text: widget.booking.passengerPhone);
     _nicCtrl = TextEditingController(text: widget.booking.passengerNic);
+    _emailCtrl = TextEditingController(text: widget.booking.passengerEmail);
+    _setDefaultPoints();
+    _pickupPointCtrl = TextEditingController(text: widget.booking.pickupPoint);
+    _dropPointCtrl = TextEditingController(text: widget.booking.dropPoint);
+    _notesCtrl = TextEditingController(text: widget.booking.passengerNotes);
   }
 
   @override
   void dispose() {
-    _nameCtrl.dispose();
+    _firstNameCtrl.dispose();
+    _lastNameCtrl.dispose();
     _phoneCtrl.dispose();
     _nicCtrl.dispose();
+    _emailCtrl.dispose();
+    _pickupPointCtrl.dispose();
+    _dropPointCtrl.dispose();
+    _notesCtrl.dispose();
     super.dispose();
   }
 
   void _sync() {
-    widget.booking.passengerName = _nameCtrl.text.trim();
+    widget.booking.passengerName =
+        '${_firstNameCtrl.text.trim()} ${_lastNameCtrl.text.trim()}'.trim();
     widget.booking.passengerPhone = _phoneCtrl.text.trim();
     widget.booking.passengerNic = _nicCtrl.text.trim();
+    widget.booking.passengerEmail = _emailCtrl.text.trim();
+    widget.booking.pickupPoint = _pickupPointCtrl.text.trim();
+    widget.booking.dropPoint = _dropPointCtrl.text.trim();
+    widget.booking.passengerNotes = _notesCtrl.text.trim();
     widget.onChanged();
+  }
+
+  void _setDefaultPoints() {
+    final trip = widget.booking.selectedTrip;
+    if (trip == null) return;
+    widget.booking.pickupPoint = widget.booking.pickupPoint.isNotEmpty
+        ? widget.booking.pickupPoint
+        : (trip.pickupPoints.isNotEmpty ? trip.pickupPoints.first : trip.from);
+    widget.booking.dropPoint = widget.booking.dropPoint.isNotEmpty
+        ? widget.booking.dropPoint
+        : (trip.dropPoints.isNotEmpty ? trip.dropPoints.last : trip.to);
   }
 
   @override
   Widget build(BuildContext context) {
     final tt = Theme.of(context).textTheme;
-
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.lg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Booking summary ──────────────────────────────────
-          _BookingSummaryBanner(booking: widget.booking),
-          const SizedBox(height: AppSpacing.lg),
-
-          // ── Passenger form ───────────────────────────────────
           Container(
             width: double.infinity,
             decoration: BoxDecoration(
@@ -70,16 +104,31 @@ class _Step3PassengerPageState extends State<Step3PassengerPage> {
               children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(
-                    AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.md,
+                    AppSpacing.lg,
+                    AppSpacing.lg,
+                    AppSpacing.lg,
+                    AppSpacing.md,
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.person_outline_rounded,
-                          size: 16, color: AppColors.primary),
+                      Container(
+                        padding: const EdgeInsets.all(AppSpacing.xs),
+                        decoration: BoxDecoration(
+                          color: AppColors.section,
+                          borderRadius: BorderRadius.circular(AppRadius.xs),
+                        ),
+                        child: const Icon(
+                          Icons.person_outline_rounded,
+                          size: 14,
+                          color: AppColors.primaryLight,
+                        ),
+                      ),
                       const SizedBox(width: AppSpacing.sm),
                       Text(
                         'Passenger Details',
-                        style: tt.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+                        style: tt.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ],
                   ),
@@ -90,15 +139,23 @@ class _Step3PassengerPageState extends State<Step3PassengerPage> {
                   child: Column(
                     children: [
                       _FormField(
-                        label: 'Full Name',
-                        hint: 'Enter passenger full name',
-                        controller: _nameCtrl,
+                        label: 'First Name *',
+                        hint: 'Enter first name',
+                        controller: _firstNameCtrl,
                         keyboardType: TextInputType.name,
                         onChanged: (_) => _sync(),
                       ),
                       const SizedBox(height: AppSpacing.md),
                       _FormField(
-                        label: 'Phone Number',
+                        label: 'Last Name *',
+                        hint: 'Enter last name',
+                        controller: _lastNameCtrl,
+                        keyboardType: TextInputType.name,
+                        onChanged: (_) => _sync(),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      _FormField(
+                        label: 'Contact No *',
                         hint: 'Enter contact number',
                         controller: _phoneCtrl,
                         keyboardType: TextInputType.phone,
@@ -106,10 +163,40 @@ class _Step3PassengerPageState extends State<Step3PassengerPage> {
                       ),
                       const SizedBox(height: AppSpacing.md),
                       _FormField(
-                        label: 'NIC (Optional)',
+                        label: 'NIC (optional)',
                         hint: 'Enter NIC number',
                         controller: _nicCtrl,
-                        keyboardType: TextInputType.text,
+                        onChanged: (_) => _sync(),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      _FormField(
+                        label: 'Email (optional)',
+                        hint: 'Enter email address',
+                        controller: _emailCtrl,
+                        keyboardType: TextInputType.emailAddress,
+                        onChanged: (_) => _sync(),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      _FormField(
+                        label: 'Pickup Point',
+                        hint: 'Enter pickup point',
+                        controller: _pickupPointCtrl,
+                        onChanged: (_) => _sync(),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      _FormField(
+                        label: 'Drop Point',
+                        hint: 'Enter drop point',
+                        controller: _dropPointCtrl,
+                        onChanged: (_) => _sync(),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      _FormField(
+                        label: 'Notes (optional)',
+                        hint: 'Add any special instructions',
+                        controller: _notesCtrl,
+                        keyboardType: TextInputType.multiline,
+                        maxLines: 4,
                         onChanged: (_) => _sync(),
                       ),
                     ],
@@ -125,119 +212,6 @@ class _Step3PassengerPageState extends State<Step3PassengerPage> {
   }
 }
 
-// ── Booking Summary Banner ────────────────────────────────────────────────────
-
-class _BookingSummaryBanner extends StatelessWidget {
-  const _BookingSummaryBanner({required this.booking});
-
-  final CallBookingModel booking;
-
-  static const _months = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-  ];
-
-  String _fmtDate(DateTime d) =>
-      '${d.day.toString().padLeft(2, '0')} ${_months[d.month - 1]} ${d.year}';
-
-  @override
-  Widget build(BuildContext context) {
-    final tt = Theme.of(context).textTheme;
-    final trip = booking.selectedTrip!;
-    final seats = booking.selectedSeats;
-    final total = seats.length * trip.pricePerSeat;
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: AppColors.section,
-        borderRadius: BorderRadius.circular(AppRadius.md),
-        border: Border.all(color: AppColors.primary.withOpacity(0.2)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.confirmation_number_outlined,
-                  size: 16, color: AppColors.primary),
-              const SizedBox(width: AppSpacing.sm),
-              Text(
-                'Booking Summary',
-                style: tt.bodyMedium?.copyWith(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.md),
-          _SummaryRow(label: 'Bus', value: '${trip.busName} ${trip.busNumber}'),
-          _SummaryRow(label: 'Route', value: trip.route),
-          _SummaryRow(label: 'Date', value: _fmtDate(booking.travelDate!)),
-          _SummaryRow(
-            label: 'Seats',
-            value: seats.map((s) => '$s').join(', '),
-          ),
-          _SummaryRow(
-            label: 'Total',
-            value: 'LKR ${total.toStringAsFixed(2)}',
-            bold: true,
-            valueColor: AppColors.primary,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SummaryRow extends StatelessWidget {
-  const _SummaryRow({
-    required this.label,
-    required this.value,
-    this.bold = false,
-    this.valueColor,
-  });
-
-  final String label;
-  final String value;
-  final bool bold;
-  final Color? valueColor;
-
-  @override
-  Widget build(BuildContext context) {
-    final tt = Theme.of(context).textTheme;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 60,
-            child: Text(
-              label,
-              style: tt.bodySmall?.copyWith(color: AppColors.textSecondary),
-            ),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Text(
-              value,
-              style: tt.bodySmall?.copyWith(
-                color: valueColor ?? AppColors.textPrimary,
-                fontWeight: bold ? FontWeight.w700 : FontWeight.w500,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ── Form Field ────────────────────────────────────────────────────────────────
-
 class _FormField extends StatelessWidget {
   const _FormField({
     required this.label,
@@ -245,13 +219,14 @@ class _FormField extends StatelessWidget {
     required this.controller,
     required this.onChanged,
     this.keyboardType,
+    this.maxLines = 1,
   });
-
   final String label;
   final String hint;
   final TextEditingController controller;
   final ValueChanged<String> onChanged;
   final TextInputType? keyboardType;
+  final int maxLines;
 
   @override
   Widget build(BuildContext context) {
@@ -271,6 +246,7 @@ class _FormField extends StatelessWidget {
         TextField(
           controller: controller,
           keyboardType: keyboardType,
+          maxLines: maxLines,
           onChanged: onChanged,
           style: tt.bodyLarge?.copyWith(color: AppColors.textPrimary),
           decoration: InputDecoration(
@@ -290,7 +266,10 @@ class _FormField extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppRadius.md),
-              borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+              borderSide: const BorderSide(
+                color: AppColors.primary,
+                width: 1.5,
+              ),
             ),
             filled: true,
             fillColor: const Color(0xFFF8FAFC),

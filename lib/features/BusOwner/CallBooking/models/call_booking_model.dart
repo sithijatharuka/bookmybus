@@ -6,6 +6,10 @@ class CallBookingModel {
   String passengerPhone;
   String passengerNic;
 
+  String passengerEmail;
+  String pickupPoint;
+  String dropPoint;
+  String passengerNotes;
   CallBookingModel({
     this.travelDate,
     this.selectedTrip,
@@ -13,6 +17,10 @@ class CallBookingModel {
     this.passengerName = '',
     this.passengerPhone = '',
     this.passengerNic = '',
+    this.passengerEmail = '',
+    this.pickupPoint = '',
+    this.dropPoint = '',
+    this.passengerNotes = '',
   });
 }
 
@@ -24,6 +32,8 @@ class CallBusTripModel {
   final String to;
   final double pricePerSeat;
   final int seatsLeft;
+  final List<String> pickupPoints;
+  final List<String> dropPoints;
 
   const CallBusTripModel({
     required this.busName,
@@ -33,6 +43,8 @@ class CallBusTripModel {
     required this.to,
     required this.pricePerSeat,
     required this.seatsLeft,
+    this.pickupPoints = const [],
+    this.dropPoints = const [],
   });
 
   String get route => '$from → $to';
