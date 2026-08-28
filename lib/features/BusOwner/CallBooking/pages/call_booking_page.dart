@@ -26,7 +26,7 @@ class _CallBookingPageState extends State<CallBookingPage> {
     (label: 'Bus & Date', icon: Icons.directions_bus_outlined),
     (label: 'Seats', icon: Icons.event_seat_outlined),
     (label: 'Passenger', icon: Icons.person_outline_rounded),
-    // (label: 'Confirm', icon: Icons.check_circle_outline_rounded),
+    (label: 'Confirm', icon: Icons.check_circle_outline_rounded),
   ];
 
   // ── Validation per step ───────────────────────────────────────────────────

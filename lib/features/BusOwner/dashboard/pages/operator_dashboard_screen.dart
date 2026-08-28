@@ -118,37 +118,37 @@ class _OperatorDashboardScreenState extends State<OperatorDashboardScreen> {
           ),
         ],
       ),
-      // bottomNavigationBar: BottomNavigationBar(
-      //   currentIndex: _selectedNav,
-      //   onTap: (i) => setState(() => _selectedNav = i),
-      //   selectedItemColor: AppColors.primary,
-      //   unselectedItemColor: AppColors.textSecondary,
-      //   type: BottomNavigationBarType.fixed,
-      //   backgroundColor: AppColors.white,
-      //   elevation: 12,
-      //   items: const [
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.dashboard_outlined),
-      //       activeIcon: Icon(Icons.dashboard),
-      //       label: 'Dashboard',
-      //     ),
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.add_circle_outline),
-      //       activeIcon: Icon(Icons.add_circle),
-      //       label: 'Add',
-      //     ),
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.directions_bus_outlined),
-      //       activeIcon: Icon(Icons.directions_bus),
-      //       label: 'Buses',
-      //     ),
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.headset_mic_outlined),
-      //       activeIcon: Icon(Icons.headset_mic),
-      //       label: 'Support',
-      //     ),
-      //   ],
-      // ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedNav,
+        onTap: (i) => setState(() => _selectedNav = i),
+        selectedItemColor: AppColors.primary,
+        unselectedItemColor: AppColors.textSecondary,
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: AppColors.white,
+        elevation: 12,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard_outlined),
+            activeIcon: Icon(Icons.dashboard),
+            label: 'Dashboard',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add_circle_outline),
+            activeIcon: Icon(Icons.add_circle),
+            label: 'Add',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.directions_bus_outlined),
+            activeIcon: Icon(Icons.directions_bus),
+            label: 'Buses',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.headset_mic_outlined),
+            activeIcon: Icon(Icons.headset_mic),
+            label: 'Support',
+          ),
+        ],
+      ),
     );
   }
 }
