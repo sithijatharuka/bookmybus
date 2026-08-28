@@ -136,51 +136,7 @@ class _ManageBusPageState extends State<ManageBusPage> {
               itemBuilder: (_, i) => BusFleetCard(bus: buses[i]),
             ),
             const SizedBox(height: AppSpacing.md),
-
-            // ── Promo Banner Card ─────────────────────────────────────
-            // ClipRRect(
-            //   borderRadius: BorderRadius.circular(AppRadius.lg),
-            //   child: Stack(
-            //     children: [
-            //       Image.network(
-            //         'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800',
-            //         height: 160,
-            //         width: double.infinity,
-            //         fit: BoxFit.cover,
-            //         errorBuilder: (_, __, ___) => Container(
-            //           height: 160,
-            //           color: AppColors.primary,
-            //         ),
-            //       ),
-            //       Container(
-            //         height: 160,
-            //         decoration: BoxDecoration(
-            //           color: AppColors.primary.withOpacity(0.65),
-            //         ),
-            //       ),
-            //       Positioned.fill(
-            //         child: Padding(
-            //           padding: const EdgeInsets.all(AppSpacing.lg),
-            //           child: Column(
-            //             mainAxisAlignment: MainAxisAlignment.end,
-            //             crossAxisAlignment: CrossAxisAlignment.start,
-            //             children: [
-            //               Text(
-            //                 'Connecting Sri Lanka with\nReliable Fleet Management.',
-            //                 style: tt.titleMedium?.copyWith(
-            //                   color: AppColors.white,
-            //                   fontWeight: FontWeight.w700,
-            //                   height: 1.4,
-            //                 ),
-            //               ),
-            //             ],
-            //           ),
-            //         ),
-            //       ),
-            //     ],
-            //   ),
-            // ),
-            // const SizedBox(height: AppSpacing.xl),
+            
           ],
         ),
       ),
