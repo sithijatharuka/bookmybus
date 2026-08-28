@@ -3,10 +3,10 @@ import 'package:bookmybus/app/theme/app_spacing.dart';
 import 'package:flutter/material.dart';
 import '../data/dummy_dashboard_data.dart';
 import '../widgets/dashboard_header.dart';
-import '../widgets/dashboard_list_cards.dart';
-import '../widgets/dashboard_metric_card.dart';
-import '../widgets/analytics_filter_bottom_sheet.dart';
-import '../widgets/filter_summary_card.dart';
+import '../widgets/dashboard_analytics_section.dart';
+import '../widgets/dashboard_navigation.dart';
+import '../widgets/dashboard_overview_section.dart';
+import '../widgets/dashboard_top_lists_section.dart';
 
 class OperatorDashboardScreen extends StatefulWidget {
   const OperatorDashboardScreen({super.key});
@@ -51,49 +51,23 @@ class _OperatorDashboardScreenState extends State<OperatorDashboardScreen> {
                     children: [
                       const SizedBox(height: 36 + AppSpacing.lg),
 
-                      // 1. Date filter pills
-                      DashboardFilterPills(
+                      DashboardOverviewSection(
                         filters: DummyDashboardData.filters,
-                        selectedIndex: _selectedFilter,
-                        onSelect: (i) =>
+                        selectedFilter: _selectedFilter,
+                        filterLabel: filterLabel,
+                        metrics: DummyDashboardData.metrics,
+                        onFilterSelected: (i) =>
                             setState(() => _selectedFilter = i),
                       ),
-                      // const SizedBox(height: AppSpacing.sm),
-
-                      // 2. Filter summary
-                      const FilterSummaryCard(),
-                      // const SizedBox(height: AppSpacing.md),
-
-                      // 3. Metrics grid
-                      DashboardMetricsGrid(
-                        metrics: DummyDashboardData.metrics,
-                        subtitle: filterLabel,
+                      DashboardAnalyticsSection(
+                        bookingsTrend: DummyDashboardData.bookingsTrend,
+                        revenueTrend: DummyDashboardData.revenueTrend,
                       ),
-                      const SizedBox(height: AppSpacing.lg),
-
-                      // 3. Trend charts
-                      DashboardTrendCard(
-                        title: 'Bookings Trend',
-                        trend: DummyDashboardData.bookingsTrend,
+                      DashboardTopListsSection(
+                        topRoutes: DummyDashboardData.topRoutes,
+                        topBuses: DummyDashboardData.topBuses,
+                        cancelledRoutes: DummyDashboardData.cancelledRoutes,
                       ),
-                      const SizedBox(height: AppSpacing.md),
-                      DashboardTrendCard(
-                        title: 'Revenue Trend',
-                        trend: DummyDashboardData.revenueTrend,
-                      ),
-                      const SizedBox(height: AppSpacing.lg),
-
-                      // 4. Top lists
-                      DashboardTopRoutesCard(
-                          routes: DummyDashboardData.topRoutes),
-                      const SizedBox(height: AppSpacing.md),
-                      DashboardTopBusesCard(
-                          buses: DummyDashboardData.topBuses),
-                      const SizedBox(height: AppSpacing.md),
-                      DashboardCancelledRoutesCard(
-                          routes: DummyDashboardData.cancelledRoutes),
-
-                      const SizedBox(height: 100),
                     ],
                   ),
                 ),
@@ -101,53 +75,12 @@ class _OperatorDashboardScreenState extends State<OperatorDashboardScreen> {
             ],
           ),
 
-          // FAB above bottom nav
-          Positioned(
-            bottom: 70,
-            right: AppSpacing.lg,
-            child: FloatingActionButton(
-              backgroundColor: AppColors.primary,
-              onPressed: () => showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                backgroundColor: Colors.transparent,
-                builder: (_) => const FilterBottomSheet(),
-              ),            
-              child: const Icon(Icons.tune, color: AppColors.white),
-            ),
-          ),
+          const DashboardFilterButton(),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedNav,
-        onTap: (i) => setState(() => _selectedNav = i),
-        selectedItemColor: AppColors.primary,
-        unselectedItemColor: AppColors.textSecondary,
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: AppColors.white,
-        elevation: 12,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard_outlined),
-            activeIcon: Icon(Icons.dashboard),
-            label: 'Dashboard',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add_circle_outline),
-            activeIcon: Icon(Icons.add_circle),
-            label: 'Add',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.directions_bus_outlined),
-            activeIcon: Icon(Icons.directions_bus),
-            label: 'Buses',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.headset_mic_outlined),
-            activeIcon: Icon(Icons.headset_mic),
-            label: 'Support',
-          ),
-        ],
+      bottomNavigationBar: DashboardNavigation(
+        selectedIndex: _selectedNav,
+        onSelected: (i) => setState(() => _selectedNav = i),
       ),
     );
   }
