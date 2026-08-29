@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 
 import '../../manage_bus/models/manage_bus_model.dart';
 import '../steps/step3_schedule/widgets/pickup_drop_points.dart';
+import '../widgets/edit_bus_sections.dart';
 
 class EditBusPage extends StatefulWidget {
   const EditBusPage({super.key, required this.bus});
@@ -52,8 +53,12 @@ class _EditBusPageState extends State<EditBusPage> {
     _whatsapp = TextEditingController();
     _conductor = TextEditingController();
 
-    _busType = _busTypes.contains(widget.bus.busType) ? widget.bus.busType : _busTypes[0];
-    _frequency = _frequencies.contains(widget.bus.frequency) ? widget.bus.frequency : _frequencies[0];
+    _busType = _busTypes.contains(widget.bus.busType)
+        ? widget.bus.busType
+        : _busTypes[0];
+    _frequency = _frequencies.contains(widget.bus.frequency)
+        ? widget.bus.frequency
+        : _frequencies[0];
     _departure = _parseTime(widget.bus.departure);
     _arrival = _parseTime(widget.bus.arrival);
     _amenities = widget.bus.amenities.toSet();
@@ -110,9 +115,9 @@ class _EditBusPageState extends State<EditBusPage> {
   void _onSave() {
     // TODO: persist updated values
     Navigator.of(context).pop();
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Bus updated successfully!')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Bus updated successfully!')));
   }
 
   @override
@@ -141,267 +146,290 @@ class _EditBusPageState extends State<EditBusPage> {
             const SizedBox(height: AppSpacing.xl),
 
             // ── Platform Controlled ───────────────────────────────
-            _SectionHeader(
-              label: 'Platform Controlled',
-              badge: 'Admin-only',
-              badgeColor: AppColors.error,
-              badgeBg: AppColors.errorLight,
-              icon: Icons.lock_outline_rounded,
-              iconColor: AppColors.error,
-            ),
-            const SizedBox(height: AppSpacing.md),
-            _ReadOnlyField(label: 'Bus Registration No', value: bus.registrationNo),
-            const SizedBox(height: AppSpacing.md),
-            Row(
-              children: [
-                Expanded(child: _ReadOnlyField(label: 'Seats', value: '${bus.totalSeats}')),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: _ReadOnlyField(
-                    label: 'Seat Layout',
-                    value: bus.seatLayout.isEmpty ? '—' : bus.seatLayout,
+            EditBusPlatformSection(
+              content: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _ReadOnlyField(
+                    label: 'Bus Registration No',
+                    value: bus.registrationNo,
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Row(
-              children: [
-                Expanded(child: _ReadOnlyField(label: 'Route From', value: bus.fromCity)),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(child: _ReadOnlyField(label: 'Route To', value: bus.toCity)),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Row(
-              children: [
-                Expanded(
-                  child: _ReadOnlyField(
-                    label: 'Status',
-                    value: bus.approvalStatus.name[0].toUpperCase() +
-                        bus.approvalStatus.name.substring(1),
+                  const SizedBox(height: AppSpacing.md),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _ReadOnlyField(
+                          label: 'Seats',
+                          value: '${bus.totalSeats}',
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: _ReadOnlyField(
+                          label: 'Seat Layout',
+                          value: bus.seatLayout.isEmpty ? '—' : bus.seatLayout,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: _ReadOnlyField(
-                    label: 'Active?',
-                    value: bus.status == BusStatus.active ? 'Active' : 'Inactive',
+                  const SizedBox(height: AppSpacing.md),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _ReadOnlyField(
+                          label: 'Route From',
+                          value: bus.fromCity,
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: _ReadOnlyField(
+                          label: 'Route To',
+                          value: bus.toCity,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.md),
-            _ReadOnlyField(label: 'Flip Seat Layout', value: 'Normal'),
-
-            const SizedBox(height: AppSpacing.xxl),
-
-            // ── Editable by You ───────────────────────────────────
-            _SectionHeader(
-              label: 'Editable by You',
-              icon: Icons.edit_outlined,
-              iconColor: AppColors.primary,
-            ),
-            const SizedBox(height: AppSpacing.lg),
-
-            // Bus Name
-            _FieldLabel(text: 'Bus Name', required: true),
-            _EditableTag(),
-            const SizedBox(height: AppSpacing.xs),
-            _textField(controller: _busName, hint: 'e.g. LION SUPER LINE', icon: Icons.directions_bus_outlined),
-
-            const SizedBox(height: AppSpacing.lg),
-
-            // Price
-            _FieldLabel(text: 'Price per Seat (LKR)', required: true),
-            _EditableTag(),
-            const SizedBox(height: AppSpacing.xs),
-            _textField(
-              controller: _price,
-              hint: 'e.g. 1850',
-              icon: Icons.payments_outlined,
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            _HintText(
-              'Actual ticket price paid by passengers. Platform fee (LKR 100/seat) and payment gateway charge (2.99%) are deducted automatically.',
-            ),
-
-            const SizedBox(height: AppSpacing.lg),
-
-            // Bus Image
-            _FieldLabel(text: 'Bus Image', required: true),
-            _EditableTag(),
-            const SizedBox(height: AppSpacing.xs),
-            _ImageUploadField(imageUrl: bus.imageUrl),
-
-            const SizedBox(height: AppSpacing.lg),
-
-            // Bus Type
-            _FieldLabel(text: 'Bus Type', required: true),
-            _EditableTag(),
-            const SizedBox(height: AppSpacing.xs),
-            _DropdownField<String>(
-              value: _busType,
-              items: _busTypes,
-              itemLabel: (v) => v,
-              onChanged: (v) => setState(() => _busType = v!),
-            ),
-
-            const SizedBox(height: AppSpacing.lg),
-
-            // Frequency
-            _FieldLabel(text: 'Frequency', required: true),
-            _EditableTag(),
-            const SizedBox(height: AppSpacing.xs),
-            _DropdownField<String>(
-              value: _frequency,
-              items: _frequencies,
-              itemLabel: (v) => v,
-              onChanged: (v) => setState(() => _frequency = v!),
-            ),
-
-            const SizedBox(height: AppSpacing.lg),
-
-            // WhatsApp
-            _FieldLabel(text: 'Operations WhatsApp Number', required: true),
-            _EditableTag(),
-            const SizedBox(height: AppSpacing.xs),
-            _PhoneField(controller: _whatsapp, hint: '0775454166'),
-            const SizedBox(height: AppSpacing.xs),
-            _HintText('Enter a valid Sri Lankan mobile number.'),
-
-            const SizedBox(height: AppSpacing.lg),
-
-            // Conductor
-            _FieldLabel(text: 'Conductor Number', required: false),
-            _EditableTag(),
-            const SizedBox(height: AppSpacing.xs),
-            _PhoneField(controller: _conductor, hint: 'e.g., 0771234567 or +94771234567'),
-            const SizedBox(height: AppSpacing.xs),
-            _HintText(
-              'Optional. If left empty, the WhatsApp number above will be used as the conductor number.',
-            ),
-
-            const SizedBox(height: AppSpacing.xxl),
-
-            // ── Schedule ──────────────────────────────────────────
-            _SectionHeader(
-              label: 'Schedule',
-              icon: Icons.schedule_outlined,
-              iconColor: AppColors.primary,
-            ),
-            const SizedBox(height: AppSpacing.lg),
-
-            _EditableTag(),
-            const SizedBox(height: AppSpacing.xs),
-            Row(
-              children: [
-                Expanded(
-                  child: _TimePickerField(
-                    label: 'Departure Time',
-                    required: true,
-                    value: _formatTime(_departure),
-                    onTap: () => _pickTime(true),
+                  const SizedBox(height: AppSpacing.md),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _ReadOnlyField(
+                          label: 'Status',
+                          value:
+                              bus.approvalStatus.name[0].toUpperCase() +
+                              bus.approvalStatus.name.substring(1),
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: _ReadOnlyField(
+                          label: 'Active?',
+                          value: bus.status == BusStatus.active
+                              ? 'Active'
+                              : 'Inactive',
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: _TimePickerField(
-                    label: 'Arrival Time',
-                    required: true,
-                    value: _formatTime(_arrival),
-                    onTap: () => _pickTime(false),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.md),
-            _ArrivesNextDayToggle(
-              value: _arrivesNextDay,
-              onChanged: (v) => setState(() => _arrivesNextDay = v),
-            ),
-
-            const SizedBox(height: AppSpacing.xxl),
-
-            // ── Amenities ─────────────────────────────────────────
-            _SectionHeader(
-              label: 'Amenities',
-              icon: Icons.star_outline_rounded,
-              iconColor: AppColors.primary,
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            _EditableTag(),
-            const SizedBox(height: AppSpacing.md),
-            Wrap(
-              spacing: AppSpacing.sm,
-              runSpacing: AppSpacing.sm,
-              children: _allAmenities.map((a) {
-                final selected = _amenities.contains(a.$1);
-                return _AmenityChip(
-                  label: a.$1,
-                  icon: a.$2,
-                  selected: selected,
-                  onTap: () => setState(() {
-                    selected ? _amenities.remove(a.$1) : _amenities.add(a.$1);
-                  }),
-                );
-              }).toList(),
-            ),
-
-            const SizedBox(height: AppSpacing.xxl),
-
-            // ── Additional Features ───────────────────────────────
-            _SectionHeader(
-              label: 'Additional Features',
-              icon: Icons.add_circle_outline_rounded,
-              iconColor: AppColors.primary,
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            _EditableTag(),
-            const SizedBox(height: AppSpacing.xs),
-            Text(
-              'comma-separated',
-              style: tt.bodySmall?.copyWith(color: AppColors.textHint, fontSize: 11),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            TextField(
-              controller: _additionalFeatures,
-              maxLines: 3,
-              style: tt.bodyLarge?.copyWith(color: AppColors.textPrimary),
-              decoration: _inputDecoration(
-                hint: 'e.g., Curtains, Extra legroom, USB charging',
-              ).copyWith(
-                alignLabelWithHint: true,
+                  const SizedBox(height: AppSpacing.md),
+                  _ReadOnlyField(label: 'Flip Seat Layout', value: 'Normal'),
+                ],
               ),
             ),
-            const SizedBox(height: AppSpacing.xs),
-            _HintText('Example: Curtains, USB Charging, Reclining Seats'),
 
-            const SizedBox(height: AppSpacing.xxl),
+            // ── Editable by You ───────────────────────────────────
+            EditBusDetailsSection(
+              content: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Bus Name
+                  _FieldLabel(text: 'Bus Name', required: true),
+                  _EditableTag(),
+                  const SizedBox(height: AppSpacing.xs),
+                  _textField(
+                    controller: _busName,
+                    hint: 'e.g. LION SUPER LINE',
+                    icon: Icons.directions_bus_outlined,
+                  ),
+
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // Price
+                  _FieldLabel(text: 'Price per Seat (LKR)', required: true),
+                  _EditableTag(),
+                  const SizedBox(height: AppSpacing.xs),
+                  _textField(
+                    controller: _price,
+                    hint: 'e.g. 1850',
+                    icon: Icons.payments_outlined,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  _HintText(
+                    'Actual ticket price paid by passengers. Platform fee (LKR 100/seat) and payment gateway charge (2.99%) are deducted automatically.',
+                  ),
+
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // Bus Image
+                  _FieldLabel(text: 'Bus Image', required: true),
+                  _EditableTag(),
+                  const SizedBox(height: AppSpacing.xs),
+                  _ImageUploadField(imageUrl: bus.imageUrl),
+
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // Bus Type
+                  _FieldLabel(text: 'Bus Type', required: true),
+                  _EditableTag(),
+                  const SizedBox(height: AppSpacing.xs),
+                  _DropdownField<String>(
+                    value: _busType,
+                    items: _busTypes,
+                    itemLabel: (v) => v,
+                    onChanged: (v) => setState(() => _busType = v!),
+                  ),
+
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // Frequency
+                  _FieldLabel(text: 'Frequency', required: true),
+                  _EditableTag(),
+                  const SizedBox(height: AppSpacing.xs),
+                  _DropdownField<String>(
+                    value: _frequency,
+                    items: _frequencies,
+                    itemLabel: (v) => v,
+                    onChanged: (v) => setState(() => _frequency = v!),
+                  ),
+
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // WhatsApp
+                  _FieldLabel(
+                    text: 'Operations WhatsApp Number',
+                    required: true,
+                  ),
+                  _EditableTag(),
+                  const SizedBox(height: AppSpacing.xs),
+                  _PhoneField(controller: _whatsapp, hint: '0775454166'),
+                  const SizedBox(height: AppSpacing.xs),
+                  _HintText('Enter a valid Sri Lankan mobile number.'),
+
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // Conductor
+                  _FieldLabel(text: 'Conductor Number', required: false),
+                  _EditableTag(),
+                  const SizedBox(height: AppSpacing.xs),
+                  _PhoneField(
+                    controller: _conductor,
+                    hint: 'e.g., 0771234567 or +94771234567',
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  _HintText(
+                    'Optional. If left empty, the WhatsApp number above will be used as the conductor number.',
+                  ),
+                ],
+              ),
+            ),
+
+            // ── Schedule ──────────────────────────────────────────
+            EditBusScheduleSection(
+              content: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _EditableTag(),
+                  const SizedBox(height: AppSpacing.xs),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _TimePickerField(
+                          label: 'Departure Time',
+                          required: true,
+                          value: _formatTime(_departure),
+                          onTap: () => _pickTime(true),
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: _TimePickerField(
+                          label: 'Arrival Time',
+                          required: true,
+                          value: _formatTime(_arrival),
+                          onTap: () => _pickTime(false),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  _ArrivesNextDayToggle(
+                    value: _arrivesNextDay,
+                    onChanged: (v) => setState(() => _arrivesNextDay = v),
+                  ),
+                ],
+              ),
+            ),
+
+            // ── Amenities ─────────────────────────────────────────
+            EditBusAmenitiesSection(
+              content: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _EditableTag(),
+                  const SizedBox(height: AppSpacing.md),
+                  Wrap(
+                    spacing: AppSpacing.sm,
+                    runSpacing: AppSpacing.sm,
+                    children: _allAmenities.map((a) {
+                      final selected = _amenities.contains(a.$1);
+                      return _AmenityChip(
+                        label: a.$1,
+                        icon: a.$2,
+                        selected: selected,
+                        onTap: () => setState(() {
+                          selected
+                              ? _amenities.remove(a.$1)
+                              : _amenities.add(a.$1);
+                        }),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+            ),
+
+            // ── Additional Features ───────────────────────────────
+            EditBusAdditionalFeaturesSection(
+              content: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _EditableTag(),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    'comma-separated',
+                    style: tt.bodySmall?.copyWith(
+                      color: AppColors.textHint,
+                      fontSize: 11,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  TextField(
+                    controller: _additionalFeatures,
+                    maxLines: 3,
+                    style: tt.bodyLarge?.copyWith(color: AppColors.textPrimary),
+                    decoration: _inputDecoration(
+                      hint: 'e.g., Curtains, Extra legroom, USB charging',
+                    ).copyWith(alignLabelWithHint: true),
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  _HintText('Example: Curtains, USB Charging, Reclining Seats'),
+                ],
+              ),
+            ),
 
             // ── Pick-up Points ────────────────────────────────────
-            _SectionHeader(
-              label: 'Pick-up Points',
-              icon: Icons.location_on_outlined,
-              iconColor: AppColors.primary,
+            EditBusPickupSection(
+              content: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _EditableTag(),
+                  const SizedBox(height: AppSpacing.md),
+                  PickupDropPoints(
+                    onChanged: (_) {},
+                    startPlace: bus.fromCity,
+                    startTime: bus.departure,
+                    endPlace: bus.toCity,
+                    endTime: bus.arrival,
+                    intermediateStops: bus.pickups
+                        .map((p) => {'place': p.city, 'time': p.time})
+                        .toList(),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: AppSpacing.xs),
-            _EditableTag(),
-            const SizedBox(height: AppSpacing.md),
-            PickupDropPoints(
-              onChanged: (_) {},
-              startPlace: bus.fromCity,
-              startTime: bus.departure,
-              endPlace: bus.toCity,
-              endTime: bus.arrival,
-              intermediateStops: bus.pickups
-                  .map((p) => {'place': p.city, 'time': p.time})
-                  .toList(),
-            ),
-
-            const SizedBox(height: AppSpacing.xxxl),
 
             // Save
             SizedBox(
@@ -435,60 +463,13 @@ class _EditBusPageState extends State<EditBusPage> {
       controller: controller,
       keyboardType: keyboardType,
       inputFormatters: inputFormatters,
-      style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: AppColors.textPrimary),
-      decoration: _inputDecoration(hint: hint, suffixIcon: Icon(icon, size: 18, color: AppColors.textHint)),
-    );
-  }
-}
-
-// ── Section Header ────────────────────────────────────────────────────────────
-
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({
-    required this.label,
-    required this.icon,
-    required this.iconColor,
-    this.badge,
-    this.badgeColor,
-    this.badgeBg,
-  });
-
-  final String label;
-  final IconData icon;
-  final Color iconColor;
-  final String? badge;
-  final Color? badgeColor;
-  final Color? badgeBg;
-
-  @override
-  Widget build(BuildContext context) {
-    final tt = Theme.of(context).textTheme;
-    return Row(
-      children: [
-        Icon(icon, size: 16, color: iconColor),
-        const SizedBox(width: AppSpacing.xs),
-        Text(
-          label,
-          style: tt.labelLarge?.copyWith(
-            color: AppColors.textPrimary,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        if (badge != null) ...[
-          const SizedBox(width: AppSpacing.sm),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 2),
-            decoration: BoxDecoration(
-              color: badgeBg,
-              borderRadius: BorderRadius.circular(AppRadius.round),
-            ),
-            child: Text(
-              badge!,
-              style: tt.labelSmall?.copyWith(color: badgeColor, fontWeight: FontWeight.w600),
-            ),
-          ),
-        ],
-      ],
+      style: Theme.of(
+        context,
+      ).textTheme.bodyLarge?.copyWith(color: AppColors.textPrimary),
+      decoration: _inputDecoration(
+        hint: hint,
+        suffixIcon: Icon(icon, size: 18, color: AppColors.textHint),
+      ),
     );
   }
 }
@@ -522,10 +503,17 @@ class _ReadOnlyField extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: tt.bodySmall?.copyWith(color: AppColors.textHint, fontSize: 11),
+                style: tt.bodySmall?.copyWith(
+                  color: AppColors.textHint,
+                  fontSize: 11,
+                ),
               ),
               const SizedBox(width: AppSpacing.xs),
-              const Icon(Icons.lock_outline_rounded, size: 11, color: AppColors.textDisabled),
+              const Icon(
+                Icons.lock_outline_rounded,
+                size: 11,
+                color: AppColors.textDisabled,
+              ),
             ],
           ),
           const SizedBox(height: 4),
@@ -566,7 +554,10 @@ class _FieldLabel extends StatelessWidget {
         if (required)
           Text(
             ' *',
-            style: tt.bodyMedium?.copyWith(color: AppColors.error, fontWeight: FontWeight.w700),
+            style: tt.bodyMedium?.copyWith(
+              color: AppColors.error,
+              fontWeight: FontWeight.w700,
+            ),
           ),
       ],
     );
@@ -587,9 +578,9 @@ class _EditableTag extends StatelessWidget {
           Text(
             'Editable',
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.w600,
-                ),
+              color: AppColors.primary,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ],
       ),
@@ -607,10 +598,9 @@ class _HintText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: AppColors.textHint,
-            fontSize: 11,
-          ),
+      style: Theme.of(
+        context,
+      ).textTheme.bodySmall?.copyWith(color: AppColors.textHint, fontSize: 11),
     );
   }
 }
@@ -635,7 +625,9 @@ class _DropdownField<T> extends StatelessWidget {
     return DropdownButtonFormField<T>(
       value: value,
       onChanged: onChanged,
-      style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: AppColors.textPrimary),
+      style: Theme.of(
+        context,
+      ).textTheme.bodyLarge?.copyWith(color: AppColors.textPrimary),
       decoration: _inputDecoration(hint: ''),
       items: items
           .map((e) => DropdownMenuItem<T>(value: e, child: Text(itemLabel(e))))
@@ -659,12 +651,19 @@ class _PhoneField extends StatelessWidget {
     return TextField(
       controller: controller,
       keyboardType: TextInputType.phone,
-      inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[\d\s\-\+]'))],
-      style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: AppColors.textPrimary),
+      inputFormatters: [
+        FilteringTextInputFormatter.allow(RegExp(r'[\d\s\-\+]')),
+      ],
+      style: Theme.of(
+        context,
+      ).textTheme.bodyLarge?.copyWith(color: AppColors.textPrimary),
       decoration: _inputDecoration(
         hint: hint,
         prefixIcon: Container(
-          margin: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+          margin: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.sm,
+            vertical: AppSpacing.xs,
+          ),
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
           decoration: BoxDecoration(
             color: AppColors.section,
@@ -679,9 +678,9 @@ class _PhoneField extends StatelessWidget {
               Text(
                 '+94',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.textPrimary,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ],
           ),
@@ -716,21 +715,31 @@ class _ImageUploadField extends StatelessWidget {
             width: double.infinity,
             decoration: BoxDecoration(
               color: AppColors.section,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.sm)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(AppRadius.sm),
+              ),
             ),
             child: imageUrl != null
                 ? ClipRRect(
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.sm)),
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(AppRadius.sm),
+                    ),
                     child: Image.network(imageUrl!, fit: BoxFit.cover),
                   )
                 : Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.image_outlined, size: 40, color: AppColors.textDisabled),
+                      Icon(
+                        Icons.image_outlined,
+                        size: 40,
+                        color: AppColors.textDisabled,
+                      ),
                       const SizedBox(height: AppSpacing.xs),
                       Text(
                         'Bus preview image',
-                        style: tt.bodySmall?.copyWith(color: AppColors.textHint),
+                        style: tt.bodySmall?.copyWith(
+                          color: AppColors.textHint,
+                        ),
                       ),
                     ],
                   ),
@@ -866,9 +875,13 @@ class _TimePickerField extends StatelessWidget {
               ),
             ),
             if (required)
-              Text(' *',
-                  style: tt.bodyMedium?.copyWith(
-                      color: AppColors.error, fontWeight: FontWeight.w700)),
+              Text(
+                ' *',
+                style: tt.bodyMedium?.copyWith(
+                  color: AppColors.error,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
           ],
         ),
         const SizedBox(height: AppSpacing.xs),
@@ -886,8 +899,11 @@ class _TimePickerField extends StatelessWidget {
             ),
             child: Row(
               children: [
-                const Icon(Icons.access_time_rounded,
-                    size: 18, color: AppColors.primary),
+                const Icon(
+                  Icons.access_time_rounded,
+                  size: 18,
+                  color: AppColors.primary,
+                ),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Text(
@@ -898,8 +914,11 @@ class _TimePickerField extends StatelessWidget {
                     ),
                   ),
                 ),
-                const Icon(Icons.keyboard_arrow_down_rounded,
-                    size: 18, color: AppColors.textHint),
+                const Icon(
+                  Icons.keyboard_arrow_down_rounded,
+                  size: 18,
+                  color: AppColors.textHint,
+                ),
               ],
             ),
           ),
@@ -912,10 +931,7 @@ class _TimePickerField extends StatelessWidget {
 // ── Arrives Next Day Toggle ───────────────────────────────────────────────────
 
 class _ArrivesNextDayToggle extends StatelessWidget {
-  const _ArrivesNextDayToggle({
-    required this.value,
-    required this.onChanged,
-  });
+  const _ArrivesNextDayToggle({required this.value, required this.onChanged});
 
   final bool value;
   final ValueChanged<bool> onChanged;
@@ -931,9 +947,7 @@ class _ArrivesNextDayToggle extends StatelessWidget {
       decoration: BoxDecoration(
         color: value ? AppColors.infoLight : AppColors.white,
         borderRadius: BorderRadius.circular(AppRadius.sm),
-        border: Border.all(
-          color: value ? AppColors.info : AppColors.border,
-        ),
+        border: Border.all(color: value ? AppColors.info : AppColors.border),
       ),
       child: Row(
         children: [
