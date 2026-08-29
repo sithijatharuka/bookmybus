@@ -9,8 +9,8 @@ import '../steps/step1_upload_images/step1_upload_images_page.dart';
 import '../steps/step2_basic_info/step2_basic_info_page.dart';
 import '../steps/step3_schedule/step3_schedule_page.dart';
 import '../steps/step4_review/step4_review_page.dart';
-import '../widgets/step_indicator.dart';
-import '../widgets/step_nav_bar.dart';
+import '../widgets/add_bus_step_content.dart';
+import '../widgets/add_bus_submitting_overlay.dart';
 
 class AddBusPage extends StatefulWidget {
   const AddBusPage({super.key});
@@ -31,12 +31,12 @@ class _AddBusPageState extends State<AddBusPage> {
   ];
 
   Widget get _stepView => switch (_currentStep) {
-        0 => const Step1UploadImagesPage(),
-        1 => const Step2BasicInfoPage(),
-        2 => const Step3SchedulePage(),
-        3 => const Step4ReviewPage(),
-        _ => const SizedBox.shrink(),
-      };
+    0 => const Step1UploadImagesPage(),
+    1 => const Step2BasicInfoPage(),
+    2 => const Step3SchedulePage(),
+    3 => const Step4ReviewPage(),
+    _ => const SizedBox.shrink(),
+  };
 
   /// Collects all step data into a single [AddBusData] object.
   AddBusData _collectData() {
@@ -75,7 +75,8 @@ class _AddBusPageState extends State<AddBusPage> {
       barrierDismissible: false,
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppRadius.lg)),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+        ),
         contentPadding: const EdgeInsets.all(AppSpacing.xxl),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -87,8 +88,11 @@ class _AddBusPageState extends State<AddBusPage> {
                 color: AppColors.successLight,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.check_rounded,
-                  size: 36, color: AppColors.success),
+              child: const Icon(
+                Icons.check_rounded,
+                size: 36,
+                color: AppColors.success,
+              ),
             ),
             const SizedBox(height: AppSpacing.lg),
             Text(
@@ -113,7 +117,8 @@ class _AddBusPageState extends State<AddBusPage> {
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.success,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppRadius.sm)),
+                    borderRadius: BorderRadius.circular(AppRadius.sm),
+                  ),
                 ),
                 child: const Text('Done'),
               ),
@@ -129,16 +134,18 @@ class _AddBusPageState extends State<AddBusPage> {
       SnackBar(
         content: Row(
           children: [
-            const Icon(Icons.error_outline_rounded,
-                color: AppColors.white, size: 18),
+            const Icon(
+              Icons.error_outline_rounded,
+              color: AppColors.white,
+              size: 18,
+            ),
             const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Text(
                 'Failed to add bus. Please try again.',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyMedium
-                    ?.copyWith(color: AppColors.white),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: AppColors.white),
               ),
             ),
           ],
@@ -146,7 +153,8 @@ class _AddBusPageState extends State<AddBusPage> {
         backgroundColor: AppColors.error,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppRadius.sm)),
+          borderRadius: BorderRadius.circular(AppRadius.sm),
+        ),
         margin: const EdgeInsets.all(AppSpacing.lg),
       ),
     );
@@ -159,28 +167,16 @@ class _AddBusPageState extends State<AddBusPage> {
       appBar: const CommonAppBar(title: 'Add Bus'),
       body: Stack(
         children: [
-          Column(
-            children: [
-              StepIndicator(steps: _steps, currentStep: _currentStep),
-              Expanded(child: _stepView),
-              StepNavBar(
-                currentStep: _currentStep,
-                totalSteps: _steps.length,
-                onBack: () => setState(() => _currentStep--),
-                onNext: () => setState(() => _currentStep++),
-                onSubmit: _onSubmit,
-              ),
-            ],
+          AddBusStepContent(
+            steps: _steps,
+            currentStep: _currentStep,
+            stepView: _stepView,
+            onBack: () => setState(() => _currentStep--),
+            onNext: () => setState(() => _currentStep++),
+            onSubmit: _onSubmit,
           ),
 
-          // ── Submitting overlay ──────────────────────────────────
-          if (_isSubmitting)
-            Container(
-              color: Colors.black.withOpacity(0.35),
-              child: const Center(
-                child: CircularProgressIndicator(color: AppColors.white),
-              ),
-            ),
+          if (_isSubmitting) const AddBusSubmittingOverlay(),
         ],
       ),
     );
