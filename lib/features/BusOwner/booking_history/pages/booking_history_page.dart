@@ -1,6 +1,3 @@
-import 'package:bookmybus/app/theme/app_colors.dart';
-import 'package:bookmybus/app/theme/app_radius.dart';
-import 'package:bookmybus/app/theme/app_shadows.dart';
 import 'package:bookmybus/app/theme/app_spacing.dart';
 import 'package:bookmybus/shared/widgets/common_app_bar.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +6,10 @@ import '../models/booking_history_model.dart';
 import '../widgets/booking_cards.dart';
 import '../widgets/booking_history_card.dart';
 import '../widgets/bus_seat_layout_view.dart';
+import '../widgets/header_section.dart';
+import '../widgets/filter_summary_section.dart';
+import '../widgets/booking_count_bar_section.dart';
+import '../widgets/empty_state.dart';
 import 'booking_details_page.dart';
 
 class BookingHistoryPage extends StatefulWidget {
@@ -109,7 +110,7 @@ class _BookingHistoryPageState extends State<BookingHistoryPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 1. Header
-            _Header(),
+            const BookingHistoryHeaderSection(),
             const SizedBox(height: AppSpacing.lg),
 
             // 2. View Booking Card
@@ -159,7 +160,7 @@ class _BookingHistoryPageState extends State<BookingHistoryPage> {
             const SizedBox(height: AppSpacing.lg),
 
             // 4. Selected Filter Summary
-            _FilterSummary(
+            FilterSummarySection(
               bus: _overviewBus,
               route: _overviewRoute,
               status: _overviewStatus,
@@ -168,7 +169,7 @@ class _BookingHistoryPageState extends State<BookingHistoryPage> {
             const SizedBox(height: AppSpacing.lg),
 
             // 5. Booking Count + Export
-            _BookingCountBar(
+            BookingCountBarSection(
               count: _results.length,
               onExport: _results.isEmpty ? null : () {},
             ),
@@ -177,7 +178,7 @@ class _BookingHistoryPageState extends State<BookingHistoryPage> {
 
             // 6. Booking History List
             if (_results.isEmpty)
-              _EmptyState()
+              const BookingHistoryEmptyState()
             else
               ListView.separated(
                 shrinkWrap: true,
@@ -199,237 +200,6 @@ class _BookingHistoryPageState extends State<BookingHistoryPage> {
             const SizedBox(height: AppSpacing.lg),
           ],
         ),
-      ),
-    );
-  }
-}
-
-// ─── Header ───────────────────────────────────────────────────────────────────
-
-class _Header extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final tt = Theme.of(context).textTheme;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Lion Super Line',
-          style: tt.bodyMedium?.copyWith(
-            color: AppColors.primary,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.xs),
-        Text('Booking History', style: tt.titleLarge),
-        const SizedBox(height: AppSpacing.xs),
-        Text(
-          'Review, filter, and export your booking history.',
-          style: tt.bodyMedium,
-        ),
-      ],
-    );
-  }
-}
-
-// ─── Filter Summary ───────────────────────────────────────────────────────────
-
-class _FilterSummary extends StatelessWidget {
-  const _FilterSummary({
-    required this.bus,
-    required this.route,
-    required this.status,
-    required this.date,
-  });
-
-  final String bus;
-  final String route;
-  final String status;
-  final String date;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(AppRadius.md),
-        border: Border.all(color: AppColors.border),
-        boxShadow: AppShadows.card,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.md,
-            ),
-            child: Text(
-              'Selected Filters',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-          ),
-          const Divider(color: AppColors.divider, height: 1),
-          Padding(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _SummaryRow(label: 'Bus', value: bus),
-                _SummaryRow(label: 'Route', value: route),
-                _SummaryRow(label: 'Status', value: status),
-                _SummaryRow(label: 'Date', value: date),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SummaryRow extends StatelessWidget {
-  const _SummaryRow({required this.label, required this.value});
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    final tt = Theme.of(context).textTheme;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-      child: Row(
-        children: [
-          Container(
-            width: 6,
-            height: 6,
-            margin: const EdgeInsets.only(right: AppSpacing.sm, top: 1),
-            decoration: const BoxDecoration(
-              color: AppColors.primary,
-              shape: BoxShape.circle,
-            ),
-          ),
-          Text(
-            '$label: ',
-            style: tt.bodyMedium?.copyWith(
-              color: AppColors.textPrimary,
-              fontWeight: FontWeight.w600,
-              fontSize: 13,
-            ),
-          ),
-          Text(value, style: tt.bodyMedium),
-        ],
-      ),
-    );
-  }
-}
-
-// ─── Booking Count Bar ───────────────────────────────────────────────────────
-
-class _BookingCountBar extends StatelessWidget {
-  const _BookingCountBar({required this.count, required this.onExport});
-
-  final int count;
-  final VoidCallback? onExport;
-
-  @override
-  Widget build(BuildContext context) {
-    final tt = Theme.of(context).textTheme;
-    final hasBookings = count > 0;
-
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(AppRadius.md),
-        border: Border.all(color: AppColors.border),
-        boxShadow: AppShadows.card,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.md,
-            ),
-            child: Text('Booking Results', style: tt.titleMedium),
-          ),
-          const Divider(color: AppColors.divider, height: 1),
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.lg,
-              vertical: AppSpacing.md,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '$count ${count == 1 ? 'Booking' : 'Bookings'}',
-                  style: tt.titleMedium,
-                ),
-                OutlinedButton.icon(
-                  onPressed: onExport,
-                  icon: Icon(
-                    Icons.download_outlined,
-                    size: 18,
-                    color: hasBookings ? AppColors.primary : AppColors.textDisabled,
-                  ),
-                  label: const Text('Export'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor:
-                        hasBookings ? AppColors.primary : AppColors.textDisabled,
-                    side: BorderSide(
-                      color: hasBookings ? AppColors.primary : AppColors.textDisabled,
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.lg,
-                      vertical: AppSpacing.sm,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppRadius.md),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ─── Empty State ──────────────────────────────────────────────────────────────
-
-class _EmptyState extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.huge),
-      decoration: BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.circular(AppRadius.md),
-        boxShadow: AppShadows.card,
-      ),
-      child: Column(
-        children: [
-          const Icon(
-            Icons.receipt_long_outlined,
-            size: 48,
-            color: AppColors.textHint,
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Text(
-            'No bookings found for the selected filters.',
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium
-                ?.copyWith(color: AppColors.textSecondary),
-            textAlign: TextAlign.center,
-          ),
-        ],
       ),
     );
   }
