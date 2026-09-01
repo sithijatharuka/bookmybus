@@ -2,6 +2,7 @@ class CallBookingModel {
   DateTime? travelDate;
   CallBusTripModel? selectedTrip;
   List<int> selectedSeats;
+  Map<int, String> seatGenders;
   String passengerName;
   String passengerPhone;
   String passengerNic;
@@ -14,6 +15,7 @@ class CallBookingModel {
     this.travelDate,
     this.selectedTrip,
     this.selectedSeats = const [],
+    this.seatGenders = const {},
     this.passengerName = '',
     this.passengerPhone = '',
     this.passengerNic = '',

@@ -1,5 +1,7 @@
 import 'package:bookmybus/features/BusOwner/CallBooking/pages/call_booking_page.dart';
 import 'package:bookmybus/features/BusOwner/addbus/pages/add_bus_page.dart';
+import 'package:bookmybus/features/BusOwner/booking_history/pages/booking_history_page.dart';
+import 'package:bookmybus/features/BusOwner/dashboard/pages/operator_dashboard_screen.dart';
 import 'package:bookmybus/features/BusOwner/manage_bus/pages/manage_bus_page.dart';
 import 'package:bookmybus/features/Profile/pages/profile_page.dart';
 import 'package:bookmybus/features/auth/login/login_page.dart';
@@ -16,6 +18,11 @@ class App extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       home: const CallBookingPage(),
+      // home: const OperatorDashboardScreen(),
+      // home: const ManageBusPage(),
+      // home: const AddBusPage(),
+      // home: const ProfilePage(),
+      // home: const BookingHistoryPage(),
     );
   }
 }

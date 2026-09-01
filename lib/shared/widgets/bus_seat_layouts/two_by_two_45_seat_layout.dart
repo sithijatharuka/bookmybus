@@ -12,10 +12,14 @@ class TwoByTwo45SeatLayout extends StatefulWidget {
   const TwoByTwo45SeatLayout({
     super.key,
     this.seatStatuses = const {},
+    this.selectedSeats = const {},
+    this.onSeatTapped,
     this.onSeatSelected,
   });
 
   final Map<int, SeatStatus> seatStatuses;
+  final Set<int> selectedSeats;
+  final ValueChanged<int>? onSeatTapped;
   final OnSeatSelected? onSeatSelected;
 
   @override
@@ -23,7 +27,6 @@ class TwoByTwo45SeatLayout extends StatefulWidget {
 }
 
 class _TwoByTwo45SeatLayoutState extends State<TwoByTwo45SeatLayout> {
-  final Set<int> _selected = {};
 
   // Rows 1–10: [leftWindow, leftAisle, rightAisle, rightWindow]
   static const List<List<int>> _rows = [
@@ -45,10 +48,16 @@ class _TwoByTwo45SeatLayoutState extends State<TwoByTwo45SeatLayout> {
   void _toggle(int seat) {
     final status = widget.seatStatuses[seat] ?? SeatStatus.available;
     if (!status.isClickable) return;
-    setState(() {
-      _selected.contains(seat) ? _selected.remove(seat) : _selected.add(seat);
-    });
-    widget.onSeatSelected?.call(List.unmodifiable(_selected));
+
+    widget.onSeatTapped?.call(seat);
+
+    final next = Set<int>.from(widget.selectedSeats);
+    if (next.contains(seat)) {
+      next.remove(seat);
+    } else {
+      next.add(seat);
+    }
+    widget.onSeatSelected?.call(List.unmodifiable(next.toList()..sort()));
   }
 
   SeatStatus _effectiveStatus(int seat) =>
@@ -68,7 +77,7 @@ class _TwoByTwo45SeatLayoutState extends State<TwoByTwo45SeatLayout> {
                 left: [seats[0], seats[1]],
                 right: [seats[2], seats[3]],
                 effectiveStatus: _effectiveStatus,
-                isSelected: _selected.contains,
+                isSelected: widget.selectedSeats.contains,
                 onTap: _toggle,
               );
             }),
@@ -77,7 +86,7 @@ class _TwoByTwo45SeatLayoutState extends State<TwoByTwo45SeatLayout> {
               rowNumber: 11,
               seats: _backRow,
               effectiveStatus: _effectiveStatus,
-              isSelected: _selected.contains,
+              isSelected: widget.selectedSeats.contains,
               onTap: _toggle,
             ),
           ],

@@ -33,7 +33,8 @@ class _CallBookingPageState extends State<CallBookingPage> {
 
   bool get _canProceed => switch (_currentStep) {
     0 => _booking.travelDate != null && _booking.selectedTrip != null,
-    1 => _booking.selectedSeats.isNotEmpty,
+    1 => _booking.selectedSeats.isNotEmpty &&
+        _booking.seatGenders.length == _booking.selectedSeats.length,
     2 =>
       _booking.passengerName.trim().split(RegExp(r'\s+')).length > 1 &&
           _booking.passengerPhone.isNotEmpty,
@@ -357,7 +358,7 @@ class _CallBookingNavBar extends StatelessWidget {
                   borderRadius: BorderRadius.circular(AppRadius.sm),
                 ),
               ),
-              child: const Text('Back'),
+              child: const Text('← Back'),
             ),
           ),
           const SizedBox(width: AppSpacing.md),
@@ -382,7 +383,7 @@ class _CallBookingNavBar extends StatelessWidget {
                     const Icon(Icons.check_circle_outline_rounded, size: 18),
                     const SizedBox(width: AppSpacing.xs),
                   ],
-                  Text(_isLast ? 'Confirm Booking' : 'Next'),
+                  Text(_isLast ? 'Confirm Booking' : 'Next →'),
                 ],
               ),
             ),

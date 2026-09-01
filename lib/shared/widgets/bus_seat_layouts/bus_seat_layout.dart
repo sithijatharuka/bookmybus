@@ -34,7 +34,7 @@ enum SeatStatus {
       };
 
   Color get borderColor => switch (this) {
-        available => const Color(0xFF2563EB),
+        available => const Color(0xFF2ECC71),
         releasedForDate => const Color(0xFFEAB308),
         _ => fillColor,
       };

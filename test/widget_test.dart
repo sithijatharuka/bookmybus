@@ -1,30 +1,38 @@
-// // This is a basic Flutter widget test.
-// //
-// // To perform an interaction with a widget in your test, use the WidgetTester
-// // utility in the flutter_test package. For example, you can send tap and scroll
-// // gestures. You can also use WidgetTester to find child widgets in the widget
-// // tree, read text, and verify that the values of widget properties are correct.
+﻿import 'package:bookmybus/features/BusOwner/CallBooking/models/call_booking_model.dart';
+import 'package:bookmybus/features/BusOwner/CallBooking/steps/step2_seats_page.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
 
-// import 'package:flutter/material.dart';
-// import 'package:flutter_test/flutter_test.dart';
+void main() {
+  testWidgets('Step 2 shows the trip banner and the seat selection contract', (WidgetTester tester) async {
+    final trip = CallBusTripModel(
+      busName: 'THEUEU',
+      busNumber: 'E454P',
+      departureTime: '00:33',
+      from: 'Trincomalee',
+      to: 'Colombo',
+      pricePerSeat: 1500,
+      seatsLeft: 45,
+    );
 
-// import 'package:bookmybus/main.dart';
+    final booking = CallBookingModel(
+      travelDate: DateTime(2026, 9, 1),
+      selectedTrip: trip,
+    );
 
-// void main() {
-//   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-//     // Build our app and trigger a frame.
-//     await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Step2SeatsPage(
+          booking: booking,
+          onChanged: () {},
+        ),
+      ),
+    );
 
-//     // Verify that our counter starts at 0.
-//     expect(find.text('0'), findsOneWidget);
-//     expect(find.text('1'), findsNothing);
-
-//     // Tap the '+' icon and trigger a frame.
-//     await tester.tap(find.byIcon(Icons.add));
-//     await tester.pump();
-
-//     // Verify that our counter has incremented.
-//     expect(find.text('0'), findsNothing);
-//     expect(find.text('1'), findsOneWidget);
-//   });
-// }
+    expect(find.text('THEUEU · Trincomalee → Colombo · 00:33'), findsOneWidget);
+    expect(find.text('Select Seats (max 10)'), findsOneWidget);
+    expect(find.text('Available'), findsWidgets);
+    expect(find.text('Booked (M)'), findsOneWidget);
+    expect(find.text('Booked (F)'), findsOneWidget);
+  });
+}
