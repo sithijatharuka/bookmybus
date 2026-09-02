@@ -1,5 +1,7 @@
 ﻿import 'package:bookmybus/features/BusOwner/CallBooking/models/call_booking_model.dart';
 import 'package:bookmybus/features/BusOwner/CallBooking/steps/step2_seats_page.dart';
+import 'package:bookmybus/features/BusOwner/dashboard/pages/operator_dashboard_screen.dart';
+import 'package:bookmybus/features/Profile/pages/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -34,5 +36,21 @@ void main() {
     expect(find.text('Available'), findsWidgets);
     expect(find.text('Booked (M)'), findsOneWidget);
     expect(find.text('Booked (F)'), findsOneWidget);
+  });
+
+  testWidgets('Dashboard header profile icon navigates to the profile screen',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: OperatorDashboardScreen(),
+      ),
+    );
+
+    expect(find.byIcon(Icons.person_outline), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.person_outline));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ProfilePage), findsOneWidget);
   });
 }

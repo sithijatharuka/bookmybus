@@ -1,5 +1,6 @@
 import 'package:bookmybus/app/theme/app_colors.dart';
 import 'package:bookmybus/app/theme/app_spacing.dart';
+import 'package:bookmybus/features/Profile/pages/profile_page.dart';
 import 'package:flutter/material.dart';
 import '../data/dummy_dashboard_data.dart';
 import '../widgets/dashboard_header.dart';
@@ -35,7 +36,13 @@ class _OperatorDashboardScreenState extends State<OperatorDashboardScreen> {
                   greeting: 'Good Morning 👋',
                   operatorName: 'NCG Express',
                   totalRevenue: 'Rs 25,000.00',
-                  onNotificationTap: () {},
+                  onProfileTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const ProfilePage(),
+                      ),
+                    );
+                  },
                 ),
               ),
               SliverToBoxAdapter(

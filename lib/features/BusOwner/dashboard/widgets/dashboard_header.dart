@@ -10,13 +10,13 @@ class DashboardHeader extends StatelessWidget {
     required this.operatorName,
     required this.greeting,
     required this.totalRevenue,
-    required this.onNotificationTap,
+    required this.onProfileTap,
   });
 
   final String operatorName;
   final String greeting;
   final String totalRevenue;
-  final VoidCallback onNotificationTap;
+  final VoidCallback onProfileTap;
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +55,7 @@ class DashboardHeader extends StatelessWidget {
                 ),
               ),
               GestureDetector(
-                onTap: onNotificationTap,
+                onTap: onProfileTap,
                 child: Container(
                   width: 44,
                   height: 44,
@@ -64,7 +64,7 @@ class DashboardHeader extends StatelessWidget {
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
-                    Icons.notifications_outlined,
+                    Icons.person_outline,
                     color: AppColors.white,
                     size: 22,
                   ),
