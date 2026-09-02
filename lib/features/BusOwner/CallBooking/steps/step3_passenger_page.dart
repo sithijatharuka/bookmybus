@@ -2,6 +2,7 @@ import 'package:bookmybus/app/theme/app_colors.dart';
 import 'package:bookmybus/app/theme/app_radius.dart';
 import 'package:bookmybus/app/theme/app_shadows.dart';
 import 'package:bookmybus/app/theme/app_spacing.dart';
+import 'package:bookmybus/features/BusOwner/CallBooking/widgets/step_3/form_field.dart' as step3;
 import 'package:flutter/material.dart';
 import '../models/call_booking_model.dart';
 
@@ -138,7 +139,7 @@ class _Step3PassengerPageState extends State<Step3PassengerPage> {
                   padding: const EdgeInsets.all(AppSpacing.lg),
                   child: Column(
                     children: [
-                      _FormField(
+                      step3.PassengerFormField(
                         label: 'First Name *',
                         hint: 'Enter first name',
                         controller: _firstNameCtrl,
@@ -146,7 +147,7 @@ class _Step3PassengerPageState extends State<Step3PassengerPage> {
                         onChanged: (_) => _sync(),
                       ),
                       const SizedBox(height: AppSpacing.md),
-                      _FormField(
+                      step3.PassengerFormField(
                         label: 'Last Name *',
                         hint: 'Enter last name',
                         controller: _lastNameCtrl,
@@ -154,7 +155,7 @@ class _Step3PassengerPageState extends State<Step3PassengerPage> {
                         onChanged: (_) => _sync(),
                       ),
                       const SizedBox(height: AppSpacing.md),
-                      _FormField(
+                      step3.PassengerFormField(
                         label: 'Contact No *',
                         hint: 'Enter contact number',
                         controller: _phoneCtrl,
@@ -162,14 +163,14 @@ class _Step3PassengerPageState extends State<Step3PassengerPage> {
                         onChanged: (_) => _sync(),
                       ),
                       const SizedBox(height: AppSpacing.md),
-                      _FormField(
+                      step3.PassengerFormField(
                         label: 'NIC (optional)',
                         hint: 'Enter NIC number',
                         controller: _nicCtrl,
                         onChanged: (_) => _sync(),
                       ),
                       const SizedBox(height: AppSpacing.md),
-                      _FormField(
+                      step3.PassengerFormField(
                         label: 'Email (optional)',
                         hint: 'Enter email address',
                         controller: _emailCtrl,
@@ -177,21 +178,21 @@ class _Step3PassengerPageState extends State<Step3PassengerPage> {
                         onChanged: (_) => _sync(),
                       ),
                       const SizedBox(height: AppSpacing.md),
-                      _FormField(
+                      step3.PassengerFormField(
                         label: 'Pickup Point',
                         hint: 'Enter pickup point',
                         controller: _pickupPointCtrl,
                         onChanged: (_) => _sync(),
                       ),
                       const SizedBox(height: AppSpacing.md),
-                      _FormField(
+                      step3.PassengerFormField(
                         label: 'Drop Point',
                         hint: 'Enter drop point',
                         controller: _dropPointCtrl,
                         onChanged: (_) => _sync(),
                       ),
                       const SizedBox(height: AppSpacing.md),
-                      _FormField(
+                      step3.PassengerFormField(
                         label: 'Notes (optional)',
                         hint: 'Add any special instructions',
                         controller: _notesCtrl,
@@ -208,74 +209,6 @@ class _Step3PassengerPageState extends State<Step3PassengerPage> {
           const SizedBox(height: AppSpacing.huge),
         ],
       ),
-    );
-  }
-}
-
-class _FormField extends StatelessWidget {
-  const _FormField({
-    required this.label,
-    required this.hint,
-    required this.controller,
-    required this.onChanged,
-    this.keyboardType,
-    this.maxLines = 1,
-  });
-  final String label;
-  final String hint;
-  final TextEditingController controller;
-  final ValueChanged<String> onChanged;
-  final TextInputType? keyboardType;
-  final int maxLines;
-
-  @override
-  Widget build(BuildContext context) {
-    final tt = Theme.of(context).textTheme;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: tt.bodyMedium?.copyWith(
-            color: AppColors.textPrimary,
-            fontWeight: FontWeight.w600,
-            fontSize: 13,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.xs),
-        TextField(
-          controller: controller,
-          keyboardType: keyboardType,
-          maxLines: maxLines,
-          onChanged: onChanged,
-          style: tt.bodyLarge?.copyWith(color: AppColors.textPrimary),
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: const TextStyle(color: AppColors.textHint),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.lg,
-              vertical: AppSpacing.md,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppRadius.md),
-              borderSide: const BorderSide(color: AppColors.border),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppRadius.md),
-              borderSide: const BorderSide(color: AppColors.border),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppRadius.md),
-              borderSide: const BorderSide(
-                color: AppColors.primary,
-                width: 1.5,
-              ),
-            ),
-            filled: true,
-            fillColor: const Color(0xFFF8FAFC),
-          ),
-        ),
-      ],
     );
   }
 }

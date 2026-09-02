@@ -1,7 +1,9 @@
-﻿import 'package:bookmybus/app/theme/app_colors.dart';
-import 'package:bookmybus/app/theme/app_radius.dart';
-import 'package:bookmybus/app/theme/app_shadows.dart';
+﻿import 'package:bookmybus/app/theme/app_radius.dart';
 import 'package:bookmybus/app/theme/app_spacing.dart';
+import 'package:bookmybus/features/BusOwner/CallBooking/widgets/step_2/trip_info_bar.dart';
+import 'package:bookmybus/features/BusOwner/CallBooking/widgets/step_2/header_row.dart';
+import 'package:bookmybus/features/BusOwner/CallBooking/widgets/step_2/legend_row.dart';
+import 'package:bookmybus/features/BusOwner/CallBooking/widgets/step_2/selection_summary.dart';
 import 'package:bookmybus/shared/widgets/bus_seat_layouts/bus_seat_layout.dart';
 import 'package:bookmybus/shared/widgets/bus_seat_layouts/two_by_two_45_seat_layout.dart';
 import 'package:flutter/material.dart';
@@ -129,19 +131,19 @@ class _Step2SeatsPageState extends State<Step2SeatsPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _TripInfoBar(
+          TripInfoBar(
             busName: trip.busName,
             from: trip.from,
             to: trip.to,
             departureTime: trip.departureTime,
           ),
           const SizedBox(height: AppSpacing.lg),
-          _HeaderRow(
+          HeaderRow(
             selectedCount: selected.length,
             totalFare: total,
           ),
           const SizedBox(height: AppSpacing.sm),
-          _LegendRow(),
+          const LegendRow(),
           const SizedBox(height: AppSpacing.lg),
           Container(
             width: double.infinity,
@@ -198,7 +200,7 @@ class _Step2SeatsPageState extends State<Step2SeatsPage> {
           ),
           const SizedBox(height: AppSpacing.lg),
           if (validSelectedSeats.isNotEmpty)
-            _SelectionSummary(
+            SelectionSummary(
               selected: validSelectedSeats.toList()..sort(),
               seatGenders: widget.booking.seatGenders,
               onGenderSelected: _assignGender,
@@ -224,184 +226,6 @@ class _Step2SeatsPageState extends State<Step2SeatsPage> {
             ),
           const SizedBox(height: AppSpacing.huge),
         ],
-      ),
-    );
-  }
-}
-
-class _TripInfoBar extends StatelessWidget {
-  const _TripInfoBar({
-    required this.busName,
-    required this.from,
-    required this.to,
-    required this.departureTime,
-  });
-
-  final String busName;
-  final String from;
-  final String to;
-  final String departureTime;
-
-  @override
-  Widget build(BuildContext context) {
-    final text = '$busName · $from → $to · $departureTime';
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.lg,
-        vertical: AppSpacing.md,
-      ),
-      decoration: BoxDecoration(
-        color: const Color(0xFFEFF6FF),
-        borderRadius: BorderRadius.circular(AppRadius.md),
-      ),
-      child: Text(
-        text,
-        style: Theme.of(context).textTheme.titleSmall?.copyWith(
-          color: const Color(0xFF1D4ED8),
-          fontWeight: FontWeight.w700,
-        ),
-      ),
-    );
-  }
-}
-
-class _HeaderRow extends StatelessWidget {
-  const _HeaderRow({
-    required this.selectedCount,
-    required this.totalFare,
-  });
-
-  final int selectedCount;
-  final double totalFare;
-
-  @override
-  Widget build(BuildContext context) {
-    final tt = Theme.of(context).textTheme;
-    return Row(
-      children: [
-        Expanded(
-          child: Text(
-            'Select Seats (max 10)',
-            style: tt.titleMedium?.copyWith(
-              color: AppColors.primary,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
-        Text(
-          '${selectedCount == 0 ? 0 : selectedCount} selected · LKR ${totalFare.toStringAsFixed(0)}',
-          style: tt.titleSmall?.copyWith(
-            color: AppColors.primary,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _LegendRow extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final items = [
-      (label: 'Available', color: Colors.white, border: const Color(0xFF2ECC71)),
-      (label: 'Booked (M)', color: const Color(0xFF2563EB), border: const Color(0xFF2563EB)),
-      (label: 'Booked (F)', color: const Color(0xFFFCE7F3), border: const Color(0xFFEC4899)),
-      (label: 'Pending', color: const Color(0xFFFDE68A), border: const Color(0xFFEAB308)),
-      (label: 'Unavailable', color: const Color(0xFFD1D5DB), border: const Color(0xFF6B7280)),
-      (label: 'Selected', color: const Color(0xFF1D4ED8), border: const Color(0xFF1D4ED8)),
-    ];
-
-    return Wrap(
-      spacing: 12,
-      runSpacing: 10,
-      children: items.map((item) {
-        return Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 14,
-              height: 14,
-              decoration: BoxDecoration(
-                color: item.color,
-                borderRadius: BorderRadius.circular(4),
-                border: Border.all(color: item.border, width: 1.5),
-              ),
-            ),
-            const SizedBox(width: 6),
-            Text(
-              item.label,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.textSecondary,
-              ),
-            ),
-          ],
-        );
-      }).toList(),
-    );
-  }
-}
-
-class _SelectionSummary extends StatelessWidget {
-  const _SelectionSummary({
-    required this.selected,
-    required this.seatGenders,
-    required this.onGenderSelected,
-    required this.onRemove,
-  });
-
-  final List<int> selected;
-  final Map<int, String> seatGenders;
-  final void Function(int, String) onGenderSelected;
-  final void Function(int) onRemove;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: const Color(0xFFEFF6FF),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFBFDBFE)),
-      ),
-      child: Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: selected.map((seat) {
-          final gender = seatGenders[seat];
-          final label = '#$seat $gender';
-
-          return Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.sm,
-              vertical: AppSpacing.xs,
-            ),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFBFDBFE)),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  label,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                GestureDetector(
-                  onTap: () => onRemove(seat),
-                  child: const Icon(Icons.close, size: 16, color: AppColors.textSecondary),
-                ),
-              ],
-            ),
-          );
-        }).toList(),
       ),
     );
   }
