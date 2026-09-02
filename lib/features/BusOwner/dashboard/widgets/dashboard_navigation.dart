@@ -1,6 +1,10 @@
 import 'package:bookmybus/app/theme/app_colors.dart';
 import 'package:bookmybus/app/theme/app_spacing.dart';
 import 'package:flutter/material.dart';
+import '../../CallBooking/pages/call_booking_page.dart';
+import '../../addbus/pages/add_bus_page.dart';
+import '../../booking_history/pages/booking_history_page.dart';
+import '../../manage_bus/pages/manage_bus_page.dart';
 import 'analytics_filter_bottom_sheet.dart';
 
 class DashboardNavigation extends StatelessWidget {
@@ -32,17 +36,22 @@ class DashboardNavigation extends StatelessWidget {
         BottomNavigationBarItem(
           icon: Icon(Icons.add_circle_outline),
           activeIcon: Icon(Icons.add_circle),
-          label: 'Add',
+          label: 'Add Bus',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.directions_bus_outlined),
           activeIcon: Icon(Icons.directions_bus),
-          label: 'Buses',
+          label: 'Manage Buses',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.history_outlined),
+          activeIcon: Icon(Icons.history),
+          label: 'Booking History',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.headset_mic_outlined),
           activeIcon: Icon(Icons.headset_mic),
-          label: 'Support',
+          label: 'Call Booking',
         ),
       ],
     );

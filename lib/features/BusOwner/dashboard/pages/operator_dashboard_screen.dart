@@ -2,6 +2,10 @@ import 'package:bookmybus/app/theme/app_colors.dart';
 import 'package:bookmybus/app/theme/app_spacing.dart';
 import 'package:bookmybus/features/Profile/pages/profile_page.dart';
 import 'package:flutter/material.dart';
+import '../../CallBooking/pages/call_booking_page.dart';
+import '../../addbus/pages/add_bus_page.dart';
+import '../../booking_history/pages/booking_history_page.dart';
+import '../../manage_bus/pages/manage_bus_page.dart';
 import '../data/dummy_dashboard_data.dart';
 import '../widgets/dashboard_header.dart';
 import '../widgets/dashboard_analytics_section.dart';
@@ -87,7 +91,25 @@ class _OperatorDashboardScreenState extends State<OperatorDashboardScreen> {
       ),
       bottomNavigationBar: DashboardNavigation(
         selectedIndex: _selectedNav,
-        onSelected: (i) => setState(() => _selectedNav = i),
+        onSelected: (i) {
+          setState(() => _selectedNav = i);
+
+          if (i == 0) return;
+
+          final page = switch (i) {
+            1 => const AddBusPage(),
+            2 => const ManageBusPage(),
+            3 => const BookingHistoryPage(),
+            4 => const CallBookingPage(),
+            _ => null,
+          };
+
+          if (page != null) {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => page),
+            );
+          }
+        },
       ),
     );
   }

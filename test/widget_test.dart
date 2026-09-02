@@ -1,5 +1,6 @@
 ﻿import 'package:bookmybus/features/BusOwner/CallBooking/models/call_booking_model.dart';
 import 'package:bookmybus/features/BusOwner/CallBooking/steps/step2_seats_page.dart';
+import 'package:bookmybus/features/BusOwner/addbus/pages/add_bus_page.dart';
 import 'package:bookmybus/features/BusOwner/dashboard/pages/operator_dashboard_screen.dart';
 import 'package:bookmybus/features/Profile/pages/profile_page.dart';
 import 'package:flutter/material.dart';
@@ -52,5 +53,25 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(ProfilePage), findsOneWidget);
+  });
+
+  testWidgets('Bottom navigation includes all required features and navigates to Add Bus',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: OperatorDashboardScreen(),
+      ),
+    );
+
+    expect(find.text('Dashboard'), findsWidgets);
+    expect(find.text('Add Bus'), findsOneWidget);
+    expect(find.text('Manage Buses'), findsOneWidget);
+    expect(find.text('Booking History'), findsOneWidget);
+    expect(find.text('Call Booking'), findsOneWidget);
+
+    await tester.tap(find.text('Add Bus'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(AddBusPage), findsOneWidget);
   });
 }
