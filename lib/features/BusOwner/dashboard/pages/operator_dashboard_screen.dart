@@ -25,87 +25,81 @@ class _OperatorDashboardScreenState extends State<OperatorDashboardScreen> {
   int _selectedFilter = 0;
   int _selectedNav = 0;
 
+  Widget _buildDashboardTab() {
+    final filterLabel = DummyDashboardData.filters[_selectedFilter];
+    return Stack(
+      children: [
+        CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
+              child: DashboardHeader(
+                greeting: 'Good Morning 👋',
+                operatorName: 'NCG Express',
+                totalRevenue: 'Rs 25,000.00',
+                onProfileTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const ProfilePage()),
+                  );
+                },
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.lg,
+                  0,
+                  AppSpacing.lg,
+                  AppSpacing.lg,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 36 + AppSpacing.lg),
+                    DashboardOverviewSection(
+                      filters: DummyDashboardData.filters,
+                      selectedFilter: _selectedFilter,
+                      filterLabel: filterLabel,
+                      metrics: DummyDashboardData.metrics,
+                      onFilterSelected: (i) =>
+                          setState(() => _selectedFilter = i),
+                    ),
+                    DashboardAnalyticsSection(
+                      bookingsTrend: DummyDashboardData.bookingsTrend,
+                      revenueTrend: DummyDashboardData.revenueTrend,
+                    ),
+                    DashboardTopListsSection(
+                      topRoutes: DummyDashboardData.topRoutes,
+                      topBuses: DummyDashboardData.topBuses,
+                      cancelledRoutes: DummyDashboardData.cancelledRoutes,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        const DashboardFilterButton(),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final filterLabel = DummyDashboardData.filters[_selectedFilter];
-
     return Scaffold(
       backgroundColor: AppColors.scaffold,
-      body: Stack(
+      body: IndexedStack(
+        index: _selectedNav,
         children: [
-          CustomScrollView(
-            slivers: [
-              SliverToBoxAdapter(
-                child: DashboardHeader(
-                  greeting: 'Good Morning 👋',
-                  operatorName: 'NCG Express',
-                  totalRevenue: 'Rs 25,000.00',
-                  onProfileTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const ProfilePage()),
-                    );
-                  },
-                ),
-              ),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    AppSpacing.lg,
-                    0,
-                    AppSpacing.lg,
-                    AppSpacing.lg,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 36 + AppSpacing.lg),
-
-                      DashboardOverviewSection(
-                        filters: DummyDashboardData.filters,
-                        selectedFilter: _selectedFilter,
-                        filterLabel: filterLabel,
-                        metrics: DummyDashboardData.metrics,
-                        onFilterSelected: (i) =>
-                            setState(() => _selectedFilter = i),
-                      ),
-                      DashboardAnalyticsSection(
-                        bookingsTrend: DummyDashboardData.bookingsTrend,
-                        revenueTrend: DummyDashboardData.revenueTrend,
-                      ),
-                      DashboardTopListsSection(
-                        topRoutes: DummyDashboardData.topRoutes,
-                        topBuses: DummyDashboardData.topBuses,
-                        cancelledRoutes: DummyDashboardData.cancelledRoutes,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          const DashboardFilterButton(),
+          _buildDashboardTab(),
+          const AddBusPage(),
+          const ManageBusPage(),
+          const BookingHistoryPage(),
+          const CallBookingPage(),
         ],
       ),
       bottomNavigationBar: DashboardNavigation(
         selectedIndex: _selectedNav,
-        onSelected: (i) {
-          setState(() => _selectedNav = i);
-
-          if (i == 0) return;
-
-          final page = switch (i) {
-            1 => const AddBusPage(),
-            2 => const ManageBusPage(),
-            3 => const BookingHistoryPage(),
-            4 => const CallBookingPage(),
-            _ => null,
-          };
-
-          if (page != null) {
-            Navigator.of(context).push(MaterialPageRoute(builder: (_) => page));
-          }
-        },
+        onSelected: (i) => setState(() => _selectedNav = i),
       ),
     );
   }
