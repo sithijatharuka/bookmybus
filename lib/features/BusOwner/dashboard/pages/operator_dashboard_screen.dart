@@ -42,9 +42,7 @@ class _OperatorDashboardScreenState extends State<OperatorDashboardScreen> {
                   totalRevenue: 'Rs 25,000.00',
                   onProfileTap: () {
                     Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const ProfilePage(),
-                      ),
+                      MaterialPageRoute(builder: (_) => const ProfilePage()),
                     );
                   },
                 ),
@@ -105,9 +103,7 @@ class _OperatorDashboardScreenState extends State<OperatorDashboardScreen> {
           };
 
           if (page != null) {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => page),
-            );
+            Navigator.of(context).push(MaterialPageRoute(builder: (_) => page));
           }
         },
       ),

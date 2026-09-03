@@ -28,6 +28,7 @@ class FilterSummaryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
+      margin: const EdgeInsets.symmetric(vertical: AppSpacing.md),
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
@@ -36,7 +37,7 @@ class FilterSummaryCard extends StatelessWidget {
           BoxShadow(color: AppColors.shadow, blurRadius: 8, offset: Offset(0, 2)),
         ],
       ),
-      child: Column(
+      child: Column(        
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           RichText(
