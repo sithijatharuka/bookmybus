@@ -10,8 +10,8 @@ class DummyDashboardData {
     DashboardMetricModel(title: 'BOOKINGS', value: '148'),
     DashboardMetricModel(title: 'REVENUE', value: 'Rs 25K'),
     DashboardMetricModel(title: 'CANCELLATIONS', value: '9', isAlert: true),
-    // DashboardMetricModel(title: 'OCCUPANCY', value: '78%'),
-    // DashboardMetricModel(title: 'TRIPS', value: '34'),
+    DashboardMetricModel(title: 'OCCUPANCY RATE', value: '0.0%'),
+    DashboardMetricModel(title: 'TRIPS', value: '0'),
   ];
 
   static const topRoutes = [

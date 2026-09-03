@@ -25,7 +25,7 @@ class DashboardMetricsGrid extends StatelessWidget {
       mainAxisSpacing: AppSpacing.md,
       childAspectRatio: 1.6,
       children: metrics
-          .map((m) => DashboardMetricCard(metric: m, subtitle: subtitle))
+          .map((m) => DashboardMetricCard(metric: m))
           .toList(),
     );
   }
@@ -35,11 +35,9 @@ class DashboardMetricCard extends StatelessWidget {
   const DashboardMetricCard({
     super.key,
     required this.metric,
-    required this.subtitle,
   });
 
   final DashboardMetricModel metric;
-  final String subtitle;
 
   @override
   Widget build(BuildContext context) {
@@ -71,11 +69,18 @@ class DashboardMetricCard extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          Text(
-            subtitle,
-            style: tt.bodySmall?.copyWith(
-              color: AppColors.textHint,
-              fontSize: 11,
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8FAFC),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              metric.badge,
+              style: tt.bodySmall?.copyWith(
+                color: const Color(0xFF94A3B8),
+                fontSize: 11,
+              ),
             ),
           ),
         ],

@@ -2,11 +2,13 @@ class DashboardMetricModel {
   final String title;
   final String value;
   final bool isAlert;
+  final String badge;
 
   const DashboardMetricModel({
     required this.title,
     required this.value,
     this.isAlert = false,
+    this.badge = 'No change vs prev',
   });
 }
 

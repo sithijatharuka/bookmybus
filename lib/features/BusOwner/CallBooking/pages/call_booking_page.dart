@@ -99,8 +99,8 @@ class _CallBookingPageState extends State<CallBookingPage> {
                 currentStep: _currentStep,
               ),
 
-              // ── Page header ────────────────────────────────
-              CallBookingPageHeader(onViewRecent: () {}),
+              // ── Page header (step 1 only) ──────────────────
+              if (_currentStep == 0) CallBookingPageHeader(onViewRecent: () {}),
 
               // ── Step content ───────────────────────────────
               Expanded(child: _stepView),

@@ -17,12 +17,8 @@ class App extends StatelessWidget {
       title: 'BookMyBus',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
-      // home: const CallBookingPage(),
       home: const OperatorDashboardScreen(),
-      // home: const ManageBusPage(),
-      // home: const AddBusPage(),
-      // home: const ProfilePage(),
-      // home: const BookingHistoryPage(),
+    
     );
   }
 }
