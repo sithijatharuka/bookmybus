@@ -11,6 +11,7 @@ import '../widgets/call_booking_page_header.dart';
 import '../widgets/call_booking_nav_bar.dart';
 import '../widgets/call_booking_loading_overlay.dart';
 import '../widgets/booking_success_card.dart';
+import '../widgets/recent_call_bookings_sheet.dart';
 
 class CallBookingPage extends StatefulWidget {
   const CallBookingPage({super.key});
@@ -111,7 +112,9 @@ class _CallBookingPageState extends State<CallBookingPage> {
               ),
 
               // ── Page header (step 1 only) ──────────────────
-              if (_currentStep == 0) CallBookingPageHeader(onViewRecent: () {}),
+              if (_currentStep == 0) CallBookingPageHeader(
+                onViewRecent: () => RecentCallBookingsSheet.show(context),
+              ),
 
               // ── Step content ───────────────────────────────
               Expanded(child: _stepView),
