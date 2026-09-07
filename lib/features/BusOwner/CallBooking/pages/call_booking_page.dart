@@ -10,7 +10,7 @@ import '../widgets/call_booking_step_indicator.dart';
 import '../widgets/call_booking_page_header.dart';
 import '../widgets/call_booking_nav_bar.dart';
 import '../widgets/call_booking_loading_overlay.dart';
-import '../widgets/call_booking_success_dialog.dart';
+import '../widgets/booking_success_card.dart';
 
 class CallBookingPage extends StatefulWidget {
   const CallBookingPage({super.key});
@@ -22,6 +22,7 @@ class CallBookingPage extends StatefulWidget {
 class _CallBookingPageState extends State<CallBookingPage> {
   int _currentStep = 0;
   bool _isSubmitting = false;
+  String _bookingReference = '';
 
   final _booking = CallBookingModel();
 
@@ -46,6 +47,14 @@ class _CallBookingPageState extends State<CallBookingPage> {
 
   // ── Step view ─────────────────────────────────────────────────────────────
 
+  static const _months = [
+    'Jan','Feb','Mar','Apr','May','Jun',
+    'Jul','Aug','Sep','Oct','Nov','Dec',
+  ];
+
+  String _fmtDate(DateTime d) =>
+      '${d.day.toString().padLeft(2, '0')} ${_months[d.month - 1]} ${d.year}';
+
   Widget get _stepView => switch (_currentStep) {
     0 => Step1BusDatePage(booking: _booking, onChanged: () => setState(() {})),
     1 => Step2SeatsPage(booking: _booking, onChanged: () => setState(() {})),
@@ -54,6 +63,18 @@ class _CallBookingPageState extends State<CallBookingPage> {
       onChanged: () => setState(() {}),
     ),
     3 => Step4ConfirmPage(booking: _booking),
+    4 => BookingSuccessCard(
+      reference: _bookingReference,
+      passengerName: _booking.passengerName,
+      travelDate: _fmtDate(_booking.travelDate!),
+      seats: _booking.selectedSeats,
+      seatGenders: _booking.seatGenders,
+      totalAmount: _booking.selectedSeats.length * (_booking.selectedTrip?.pricePerSeat ?? 0),
+      onCreateAnother: () => setState(() {
+        _currentStep = 0;
+        _bookingReference = '';
+      }),
+    ),
     _ => const SizedBox.shrink(),
   };
 
@@ -65,23 +86,13 @@ class _CallBookingPageState extends State<CallBookingPage> {
       // TODO: API integration
       await Future.delayed(const Duration(milliseconds: 600));
       if (!mounted) return;
-      _showSuccessDialog();
+      setState(() {
+        _bookingReference = 'BK${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
+        _currentStep = 4;
+      });
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }
-  }
-
-  void _showSuccessDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => CallBookingSuccessDialog(
-        onDone: () {
-          Navigator.of(context).pop();
-          Navigator.of(context).pop();
-        },
-      ),
-    );
   }
 
   @override
@@ -93,8 +104,8 @@ class _CallBookingPageState extends State<CallBookingPage> {
         children: [
           Column(
             children: [
-              // ── Step indicator ─────────────────────────────
-              CallBookingStepIndicator(
+              // ── Step indicator (hidden on success screen) ──
+              if (_currentStep < 4) CallBookingStepIndicator(
                 steps: _steps,
                 currentStep: _currentStep,
               ),
@@ -105,8 +116,8 @@ class _CallBookingPageState extends State<CallBookingPage> {
               // ── Step content ───────────────────────────────
               Expanded(child: _stepView),
 
-              // ── Nav bar ────────────────────────────────────
-              CallBookingNavBar(
+              // ── Nav bar (hidden on success screen) ─────────
+              if (_currentStep < 4) CallBookingNavBar(
                 currentStep: _currentStep,
                 totalSteps: _steps.length,
                 canProceed: _canProceed,
