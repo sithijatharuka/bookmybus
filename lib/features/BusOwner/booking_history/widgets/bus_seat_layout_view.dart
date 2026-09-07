@@ -4,7 +4,7 @@ import 'package:bookmybus/app/theme/app_spacing.dart';
 import 'package:flutter/material.dart';
 import '../models/booking_history_model.dart';
 
-class BusSeatLayoutView extends StatelessWidget {
+class BusSeatLayoutView extends StatefulWidget {
   const BusSeatLayoutView({
     super.key,
     required this.busNumber,
@@ -33,11 +33,17 @@ class BusSeatLayoutView extends StatelessWidget {
     );
   }
 
-  // Aggregate booked seats across all bookings for this bus+date
-  // Returns map: seatNum → (gender, phone, isCallBooking)
-  Map<int, ({String gender, String phone, bool isCall})> get _bookedSeats {
-    final map = <int, ({String gender, String phone, bool isCall})>{};
-    for (final booking in bookings) {
+  @override
+  State<BusSeatLayoutView> createState() => _BusSeatLayoutViewState();
+}
+
+class _BusSeatLayoutViewState extends State<BusSeatLayoutView> {
+  int? _selectedSeat;
+
+  // Aggregate booked seats: seatNum → (gender, phone, isCall, passengerName)
+  Map<int, ({String gender, String phone, bool isCall, String name})> get _bookedSeats {
+    final map = <int, ({String gender, String phone, bool isCall, String name})>{};
+    for (final booking in widget.bookings) {
       for (final s in booking.seats) {
         final match = RegExp(r'(\d+)\s*\((Male|Female)\)', caseSensitive: false)
             .firstMatch(s);
@@ -46,6 +52,7 @@ class BusSeatLayoutView extends StatelessWidget {
             gender: match.group(2)!.toLowerCase() == 'male' ? 'M' : 'F',
             phone: booking.passengerPhone,
             isCall: booking.isCallBooking,
+            name: booking.passengerName,
           );
         }
       }
@@ -54,15 +61,15 @@ class BusSeatLayoutView extends StatelessWidget {
   }
 
   String get _busLabel {
-    if (bookings.isNotEmpty) {
-      return '${bookings.first.busName.toUpperCase()} ($busNumber)';
+    if (widget.bookings.isNotEmpty) {
+      return '${widget.bookings.first.busName.toUpperCase()} (${widget.busNumber})';
     }
-    return busNumber;
+    return widget.busNumber;
   }
 
   String get _routeLabel {
-    if (bookings.isNotEmpty) {
-      return '${bookings.first.from} → ${bookings.first.to}';
+    if (widget.bookings.isNotEmpty) {
+      return '${widget.bookings.first.from} → ${widget.bookings.first.to}';
     }
     return '—';
   }
@@ -75,6 +82,7 @@ class BusSeatLayoutView extends StatelessWidget {
     final availableCount = totalSeats - bookedCount;
     final maleCount = booked.values.where((v) => v.gender == 'M').length;
     final femaleCount = booked.values.where((v) => v.gender == 'F').length;
+    final selectedInfo = _selectedSeat != null ? booked[_selectedSeat!] : null;
 
     return Dialog(
       insetPadding: const EdgeInsets.all(AppSpacing.lg),
@@ -88,7 +96,7 @@ class BusSeatLayoutView extends StatelessWidget {
             _Header(
               busLabel: _busLabel,
               routeLabel: _routeLabel,
-              travelDate: travelDate,
+              travelDate: widget.travelDate,
             ),
             Flexible(
               child: SingleChildScrollView(
@@ -106,7 +114,25 @@ class BusSeatLayoutView extends StatelessWidget {
                     const SizedBox(height: AppSpacing.md),
                     const _Legend(),
                     const SizedBox(height: AppSpacing.lg),
-                    _SeatGrid(bookedSeats: booked),                  ],
+                    _SeatGrid(
+                      bookedSeats: booked,
+                      selectedSeat: _selectedSeat,
+                      onSeatTapped: (seatNum) => setState(() {
+                        _selectedSeat = _selectedSeat == seatNum ? null : seatNum;
+                      }),
+                    ),
+                    if (selectedInfo != null) ...[
+                      const SizedBox(height: AppSpacing.lg),
+                      SeatDetailCardWidget(
+                        seatNumber: _selectedSeat!,
+                        passengerName: selectedInfo.name,
+                        gender: selectedInfo.gender,
+                        phone: selectedInfo.phone,
+                        isCallBooking: selectedInfo.isCall,
+                        onDismiss: () => setState(() => _selectedSeat = null),
+                      ),
+                    ],
+                  ],
                 ),
               ),
             ),
@@ -327,8 +353,14 @@ class _LegendItem extends StatelessWidget {
 // ─── Seat Grid ────────────────────────────────────────────────────────────────
 
 class _SeatGrid extends StatelessWidget {
-  const _SeatGrid({required this.bookedSeats});
-  final Map<int, ({String gender, String phone, bool isCall})> bookedSeats;
+  const _SeatGrid({
+    required this.bookedSeats,
+    required this.selectedSeat,
+    required this.onSeatTapped,
+  });
+  final Map<int, ({String gender, String phone, bool isCall, String name})> bookedSeats;
+  final int? selectedSeat;
+  final ValueChanged<int> onSeatTapped;
 
   // Seat numbering: rows 1-10 → seats 1-40 (left: odd cols, right: even cols)
   // Row r, col c (0-indexed): seat = (r * 4) + c + 1
@@ -374,14 +406,14 @@ class _SeatGrid extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: AppSpacing.xs),
-                _SeatWidget(seatNum: seats[0], bookedSeats: bookedSeats),
+                _SeatWidget(seatNum: seats[0], bookedSeats: bookedSeats, selectedSeat: selectedSeat, onTapped: onSeatTapped),
                 const SizedBox(width: AppSpacing.xs),
-                _SeatWidget(seatNum: seats[1], bookedSeats: bookedSeats),
+                _SeatWidget(seatNum: seats[1], bookedSeats: bookedSeats, selectedSeat: selectedSeat, onTapped: onSeatTapped),
                 // Aisle
                 const Spacer(),
-                _SeatWidget(seatNum: seats[2], bookedSeats: bookedSeats),
+                _SeatWidget(seatNum: seats[2], bookedSeats: bookedSeats, selectedSeat: selectedSeat, onTapped: onSeatTapped),
                 const SizedBox(width: AppSpacing.xs),
-                _SeatWidget(seatNum: seats[3], bookedSeats: bookedSeats),
+                _SeatWidget(seatNum: seats[3], bookedSeats: bookedSeats, selectedSeat: selectedSeat, onTapped: onSeatTapped),
               ],
             ),
           );
@@ -407,7 +439,7 @@ class _SeatGrid extends StatelessWidget {
                 final seatNum = 41 + i;
                 return Padding(
                   padding: EdgeInsets.only(right: i < 4 ? AppSpacing.xs : 0),
-                  child: _SeatWidget(seatNum: seatNum, bookedSeats: bookedSeats),
+                  child: _SeatWidget(seatNum: seatNum, bookedSeats: bookedSeats, selectedSeat: selectedSeat, onTapped: onSeatTapped),
                 );
               }),
             ],
@@ -419,37 +451,55 @@ class _SeatGrid extends StatelessWidget {
 }
 
 class _SeatWidget extends StatelessWidget {
-  const _SeatWidget({required this.seatNum, required this.bookedSeats});
+  const _SeatWidget({
+    required this.seatNum,
+    required this.bookedSeats,
+    required this.selectedSeat,
+    required this.onTapped,
+  });
   final int seatNum;
-  final Map<int, ({String gender, String phone, bool isCall})> bookedSeats;
+  final Map<int, ({String gender, String phone, bool isCall, String name})> bookedSeats;
+  final int? selectedSeat;
+  final ValueChanged<int> onTapped;
 
   @override
   Widget build(BuildContext context) {
     final info = bookedSeats[seatNum];
     final isBooked = info != null;
+    final isSelected = selectedSeat == seatNum;
 
     if (isBooked && info.isCall) {
-      return _CallBookingSeat(
-        seatNum: seatNum,
-        gender: info.gender,
-        phone: info.phone,
+      return GestureDetector(
+        onTap: () => onTapped(seatNum),
+        child: _CallBookingSeat(
+          seatNum: seatNum,
+          gender: info.gender,
+          phone: info.phone,
+          isSelected: isSelected,
+        ),
       );
     }
 
     final isFemale = info?.gender == 'F';
-    final bg = isBooked
+    Color bg = isBooked
         ? (isFemale ? const Color(0xFFFF4081) : AppColors.primary)
         : AppColors.white;
+    if (isSelected) bg = bg.withOpacity(0.65);
     final fg = isBooked ? AppColors.white : AppColors.textHint;
-    final borderColor = isBooked ? Colors.transparent : AppColors.border;
+    final borderColor = isSelected
+        ? const Color(0xFFFBBF24)
+        : (isBooked ? Colors.transparent : AppColors.border);
 
-    return _SeatBox(
-      label: isBooked ? info!.gender : '$seatNum',
-      bg: bg,
-      fg: fg,
-      borderColor: borderColor,
-      size: 36,
-      subLabel: isBooked ? '$seatNum' : null,
+    return GestureDetector(
+      onTap: isBooked ? () => onTapped(seatNum) : null,
+      child: _SeatBox(
+        label: isBooked ? info!.gender : '$seatNum',
+        bg: bg,
+        fg: fg,
+        borderColor: borderColor,
+        size: 36,
+        subLabel: isBooked ? '$seatNum' : null,
+      ),
     );
   }
 }
@@ -459,11 +509,13 @@ class _CallBookingSeat extends StatelessWidget {
     required this.seatNum,
     required this.gender,
     required this.phone,
+    this.isSelected = false,
   });
 
   final int seatNum;
   final String gender;
   final String phone;
+  final bool isSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -479,6 +531,9 @@ class _CallBookingSeat extends StatelessWidget {
             decoration: BoxDecoration(
               color: const Color(0xFF1E3A8A),
               borderRadius: BorderRadius.circular(6),
+              border: isSelected
+                  ? Border.all(color: const Color(0xFFFBBF24), width: 2)
+                  : null,
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -588,6 +643,158 @@ class _SeatBox extends StatelessWidget {
                       fontSize: size > 24 ? 11 : 10,
                       fontWeight: FontWeight.w600)),
             ),
+    );
+  }
+}
+
+// ─── Seat Detail Card ─────────────────────────────────────────────────────────
+
+class SeatDetailCardWidget extends StatelessWidget {
+  const SeatDetailCardWidget({
+    super.key,
+    required this.seatNumber,
+    required this.passengerName,
+    required this.gender,
+    required this.phone,
+    required this.isCallBooking,
+    required this.onDismiss,
+  });
+
+  final int seatNumber;
+  final String passengerName;
+  final String gender;
+  final String phone;
+  final bool isCallBooking;
+  final VoidCallback onDismiss;
+
+  @override
+  Widget build(BuildContext context) {
+    final tt = Theme.of(context).textTheme;
+    final isFemale = gender == 'F';
+    final genderLabel = isFemale ? 'Female' : 'Male';
+    final genderColor =
+        isFemale ? const Color(0xFFDB2777) : const Color(0xFF2563EB);
+
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Seat $seatNumber Details',
+                style: tt.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              GestureDetector(
+                onTap: onDismiss,
+                child: Text(
+                  'Dismiss',
+                  style: tt.bodySmall?.copyWith(
+                    color: AppColors.primary,
+                    decoration: TextDecoration.underline,
+                    decorationColor: AppColors.primary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          // 2×2 grid
+          Row(
+            children: [
+              Expanded(
+                child: _DetailField(
+                  label: 'Passenger',
+                  value: passengerName,
+                ),
+              ),
+              Expanded(
+                child: _DetailField(
+                  label: 'Gender',
+                  value: genderLabel,
+                  valueColor: genderColor,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Row(
+            children: [
+              Expanded(
+                child: _DetailField(
+                  label: 'Contact',
+                  value: phone,
+                ),
+              ),
+              Expanded(
+                child: _DetailField(
+                  label: 'Booking Type',
+                  value: isCallBooking ? 'Call Booking' : 'Online',
+                  valueColor:
+                      isCallBooking ? const Color(0xFFD97706) : AppColors.textPrimary,
+                  icon: isCallBooking ? Icons.phone_in_talk_outlined : null,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DetailField extends StatelessWidget {
+  const _DetailField({
+    required this.label,
+    required this.value,
+    this.valueColor,
+    this.icon,
+  });
+
+  final String label;
+  final String value;
+  final Color? valueColor;
+  final IconData? icon;
+
+  @override
+  Widget build(BuildContext context) {
+    final tt = Theme.of(context).textTheme;
+    final color = valueColor ?? AppColors.textPrimary;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: tt.bodySmall?.copyWith(color: AppColors.textHint, fontSize: 11),
+        ),
+        const SizedBox(height: 2),
+        Row(
+          children: [
+            if (icon != null) ...[
+              Icon(icon, size: 13, color: color),
+              const SizedBox(width: 3),
+            ],
+            Flexible(
+              child: Text(
+                value,
+                style: tt.bodySmall?.copyWith(
+                  color: color,
+                  fontWeight: FontWeight.w600,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
