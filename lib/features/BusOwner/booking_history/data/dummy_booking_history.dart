@@ -36,6 +36,7 @@ class DummyBookingHistory {
       fare: 2010.45,
       paymentMethod: 'Online Payment',
       status: 'confirmed',
+      isCallBooking: true,
     ),
     BookingHistoryModel(
       ticketRef: '3FC9812A',
@@ -99,6 +100,7 @@ class DummyBookingHistory {
       fare: 4200.00,
       paymentMethod: 'Bank Transfer',
       status: 'pending',
+      isCallBooking: true,
     ),
     BookingHistoryModel(
       ticketRef: 'C5A9004D',

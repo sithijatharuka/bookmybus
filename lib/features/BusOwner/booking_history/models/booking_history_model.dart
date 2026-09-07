@@ -18,6 +18,7 @@ class BookingHistoryModel {
   final double fare;
   final String paymentMethod;
   final String status; // 'confirmed', 'cancelled', 'pending'
+  final bool isCallBooking;
 
   const BookingHistoryModel({
     required this.ticketRef,
@@ -39,5 +40,6 @@ class BookingHistoryModel {
     required this.fare,
     required this.paymentMethod,
     required this.status,
+    this.isCallBooking = false,
   });
 }

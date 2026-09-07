@@ -13,12 +13,15 @@ class TwoByTwo45SeatLayout extends StatefulWidget {
     super.key,
     this.seatStatuses = const {},
     this.selectedSeats = const {},
+    this.callBookingSeats = const {},
     this.onSeatTapped,
     this.onSeatSelected,
   });
 
   final Map<int, SeatStatus> seatStatuses;
   final Set<int> selectedSeats;
+  /// Maps seat number → (gender, phone) for call-booked seats.
+  final Map<int, ({String gender, String phone})> callBookingSeats;
   final ValueChanged<int>? onSeatTapped;
   final OnSeatSelected? onSeatSelected;
 
@@ -78,6 +81,7 @@ class _TwoByTwo45SeatLayoutState extends State<TwoByTwo45SeatLayout> {
                 right: [seats[2], seats[3]],
                 effectiveStatus: _effectiveStatus,
                 isSelected: widget.selectedSeats.contains,
+                callBookingSeats: widget.callBookingSeats,
                 onTap: _toggle,
               );
             }),
@@ -87,6 +91,7 @@ class _TwoByTwo45SeatLayoutState extends State<TwoByTwo45SeatLayout> {
               seats: _backRow,
               effectiveStatus: _effectiveStatus,
               isSelected: widget.selectedSeats.contains,
+              callBookingSeats: widget.callBookingSeats,
               onTap: _toggle,
             ),
           ],
@@ -103,6 +108,7 @@ class _SeatRow extends StatelessWidget {
     required this.right,
     required this.effectiveStatus,
     required this.isSelected,
+    required this.callBookingSeats,
     required this.onTap,
   });
 
@@ -111,6 +117,7 @@ class _SeatRow extends StatelessWidget {
   final List<int> right;
   final SeatStatus Function(int) effectiveStatus;
   final bool Function(int) isSelected;
+  final Map<int, ({String gender, String phone})> callBookingSeats;
   final void Function(int) onTap;
 
   @override
@@ -137,6 +144,7 @@ class _SeatRow extends StatelessWidget {
                 seat: s,
                 status: effectiveStatus(s),
                 isSelected: isSelected(s),
+                callInfo: callBookingSeats[s],
                 onTap: onTap,
               )),
           const SizedBox(width: 36),
@@ -144,6 +152,7 @@ class _SeatRow extends StatelessWidget {
                 seat: s,
                 status: effectiveStatus(s),
                 isSelected: isSelected(s),
+                callInfo: callBookingSeats[s],
                 onTap: onTap,
               )),
         ],
@@ -158,6 +167,7 @@ class _BackRow extends StatelessWidget {
     required this.seats,
     required this.effectiveStatus,
     required this.isSelected,
+    required this.callBookingSeats,
     required this.onTap,
   });
 
@@ -165,6 +175,7 @@ class _BackRow extends StatelessWidget {
   final List<int> seats;
   final SeatStatus Function(int) effectiveStatus;
   final bool Function(int) isSelected;
+  final Map<int, ({String gender, String phone})> callBookingSeats;
   final void Function(int) onTap;
 
   @override
@@ -191,6 +202,7 @@ class _BackRow extends StatelessWidget {
                 seat: s,
                 status: effectiveStatus(s),
                 isSelected: isSelected(s),
+                callInfo: callBookingSeats[s],
                 onTap: onTap,
               )),
         ],
@@ -205,15 +217,97 @@ class _SeatCell extends StatelessWidget {
     required this.status,
     required this.isSelected,
     required this.onTap,
+    this.callInfo,
   });
 
   final int seat;
   final SeatStatus status;
   final bool isSelected;
   final void Function(int) onTap;
+  final ({String gender, String phone})? callInfo;
 
   @override
   Widget build(BuildContext context) {
+    // Call-booking seat: navy tile with gender, seat number, phone + 'C' badge
+    if (callInfo != null) {
+      return Container(
+        margin: const EdgeInsets.symmetric(horizontal: 3),
+        child: SizedBox(
+          width: 44,
+          height: 44,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1E3A8A),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      callInfo!.gender,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 9,
+                        fontWeight: FontWeight.w500,
+                        height: 1.1,
+                      ),
+                    ),
+                    Text(
+                      '$seat',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        height: 1.1,
+                      ),
+                    ),
+                    Text(
+                      callInfo!.phone.length > 7
+                          ? callInfo!.phone.substring(callInfo!.phone.length - 7)
+                          : callInfo!.phone,
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 7,
+                        height: 1.1,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // White 'C' badge
+              Positioned(
+                top: -5,
+                right: -5,
+                child: Container(
+                  width: 15,
+                  height: 15,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'C',
+                    style: TextStyle(
+                      color: Color(0xFF1E3A8A),
+                      fontSize: 8,
+                      fontWeight: FontWeight.bold,
+                      height: 1,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     final bg = status.fillColor;
     final border = status.borderColor;
     final effectiveBg = isSelected ? border : bg;

@@ -34,15 +34,19 @@ class BusSeatLayoutView extends StatelessWidget {
   }
 
   // Aggregate booked seats across all bookings for this bus+date
-  Map<int, String> get _bookedSeats {
-    final map = <int, String>{};
+  // Returns map: seatNum → (gender, phone, isCallBooking)
+  Map<int, ({String gender, String phone, bool isCall})> get _bookedSeats {
+    final map = <int, ({String gender, String phone, bool isCall})>{};
     for (final booking in bookings) {
       for (final s in booking.seats) {
         final match = RegExp(r'(\d+)\s*\((Male|Female)\)', caseSensitive: false)
             .firstMatch(s);
         if (match != null) {
-          map[int.parse(match.group(1)!)] =
-              match.group(2)!.toLowerCase() == 'male' ? 'M' : 'F';
+          map[int.parse(match.group(1)!)] = (
+            gender: match.group(2)!.toLowerCase() == 'male' ? 'M' : 'F',
+            phone: booking.passengerPhone,
+            isCall: booking.isCallBooking,
+          );
         }
       }
     }
@@ -69,8 +73,8 @@ class BusSeatLayoutView extends StatelessWidget {
     const totalSeats = 45;
     final bookedCount = booked.length;
     final availableCount = totalSeats - bookedCount;
-    final maleCount = booked.values.where((v) => v == 'M').length;
-    final femaleCount = booked.values.where((v) => v == 'F').length;
+    final maleCount = booked.values.where((v) => v.gender == 'M').length;
+    final femaleCount = booked.values.where((v) => v.gender == 'F').length;
 
     return Dialog(
       insetPadding: const EdgeInsets.all(AppSpacing.lg),
@@ -102,8 +106,7 @@ class BusSeatLayoutView extends StatelessWidget {
                     const SizedBox(height: AppSpacing.md),
                     const _Legend(),
                     const SizedBox(height: AppSpacing.lg),
-                    _SeatGrid(bookedSeats: booked),
-                  ],
+                    _SeatGrid(bookedSeats: booked),                  ],
                 ),
               ),
             ),
@@ -259,15 +262,40 @@ class _Legend extends StatelessWidget {
           tt: tt,
         ),
         _LegendItem(
-          child: Container(
-            width: 22,
-            height: 22,
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFF8E1),
-              border: Border.all(color: const Color(0xFFFFB300), width: 1.5),
-              borderRadius: BorderRadius.circular(AppRadius.xs),
-            ),
-            child: const Icon(Icons.access_time, size: 14, color: Color(0xFFFFB300)),
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Container(
+                width: 22,
+                height: 22,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1E3A8A),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                alignment: Alignment.center,
+                child: const Text('C',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold)),
+              ),
+              Positioned(
+                top: -3,
+                right: -3,
+                child: Container(
+                  width: 9,
+                  height: 9,
+                  decoration: const BoxDecoration(
+                      color: Colors.white, shape: BoxShape.circle),
+                  alignment: Alignment.center,
+                  child: const Text('C',
+                      style: TextStyle(
+                          color: Color(0xFF1E3A8A),
+                          fontSize: 5,
+                          fontWeight: FontWeight.bold)),
+                ),
+              ),
+            ],
           ),
           label: 'Call Booking',
           tt: tt,
@@ -300,7 +328,7 @@ class _LegendItem extends StatelessWidget {
 
 class _SeatGrid extends StatelessWidget {
   const _SeatGrid({required this.bookedSeats});
-  final Map<int, String> bookedSeats;
+  final Map<int, ({String gender, String phone, bool isCall})> bookedSeats;
 
   // Seat numbering: rows 1-10 → seats 1-40 (left: odd cols, right: even cols)
   // Row r, col c (0-indexed): seat = (r * 4) + c + 1
@@ -393,14 +421,22 @@ class _SeatGrid extends StatelessWidget {
 class _SeatWidget extends StatelessWidget {
   const _SeatWidget({required this.seatNum, required this.bookedSeats});
   final int seatNum;
-  final Map<int, String> bookedSeats;
+  final Map<int, ({String gender, String phone, bool isCall})> bookedSeats;
 
   @override
   Widget build(BuildContext context) {
-    final gender = bookedSeats[seatNum];
-    final isBooked = gender != null;
-    final isFemale = gender == 'F';
+    final info = bookedSeats[seatNum];
+    final isBooked = info != null;
 
+    if (isBooked && info.isCall) {
+      return _CallBookingSeat(
+        seatNum: seatNum,
+        gender: info.gender,
+        phone: info.phone,
+      );
+    }
+
+    final isFemale = info?.gender == 'F';
     final bg = isBooked
         ? (isFemale ? const Color(0xFFFF4081) : AppColors.primary)
         : AppColors.white;
@@ -408,12 +444,99 @@ class _SeatWidget extends StatelessWidget {
     final borderColor = isBooked ? Colors.transparent : AppColors.border;
 
     return _SeatBox(
-      label: isBooked ? gender! : '$seatNum',
+      label: isBooked ? info!.gender : '$seatNum',
       bg: bg,
       fg: fg,
       borderColor: borderColor,
       size: 36,
       subLabel: isBooked ? '$seatNum' : null,
+    );
+  }
+}
+
+class _CallBookingSeat extends StatelessWidget {
+  const _CallBookingSeat({
+    required this.seatNum,
+    required this.gender,
+    required this.phone,
+  });
+
+  final int seatNum;
+  final String gender;
+  final String phone;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 36,
+      height: 36,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: const Color(0xFF1E3A8A),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  gender,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 8,
+                    fontWeight: FontWeight.w500,
+                    height: 1.1,
+                  ),
+                ),
+                Text(
+                  '$seatNum',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    height: 1.1,
+                  ),
+                ),
+                Text(
+                  phone.length > 7 ? phone.substring(phone.length - 7) : phone,
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 6,
+                    height: 1.1,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // 'C' badge
+          Positioned(
+            top: -4,
+            right: -4,
+            child: Container(
+              width: 13,
+              height: 13,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              alignment: Alignment.center,
+              child: const Text(
+                'C',
+                style: TextStyle(
+                  color: Color(0xFF1E3A8A),
+                  fontSize: 7,
+                  fontWeight: FontWeight.bold,
+                  height: 1,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
