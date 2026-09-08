@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../app/theme/app_colors.dart';
-import '../../../app/theme/app_spacing.dart';
-import '../../../shared/widgets/common_app_bar.dart';
+import '../../../../app/theme/app_colors.dart';
+import '../../../../app/theme/app_spacing.dart';
+import '../../../../shared/widgets/common_app_bar.dart';
 import '../widgets/company_admin_info_card.dart';
 import '../widgets/company_editable_info_card.dart';
 import '../widgets/company_address_card.dart';

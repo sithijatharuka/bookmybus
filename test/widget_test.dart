@@ -2,7 +2,7 @@
 import 'package:bookmybus/features/BusOwner/CallBooking/steps/step2_seats_page.dart';
 import 'package:bookmybus/features/BusOwner/addbus/pages/add_bus_page.dart';
 import 'package:bookmybus/features/BusOwner/dashboard/pages/operator_dashboard_screen.dart';
-import 'package:bookmybus/features/Profile/pages/profile_page.dart';
+import 'package:bookmybus/features/BusOwner/Profile/pages/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

@@ -1,6 +1,6 @@
 import 'package:bookmybus/app/theme/app_colors.dart';
 import 'package:bookmybus/app/theme/app_spacing.dart';
-import 'package:bookmybus/features/Profile/pages/profile_page.dart';
+import 'package:bookmybus/features/BusOwner/Profile/pages/profile_page.dart';
 import 'package:flutter/material.dart';
 import '../../CallBooking/pages/call_booking_page.dart';
 import '../../addbus/pages/add_bus_page.dart';
