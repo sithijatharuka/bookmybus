@@ -4,6 +4,7 @@ import 'package:bookmybus/features/BusOwner/CallBooking/widgets/step_2/trip_info
 import 'package:bookmybus/features/BusOwner/CallBooking/widgets/step_2/header_row.dart';
 import 'package:bookmybus/features/BusOwner/CallBooking/widgets/step_2/legend_row.dart';
 import 'package:bookmybus/features/BusOwner/CallBooking/widgets/step_2/selection_summary.dart';
+import 'package:bookmybus/features/BusOwner/CallBooking/widgets/step_2/seat_hold_countdown_banner.dart';
 import 'package:bookmybus/shared/widgets/bus_seat_layouts/bus_seat_layout.dart';
 import 'package:bookmybus/shared/widgets/bus_seat_layouts/two_by_two_45_seat_layout.dart';
 import 'package:flutter/material.dart';
@@ -25,11 +26,16 @@ class Step2SeatsPage extends StatefulWidget {
 
 class _Step2SeatsPageState extends State<Step2SeatsPage> {
   Set<int> _pendingSeatSelection = {};
+  bool _showCountdown = false;
 
   void _onSeatSelected(List<int> seats) {
     final previous = widget.booking.selectedSeats.toSet();
     final next = seats.toSet();
     final newlySelected = next.difference(previous).toList();
+
+    if (newlySelected.isNotEmpty && !_showCountdown) {
+      setState(() => _showCountdown = true);
+    }
 
     final kept = <int, String>{};
     for (final seat in seats) {
@@ -199,6 +205,13 @@ class _Step2SeatsPageState extends State<Step2SeatsPage> {
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
+          if (_showCountdown && validSelectedSeats.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+              child: SeatHoldCountdownBanner(
+                onTimerExpired: () => setState(() => _showCountdown = false),
+              ),
+            ),
           if (validSelectedSeats.isNotEmpty)
             SelectionSummary(
               selected: validSelectedSeats.toList()..sort(),
