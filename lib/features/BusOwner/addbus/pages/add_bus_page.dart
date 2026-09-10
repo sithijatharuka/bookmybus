@@ -8,7 +8,6 @@ import '../models/add_bus_data.dart';
 import '../steps/step1_upload_images/step1_upload_images_page.dart';
 import '../steps/step2_basic_info/step2_basic_info_page.dart';
 import '../steps/step3_schedule/step3_schedule_page.dart';
-import '../steps/step4_review/step4_review_page.dart';
 import '../widgets/add_bus_submitting_overlay.dart';
 
 class AddBusPage extends StatefulWidget {
@@ -147,8 +146,6 @@ class _AddBusPageState extends State<AddBusPage> {
                       Step2BasicInfoPage(standalone: false),
                       Divider(height: 1),
                       Step3SchedulePage(standalone: false),
-                      Divider(height: 1),
-                      Step4ReviewPage(standalone: false),
                     ],
                   ),
                 ),
