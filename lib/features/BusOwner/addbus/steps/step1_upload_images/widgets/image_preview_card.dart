@@ -9,13 +9,11 @@ class ImagePreviewCard extends StatelessWidget {
     super.key,
     required this.label,
     required this.icon,
-    this.onEdit,
     this.onDelete,
   });
 
   final String label;
   final IconData icon;
-  final VoidCallback? onEdit;
   final VoidCallback? onDelete;
 
   @override
@@ -65,8 +63,6 @@ class ImagePreviewCard extends StatelessWidget {
             right: AppSpacing.xs,
             child: Row(
               children: [
-                _ActionIcon(icon: Icons.edit_outlined, onTap: onEdit ?? () {}),
-                const SizedBox(width: AppSpacing.xs),
                 _ActionIcon(icon: Icons.delete_outline, onTap: onDelete ?? () {}),
               ],
             ),

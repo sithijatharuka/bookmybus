@@ -12,7 +12,7 @@ class App extends StatelessWidget {
       title: 'BookMyBus',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
-      home: const PassengerHomePage(),      
+      home: const OperatorDashboardScreen(),      
     );
   }
 }

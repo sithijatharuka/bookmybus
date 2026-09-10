@@ -7,11 +7,7 @@ import 'widgets/upload_progress_bar.dart';
 class Step1UploadImagesPage extends StatelessWidget {
   const Step1UploadImagesPage({super.key});
 
-  static const _images = [
-    (label: 'Exterior Front', icon: Icons.directions_bus_outlined),
-    (label: 'Interior', icon: Icons.airline_seat_recline_normal_outlined),
-    (label: 'Air Conditioned Bus', icon: Icons.ac_unit_outlined),
-  ];
+  static const _image = (label: 'Bus Image', icon: Icons.directions_bus_outlined);
 
   @override
   Widget build(BuildContext context) {
@@ -31,25 +27,11 @@ class Step1UploadImagesPage extends StatelessWidget {
           const SizedBox(height: AppSpacing.xl),
           const ImageDropZone(),
           const SizedBox(height: AppSpacing.xxl),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('Preview Gallery', style: tt.titleMedium),
-              _CountBadge(count: _images.length),
-            ],
-          ),
+          Text('Image Preview', style: tt.titleMedium),
           const SizedBox(height: AppSpacing.md),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: _images.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: AppSpacing.md,
-              mainAxisSpacing: AppSpacing.md,
-              childAspectRatio: 1.1,
-            ),
-            itemBuilder: (_, i) => ImagePreviewCard(label: _images[i].label, icon: _images[i].icon),
+          AspectRatio(
+            aspectRatio: 16 / 9,
+            child: ImagePreviewCard(label: _image.label, icon: _image.icon),
           ),
           const SizedBox(height: AppSpacing.xxl),
           const UploadProgressBar(fileName: 'bus_exterior.jpg', progress: 0.75),
@@ -59,23 +41,3 @@ class Step1UploadImagesPage extends StatelessWidget {
   }
 }
 
-class _CountBadge extends StatelessWidget {
-  const _CountBadge({required this.count});
-  final int count;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
-      decoration: BoxDecoration(color: const Color(0xFFF2F3FF), borderRadius: BorderRadius.circular(999)),
-      child: Text(
-        '$count images selected',
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: const Color(0xFF3557A8),
-              fontWeight: FontWeight.w600,
-              fontSize: 12,
-            ),
-      ),
-    );
-  }
-}
