@@ -442,13 +442,16 @@ class _ActionButton extends StatelessWidget {
             children: [
               Icon(icon, size: 14, color: fg),
               const SizedBox(width: AppSpacing.xs),
-              Text(
-                label,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: fg,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 12,
-                    ),
+              Flexible(
+                child: Text(
+                  label,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: fg,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                      ),
+                ),
               ),
             ],
           ),
