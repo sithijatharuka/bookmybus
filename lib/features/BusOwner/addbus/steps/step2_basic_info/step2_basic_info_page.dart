@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'widgets/bus_form_fields.dart';
+import 'widgets/route_info_section.dart';
 
 class Step2BasicInfoPage extends StatefulWidget {
   const Step2BasicInfoPage({super.key, this.standalone = true});
@@ -19,6 +20,9 @@ class _Step2BasicInfoPageState extends State<Step2BasicInfoPage> {
   final _totalSeats = TextEditingController();
   final _pricePerSeat = TextEditingController();
   final _phone = TextEditingController();
+  final _conductorPhone = TextEditingController();
+  final _fromCity = TextEditingController();
+  final _toCity = TextEditingController();
 
   @override
   void dispose() {
@@ -27,6 +31,9 @@ class _Step2BasicInfoPageState extends State<Step2BasicInfoPage> {
     _totalSeats.dispose();
     _pricePerSeat.dispose();
     _phone.dispose();
+    _conductorPhone.dispose();
+    _fromCity.dispose();
+    _toCity.dispose();
     super.dispose();
   }
 
@@ -82,14 +89,24 @@ class _Step2BasicInfoPageState extends State<Step2BasicInfoPage> {
                       keyboardType: TextInputType.number,
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     ),
+                    const BusFieldHint('Actual ticket price paid by passengers. The platform fee (LKR 100/seat) and payment gateway charge (2.99%) are deducted automatically.'),
                   ],
                 ),
               ),
             ],
           ),
           const SizedBox(height: AppSpacing.lg),
-          const BusFieldLabel('WhatsApp Phone Number'),
+          const BusFieldLabel('WhatsApp Number (Sri Lankan)'),
           BusPhoneField(controller: _phone),
+          const BusFieldHint('Enter a valid Sri Lankan mobile number.'),
+          const SizedBox(height: AppSpacing.lg),
+          const BusFieldLabel('Conductor Number (Sri Lankan)'),
+          BusPhoneField(controller: _conductorPhone),
+          const BusFieldHint('Optional. If left empty, the WhatsApp number above will be used as the conductor number.'),
+          const SizedBox(height: AppSpacing.xl),
+          const Divider(),
+          const SizedBox(height: AppSpacing.xl),
+          RouteInfoSection(fromController: _fromCity, toController: _toCity),
         ],
       );
     return widget.standalone

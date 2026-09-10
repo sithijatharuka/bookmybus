@@ -8,6 +8,7 @@ class AddBusData {
     this.totalSeats = '',
     this.pricePerSeat = '',
     this.whatsappPhone = '',
+    this.conductorPhone = '',
     // Step 3 – Route
     this.fromCity = '',
     this.toCity = '',
@@ -43,6 +44,7 @@ class AddBusData {
   final String totalSeats;
   final String pricePerSeat;
   final String whatsappPhone;
+  final String conductorPhone;
 
   // Step 3 – Route
   final String fromCity;
@@ -80,6 +82,7 @@ class AddBusData {
         'totalSeats': totalSeats,
         'pricePerSeat': pricePerSeat,
         'whatsappPhone': whatsappPhone,
+        'conductorPhone': conductorPhone,
         'fromCity': fromCity,
         'toCity': toCity,
         'frequency': frequency,

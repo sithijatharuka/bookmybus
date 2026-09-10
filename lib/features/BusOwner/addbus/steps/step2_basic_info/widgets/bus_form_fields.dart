@@ -25,6 +25,25 @@ class BusFieldLabel extends StatelessWidget {
   }
 }
 
+class BusFieldHint extends StatelessWidget {
+  const BusFieldHint(this.text, {super.key});
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.xs),
+      child: Text(
+        text,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: AppColors.textHint,
+              fontSize: 11,
+            ),
+      ),
+    );
+  }
+}
+
 class BusFormField extends StatelessWidget {
   const BusFormField({
     super.key,
