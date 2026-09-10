@@ -19,10 +19,12 @@ class ScheduleInformationStep extends StatefulWidget {
     super.key,
     this.fromCity = 'Departure City',
     this.toCity = 'Destination City',
+    this.standalone = true,
   });
 
   final String fromCity;
   final String toCity;
+  final bool standalone;
 
   @override
   State<ScheduleInformationStep> createState() =>
@@ -93,9 +95,7 @@ class _ScheduleInformationStepState extends State<ScheduleInformationStep> {
   Widget build(BuildContext context) {
     final tt = Theme.of(context).textTheme;
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      child: Column(
+    final content = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // ── Guidance Banner ───────────────────────────────────────
@@ -238,8 +238,10 @@ class _ScheduleInformationStepState extends State<ScheduleInformationStep> {
           const SizedBox(height: AppSpacing.xl),
           const PickupDropPoints(),
         ],
-      ),
-    );
+      );
+    return widget.standalone
+        ? SingleChildScrollView(padding: const EdgeInsets.all(AppSpacing.lg), child: content)
+        : Padding(padding: const EdgeInsets.all(AppSpacing.lg), child: content);
   }
 }
 

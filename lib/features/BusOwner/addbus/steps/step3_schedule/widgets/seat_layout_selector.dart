@@ -43,12 +43,14 @@ class SeatLayoutSelector extends StatelessWidget {
             const Icon(Icons.info_outline_rounded,
                 size: 14, color: AppColors.textHint),
             const SizedBox(width: AppSpacing.xs),
-            Text(
-              "Seat count must match the selected layout's seat count.",
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(color: AppColors.textHint, fontSize: 12),
+            Expanded(
+              child: Text(
+                "Seat count must match the selected layout's seat count.",
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.copyWith(color: AppColors.textHint, fontSize: 12),
+              ),
             ),
           ],
         ),

@@ -9,7 +9,6 @@ import '../steps/step1_upload_images/step1_upload_images_page.dart';
 import '../steps/step2_basic_info/step2_basic_info_page.dart';
 import '../steps/step3_schedule/step3_schedule_page.dart';
 import '../steps/step4_review/step4_review_page.dart';
-import '../widgets/add_bus_step_content.dart';
 import '../widgets/add_bus_submitting_overlay.dart';
 
 class AddBusPage extends StatefulWidget {
@@ -20,30 +19,9 @@ class AddBusPage extends StatefulWidget {
 }
 
 class _AddBusPageState extends State<AddBusPage> {
-  int _currentStep = 0;
   bool _isSubmitting = false;
 
-  static const _steps = [
-    (label: 'Images', icon: Icons.photo_library_outlined),
-    (label: 'Details', icon: Icons.directions_bus_outlined),
-    (label: 'Schedule', icon: Icons.schedule_outlined),
-    (label: 'Review', icon: Icons.check_circle_outline),
-  ];
-
-  Widget get _stepView => switch (_currentStep) {
-    0 => const Step1UploadImagesPage(),
-    1 => const Step2BasicInfoPage(),
-    2 => const Step3SchedulePage(),
-    3 => const Step4ReviewPage(),
-    _ => const SizedBox.shrink(),
-  };
-
-  /// Collects all step data into a single [AddBusData] object.
-  AddBusData _collectData() {
-    // Data is currently held in each step's local state.
-    // When steps are refactored to share a controller, populate fields here.
-    return AddBusData();
-  }
+  AddBusData _collectData() => AddBusData();
 
   Future<void> _onSubmit() async {
     setState(() => _isSubmitting = true);
@@ -56,7 +34,6 @@ class _AddBusPageState extends State<AddBusPage> {
       //   final response = await BusRepository().addBus(busData.toJson());
       //   if (response.success) { ... }
 
-      // Simulate async work
       await Future.delayed(const Duration(milliseconds: 600));
 
       if (!mounted) return;
@@ -111,8 +88,8 @@ class _AddBusPageState extends State<AddBusPage> {
               width: double.infinity,
               child: FilledButton(
                 onPressed: () {
-                  Navigator.of(context).pop(); // close dialog
-                  Navigator.of(context).pop(); // back to previous screen
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
                 },
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.success,
@@ -134,27 +111,19 @@ class _AddBusPageState extends State<AddBusPage> {
       SnackBar(
         content: Row(
           children: [
-            const Icon(
-              Icons.error_outline_rounded,
-              color: AppColors.white,
-              size: 18,
-            ),
+            const Icon(Icons.error_outline_rounded, color: AppColors.white, size: 18),
             const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Text(
                 'Failed to add bus. Please try again.',
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.copyWith(color: AppColors.white),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.white),
               ),
             ),
           ],
         ),
         backgroundColor: AppColors.error,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppRadius.sm),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.sm)),
         margin: const EdgeInsets.all(AppSpacing.lg),
       ),
     );
@@ -167,17 +136,67 @@ class _AddBusPageState extends State<AddBusPage> {
       appBar: const CommonAppBar(title: 'Add Bus'),
       body: Stack(
         children: [
-          AddBusStepContent(
-            steps: _steps,
-            currentStep: _currentStep,
-            stepView: _stepView,
-            onBack: () => setState(() => _currentStep--),
-            onNext: () => setState(() => _currentStep++),
-            onSubmit: _onSubmit,
+          Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: const [
+                      Step1UploadImagesPage(standalone: false),
+                      Divider(height: 1),
+                      Step2BasicInfoPage(standalone: false),
+                      Divider(height: 1),
+                      Step3SchedulePage(standalone: false),
+                      Divider(height: 1),
+                      Step4ReviewPage(standalone: false),
+                    ],
+                  ),
+                ),
+              ),
+              _SubmitBar(onSubmit: _onSubmit),
+            ],
           ),
-
           if (_isSubmitting) const AddBusSubmittingOverlay(),
         ],
+      ),
+    );
+  }
+}
+
+class _SubmitBar extends StatelessWidget {
+  const _SubmitBar({required this.onSubmit});
+  final VoidCallback onSubmit;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg, AppSpacing.md, AppSpacing.lg, AppSpacing.xl,
+      ),
+      decoration: const BoxDecoration(
+        color: AppColors.white,
+        border: Border(top: BorderSide(color: AppColors.border)),
+      ),
+      child: SizedBox(
+        width: double.infinity,
+        child: FilledButton(
+          onPressed: onSubmit,
+          style: FilledButton.styleFrom(
+            backgroundColor: AppColors.success,
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRadius.sm),
+            ),
+          ),
+          child: const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.check_circle_outline_rounded, size: 18),
+              SizedBox(width: AppSpacing.xs),
+              Text('Add Bus to System'),
+            ],
+          ),
+        ),
       ),
     );
   }

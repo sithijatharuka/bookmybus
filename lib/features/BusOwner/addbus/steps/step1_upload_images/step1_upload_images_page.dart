@@ -5,17 +5,15 @@ import 'widgets/image_preview_card.dart';
 import 'widgets/upload_progress_bar.dart';
 
 class Step1UploadImagesPage extends StatelessWidget {
-  const Step1UploadImagesPage({super.key});
+  const Step1UploadImagesPage({super.key, this.standalone = true});
 
+  final bool standalone;
   static const _image = (label: 'Bus Image', icon: Icons.directions_bus_outlined);
 
   @override
   Widget build(BuildContext context) {
     final tt = Theme.of(context).textTheme;
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      child: Column(
+    final content = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Step 1: Upload Bus Images', style: tt.titleMedium),
@@ -36,8 +34,10 @@ class Step1UploadImagesPage extends StatelessWidget {
           const SizedBox(height: AppSpacing.xxl),
           const UploadProgressBar(fileName: 'bus_exterior.jpg', progress: 0.75),
         ],
-      ),
-    );
+      );
+    return standalone
+        ? SingleChildScrollView(padding: const EdgeInsets.all(AppSpacing.lg), child: content)
+        : Padding(padding: const EdgeInsets.all(AppSpacing.lg), child: content);
   }
 }
 

@@ -5,7 +5,9 @@ import 'package:flutter/services.dart';
 import 'widgets/bus_form_fields.dart';
 
 class Step2BasicInfoPage extends StatefulWidget {
-  const Step2BasicInfoPage({super.key});
+  const Step2BasicInfoPage({super.key, this.standalone = true});
+
+  final bool standalone;
 
   @override
   State<Step2BasicInfoPage> createState() => _Step2BasicInfoPageState();
@@ -31,10 +33,7 @@ class _Step2BasicInfoPageState extends State<Step2BasicInfoPage> {
   @override
   Widget build(BuildContext context) {
     final tt = Theme.of(context).textTheme;
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      child: Column(
+    final content = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Step 2: Basic Information', style: tt.titleMedium),
@@ -92,7 +91,9 @@ class _Step2BasicInfoPageState extends State<Step2BasicInfoPage> {
           const BusFieldLabel('WhatsApp Phone Number'),
           BusPhoneField(controller: _phone),
         ],
-      ),
-    );
+      );
+    return widget.standalone
+        ? SingleChildScrollView(padding: const EdgeInsets.all(AppSpacing.lg), child: content)
+        : Padding(padding: const EdgeInsets.all(AppSpacing.lg), child: content);
   }
 }

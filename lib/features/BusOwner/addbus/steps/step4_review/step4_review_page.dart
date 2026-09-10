@@ -5,15 +5,15 @@ import 'package:flutter/material.dart';
 import '../step3_schedule/widgets/guidance_banner.dart';
 
 class Step4ReviewPage extends StatelessWidget {
-  const Step4ReviewPage({super.key});
+  const Step4ReviewPage({super.key, this.standalone = true});
+
+  final bool standalone;
 
   @override
   Widget build(BuildContext context) {
     final tt = Theme.of(context).textTheme;
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      child: Column(
+    final content = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const GuidanceBanner(
@@ -141,8 +141,10 @@ class Step4ReviewPage extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.xl),
         ],
-      ),
-    );
+      );
+    return standalone
+        ? SingleChildScrollView(padding: const EdgeInsets.all(AppSpacing.lg), child: content)
+        : Padding(padding: const EdgeInsets.all(AppSpacing.lg), child: content);
   }
 }
 
