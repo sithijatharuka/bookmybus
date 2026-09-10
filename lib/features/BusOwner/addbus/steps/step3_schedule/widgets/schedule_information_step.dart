@@ -20,18 +20,21 @@ class ScheduleInformationStep extends StatefulWidget {
     this.fromCity = 'Departure City',
     this.toCity = 'Destination City',
     this.standalone = true,
+    this.busConfigKey,
   });
 
   final String fromCity;
   final String toCity;
   final bool standalone;
+  final GlobalKey<BusConfigurationStepState>? busConfigKey;
 
   @override
   State<ScheduleInformationStep> createState() =>
-      _ScheduleInformationStepState();
+      ScheduleInformationStepState();
 }
 
-class _ScheduleInformationStepState extends State<ScheduleInformationStep> {
+// Public so AddBusPage can call validate() via GlobalKey
+class ScheduleInformationStepState extends State<ScheduleInformationStep> {
   _Frequency _frequency = _Frequency.everyday;
 
   // Everyday / Every Other Day
@@ -54,6 +57,53 @@ class _ScheduleInformationStepState extends State<ScheduleInformationStep> {
   final _downDep = TextEditingController();
   final _downArr = TextEditingController();
   bool _downNextDay = false;
+
+  // Validation errors
+  String? _depTimeError;
+  String? _arrTimeError;
+  String? _eodStartDateError;
+  String? _startDateError;
+  String? _upDepError;
+  String? _upArrError;
+  String? _downDepError;
+  String? _downArrError;
+
+  /// Called by [AddBusPage] on submit. Returns true if all required fields are valid.
+  bool validate() {
+    setState(() {
+      if (_frequency == _Frequency.everyday) {
+        _depTimeError = _depTime.text.trim().isEmpty ? 'Departure Time is required.' : null;
+        _arrTimeError = _arrTime.text.trim().isEmpty ? 'Arrival Time is required.' : null;
+        _eodStartDateError = null;
+        _startDateError = null;
+        _upDepError = null; _upArrError = null;
+        _downDepError = null; _downArrError = null;
+      } else if (_frequency == _Frequency.everyOtherDay) {
+        _eodStartDateError = _eodStartDate.text.trim().isEmpty ? 'Starting Date is required.' : null;
+        _depTimeError = _depTime.text.trim().isEmpty ? 'Departure Time is required.' : null;
+        _arrTimeError = _arrTime.text.trim().isEmpty ? 'Arrival Time is required.' : null;
+        _startDateError = null;
+        _upDepError = null; _upArrError = null;
+        _downDepError = null; _downArrError = null;
+      } else {
+        _startDateError = _startDate.text.trim().isEmpty ? 'Starting Date is required.' : null;
+        _upDepError = _upDep.text.trim().isEmpty ? 'Departure Time is required.' : null;
+        _upArrError = _upArr.text.trim().isEmpty ? 'Arrival Time is required.' : null;
+        _downDepError = _downDep.text.trim().isEmpty ? 'Departure Time is required.' : null;
+        _downArrError = _downArr.text.trim().isEmpty ? 'Arrival Time is required.' : null;
+        _depTimeError = null; _arrTimeError = null;
+        _eodStartDateError = null;
+      }
+    });
+    if (_frequency == _Frequency.everyday) {
+      return _depTimeError == null && _arrTimeError == null;
+    } else if (_frequency == _Frequency.everyOtherDay) {
+      return _eodStartDateError == null && _depTimeError == null && _arrTimeError == null;
+    } else {
+      return _startDateError == null && _upDepError == null && _upArrError == null &&
+          _downDepError == null && _downArrError == null;
+    }
+  }
 
   @override
   void dispose() {
@@ -145,6 +195,10 @@ class _ScheduleInformationStepState extends State<ScheduleInformationStep> {
                   setState(() => _arrivesNextDay = v ?? false),
               onDepartureTap: () => _pickTime(_depTime),
               onArrivalTap: () => _pickTime(_arrTime),
+              departureErrorText: _depTimeError,
+              arrivalErrorText: _arrTimeError,
+              onDepartureChanged: (_) => setState(() => _depTimeError = null),
+              onArrivalChanged: (_) => setState(() => _arrTimeError = null),
             ),
 
           if (_frequency == _Frequency.everyOtherDay) ...[
@@ -161,6 +215,8 @@ class _ScheduleInformationStepState extends State<ScheduleInformationStep> {
             _DatePickerField(
               controller: _eodStartDate,
               onTap: () => _pickDate(_eodStartDate),
+              errorText: _eodStartDateError,
+              onChanged: () => setState(() => _eodStartDateError = null),
             ),
             const SizedBox(height: AppSpacing.xl),
             ScheduleTimeFields(
@@ -171,6 +227,10 @@ class _ScheduleInformationStepState extends State<ScheduleInformationStep> {
                   setState(() => _arrivesNextDay = v ?? false),
               onDepartureTap: () => _pickTime(_depTime),
               onArrivalTap: () => _pickTime(_arrTime),
+              departureErrorText: _depTimeError,
+              arrivalErrorText: _arrTimeError,
+              onDepartureChanged: (_) => setState(() => _depTimeError = null),
+              onArrivalChanged: (_) => setState(() => _arrTimeError = null),
             ),
           ],
 
@@ -189,6 +249,8 @@ class _ScheduleInformationStepState extends State<ScheduleInformationStep> {
             _DatePickerField(
               controller: _startDate,
               onTap: () => _pickDate(_startDate),
+              errorText: _startDateError,
+              onChanged: () => setState(() => _startDateError = null),
             ),
             const SizedBox(height: AppSpacing.xl),
 
@@ -203,6 +265,10 @@ class _ScheduleInformationStepState extends State<ScheduleInformationStep> {
                   setState(() => _upNextDay = v ?? false),
               onDepartureTap: () => _pickTime(_upDep),
               onArrivalTap: () => _pickTime(_upArr),
+              departureErrorText: _upDepError,
+              arrivalErrorText: _upArrError,
+              onDepartureChanged: (_) => setState(() => _upDepError = null),
+              onArrivalChanged: (_) => setState(() => _upArrError = null),
             ),
             const SizedBox(height: AppSpacing.lg),
 
@@ -217,6 +283,10 @@ class _ScheduleInformationStepState extends State<ScheduleInformationStep> {
                   setState(() => _downNextDay = v ?? false),
               onDepartureTap: () => _pickTime(_downDep),
               onArrivalTap: () => _pickTime(_downArr),
+              departureErrorText: _downDepError,
+              arrivalErrorText: _downArrError,
+              onDepartureChanged: (_) => setState(() => _downDepError = null),
+              onArrivalChanged: (_) => setState(() => _downArrError = null),
             ),
           ],
 
@@ -224,7 +294,7 @@ class _ScheduleInformationStepState extends State<ScheduleInformationStep> {
           const SizedBox(height: AppSpacing.xl),
           const Divider(color: Color(0xFFE2E8F0)),
           const SizedBox(height: AppSpacing.xl),
-          const BusConfigurationStep(),
+          BusConfigurationStep(key: widget.busConfigKey),
           const SizedBox(height: AppSpacing.xl),
           const Divider(color: Color(0xFFE2E8F0)),
           const SizedBox(height: AppSpacing.xl),
@@ -246,46 +316,69 @@ class _ScheduleInformationStepState extends State<ScheduleInformationStep> {
 }
 
 class _DatePickerField extends StatelessWidget {
-  const _DatePickerField({required this.controller, required this.onTap});
+  const _DatePickerField({
+    required this.controller,
+    required this.onTap,
+    this.errorText,
+    this.onChanged,
+  });
   final TextEditingController controller;
   final VoidCallback onTap;
+  final String? errorText;
+  final VoidCallback? onChanged;
 
   @override
   Widget build(BuildContext context) {
     final tt = Theme.of(context).textTheme;
-    return GestureDetector(
-      onTap: onTap,
-      child: AbsorbPointer(
-        child: TextField(
-          controller: controller,
-          readOnly: true,
-          style: tt.bodyLarge?.copyWith(color: AppColors.textPrimary),
-          decoration: InputDecoration(
-            hintText: 'mm/dd/yyyy',
-            hintStyle: tt.bodyMedium?.copyWith(color: AppColors.textHint),
-            suffixIcon: const Icon(Icons.calendar_today_outlined,
-                size: 18, color: AppColors.textHint),
-            filled: true,
-            fillColor: const Color(0xFFF8FAFC),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.lg,
-              vertical: AppSpacing.md,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppRadius.md),
-              borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppRadius.md),
-              borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppRadius.md),
-              borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        GestureDetector(
+          onTap: () {
+            onTap();
+            onChanged?.call();
+          },
+          child: AbsorbPointer(
+            child: TextField(
+              controller: controller,
+              readOnly: true,
+              style: tt.bodyLarge?.copyWith(color: AppColors.textPrimary),
+              decoration: InputDecoration(
+                hintText: 'mm/dd/yyyy',
+                hintStyle: tt.bodyMedium?.copyWith(color: AppColors.textHint),
+                suffixIcon: const Icon(Icons.calendar_today_outlined,
+                    size: 18, color: AppColors.textHint),
+                filled: true,
+                fillColor: const Color(0xFFF8FAFC),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.lg,
+                  vertical: AppSpacing.md,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                  borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                  borderSide: BorderSide(color: errorText != null ? AppColors.error : const Color(0xFFE2E8F0)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                  borderSide: BorderSide(color: errorText != null ? AppColors.error : AppColors.primary, width: 1.5),
+                ),
+              ),
             ),
           ),
         ),
-      ),
+        if (errorText != null)
+          Padding(
+            padding: const EdgeInsets.only(top: AppSpacing.xs),
+            child: Text(
+              errorText!,
+              style: tt.bodySmall?.copyWith(color: AppColors.error, fontSize: 11),
+            ),
+          ),
+      ],
     );
   }
 }

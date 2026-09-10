@@ -12,6 +12,10 @@ class ScheduleTimeFields extends StatelessWidget {
     required this.onArrivesNextDayChanged,
     this.onDepartureTap,
     this.onArrivalTap,
+    this.departureErrorText,
+    this.arrivalErrorText,
+    this.onDepartureChanged,
+    this.onArrivalChanged,
   });
 
   final TextEditingController departureController;
@@ -20,6 +24,10 @@ class ScheduleTimeFields extends StatelessWidget {
   final ValueChanged<bool?> onArrivesNextDayChanged;
   final VoidCallback? onDepartureTap;
   final VoidCallback? onArrivalTap;
+  final String? departureErrorText;
+  final String? arrivalErrorText;
+  final ValueChanged<String>? onDepartureChanged;
+  final ValueChanged<String>? onArrivalChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +42,8 @@ class ScheduleTimeFields extends StatelessWidget {
                 required: true,
                 controller: departureController,
                 onTap: onDepartureTap,
+                errorText: departureErrorText,
+                onChanged: onDepartureChanged,
               ),
             ),
             const SizedBox(width: AppSpacing.md),
@@ -43,6 +53,8 @@ class ScheduleTimeFields extends StatelessWidget {
                 required: true,
                 controller: arrivalController,
                 onTap: onArrivalTap,
+                errorText: arrivalErrorText,
+                onChanged: onArrivalChanged,
               ),
             ),
           ],
@@ -63,12 +75,16 @@ class _TimeField extends StatelessWidget {
     required this.controller,
     this.required = false,
     this.onTap,
+    this.errorText,
+    this.onChanged,
   });
 
   final String label;
   final TextEditingController controller;
   final bool required;
   final VoidCallback? onTap;
+  final String? errorText;
+  final ValueChanged<String>? onChanged;
 
   static const _fillColor = Color(0xFFF8FAFC);
   static const _borderColor = Color(0xFFE2E8F0);
@@ -82,7 +98,10 @@ class _TimeField extends StatelessWidget {
       children: [
         _FieldLabel(label, required: required),
         GestureDetector(
-          onTap: onTap,
+          onTap: () {
+            onTap?.call();
+            onChanged?.call(controller.text);
+          },
           child: AbsorbPointer(
             child: TextField(
               controller: controller,
@@ -105,17 +124,24 @@ class _TimeField extends StatelessWidget {
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppRadius.md),
-                  borderSide: const BorderSide(color: _borderColor),
+                  borderSide: BorderSide(color: errorText != null ? AppColors.error : _borderColor),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppRadius.md),
-                  borderSide:
-                      const BorderSide(color: AppColors.primary, width: 1.5),
+                  borderSide: BorderSide(color: errorText != null ? AppColors.error : AppColors.primary, width: 1.5),
                 ),
               ),
             ),
           ),
         ),
+        if (errorText != null)
+          Padding(
+            padding: const EdgeInsets.only(top: AppSpacing.xs),
+            child: Text(
+              errorText!,
+              style: tt.bodySmall?.copyWith(color: AppColors.error, fontSize: 11),
+            ),
+          ),
       ],
     );
   }

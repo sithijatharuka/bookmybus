@@ -19,10 +19,18 @@ class RouteInfoSection extends StatefulWidget {
     super.key,
     required this.fromController,
     required this.toController,
+    this.fromErrorText,
+    this.toErrorText,
+    this.onFromChanged,
+    this.onToChanged,
   });
 
   final TextEditingController fromController;
   final TextEditingController toController;
+  final String? fromErrorText;
+  final String? toErrorText;
+  final ValueChanged<String>? onFromChanged;
+  final ValueChanged<String>? onToChanged;
 
   @override
   State<RouteInfoSection> createState() => _RouteInfoSectionState();
@@ -31,6 +39,9 @@ class RouteInfoSection extends StatefulWidget {
 class _RouteInfoSectionState extends State<RouteInfoSection> {
   String? _fromError;
   String? _toError;
+
+  String? get _effectiveFromError => widget.fromErrorText ?? _fromError;
+  String? get _effectiveToError => widget.toErrorText ?? _toError;
 
   void _validate() {
     setState(() {
@@ -51,8 +62,11 @@ class _RouteInfoSectionState extends State<RouteInfoSection> {
           label: 'From',
           controller: widget.fromController,
           hint: 'Start typing: C → Co → Col…',
-          errorText: _fromError,
-          onChanged: (_) => setState(() => _fromError = null),
+          errorText: _effectiveFromError,
+          onChanged: (v) {
+            setState(() => _fromError = null);
+            widget.onFromChanged?.call(v);
+          },
           onEditingComplete: _validate,
         ),
         const SizedBox(height: AppSpacing.lg),
@@ -60,8 +74,11 @@ class _RouteInfoSectionState extends State<RouteInfoSection> {
           label: 'To',
           controller: widget.toController,
           hint: 'Start typing: K → Ka → Kan…',
-          errorText: _toError,
-          onChanged: (_) => setState(() => _toError = null),
+          errorText: _effectiveToError,
+          onChanged: (v) {
+            setState(() => _toError = null);
+            widget.onToChanged?.call(v);
+          },
           onEditingComplete: _validate,
         ),
       ],

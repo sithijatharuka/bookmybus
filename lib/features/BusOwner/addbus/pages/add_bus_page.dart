@@ -8,6 +8,8 @@ import '../models/add_bus_data.dart';
 import '../steps/step1_upload_images/step1_upload_images_page.dart';
 import '../steps/step2_basic_info/step2_basic_info_page.dart';
 import '../steps/step3_schedule/step3_schedule_page.dart';
+import '../steps/step3_schedule/widgets/bus_configuration_step.dart';
+import '../steps/step3_schedule/widgets/schedule_information_step.dart';
 import '../widgets/add_bus_submitting_overlay.dart';
 
 class AddBusPage extends StatefulWidget {
@@ -20,9 +22,18 @@ class AddBusPage extends StatefulWidget {
 class _AddBusPageState extends State<AddBusPage> {
   bool _isSubmitting = false;
 
+  final _step2Key = GlobalKey<Step2BasicInfoPageState>();
+  final _scheduleKey = GlobalKey<ScheduleInformationStepState>();
+  final _busConfigKey = GlobalKey<BusConfigurationStepState>();
+
   AddBusData _collectData() => AddBusData();
 
   Future<void> _onSubmit() async {
+    final step2Valid = _step2Key.currentState?.validate() ?? false;
+    final scheduleValid = _scheduleKey.currentState?.validate() ?? false;
+    final configValid = _busConfigKey.currentState?.validate() ?? false;
+    if (!step2Valid || !scheduleValid || !configValid) return;
+
     setState(() => _isSubmitting = true);
 
     try {
@@ -140,12 +151,16 @@ class _AddBusPageState extends State<AddBusPage> {
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
-                    children: const [
-                      Step1UploadImagesPage(standalone: false),
-                      Divider(height: 1),
-                      Step2BasicInfoPage(standalone: false),
-                      Divider(height: 1),
-                      Step3SchedulePage(standalone: false),
+                    children: [
+                      const Step1UploadImagesPage(standalone: false),
+                      const Divider(height: 1),
+                      Step2BasicInfoPage(key: _step2Key, standalone: false),
+                      const Divider(height: 1),
+                      Step3SchedulePage(
+                        standalone: false,
+                        scheduleKey: _scheduleKey,
+                        busConfigKey: _busConfigKey,
+                      ),
                     ],
                   ),
                 ),

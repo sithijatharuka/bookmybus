@@ -15,6 +15,10 @@ class ManualTripCard extends StatelessWidget {
     required this.onArrivesNextDayChanged,
     this.onDepartureTap,
     this.onArrivalTap,
+    this.departureErrorText,
+    this.arrivalErrorText,
+    this.onDepartureChanged,
+    this.onArrivalChanged,
   });
 
   final String title;
@@ -25,6 +29,10 @@ class ManualTripCard extends StatelessWidget {
   final ValueChanged<bool?> onArrivesNextDayChanged;
   final VoidCallback? onDepartureTap;
   final VoidCallback? onArrivalTap;
+  final String? departureErrorText;
+  final String? arrivalErrorText;
+  final ValueChanged<String>? onDepartureChanged;
+  final ValueChanged<String>? onArrivalChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -84,6 +92,10 @@ class ManualTripCard extends StatelessWidget {
             onArrivesNextDayChanged: onArrivesNextDayChanged,
             onDepartureTap: onDepartureTap,
             onArrivalTap: onArrivalTap,
+            departureErrorText: departureErrorText,
+            arrivalErrorText: arrivalErrorText,
+            onDepartureChanged: onDepartureChanged,
+            onArrivalChanged: onArrivalChanged,
           ),
         ],
       ),

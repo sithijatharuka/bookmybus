@@ -10,13 +10,26 @@ class BusConfigurationStep extends StatefulWidget {
   const BusConfigurationStep({super.key});
 
   @override
-  State<BusConfigurationStep> createState() => _BusConfigurationStepState();
+  State<BusConfigurationStep> createState() => BusConfigurationStepState();
 }
 
-class _BusConfigurationStepState extends State<BusConfigurationStep> {
+// Public so AddBusPage can call validate() via GlobalKey
+class BusConfigurationStepState extends State<BusConfigurationStep> {
   String? _busType;
   String? _seatLayout;
   bool _flipLayout = false;
+
+  String? _busTypeError;
+  String? _seatLayoutError;
+
+  /// Called by [AddBusPage] on submit. Returns true if all required fields are valid.
+  bool validate() {
+    setState(() {
+      _busTypeError = _busType == null ? 'Bus Type is required.' : null;
+      _seatLayoutError = _seatLayout == null ? 'Seat Layout is required.' : null;
+    });
+    return _busTypeError == null && _seatLayoutError == null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +45,11 @@ class _BusConfigurationStepState extends State<BusConfigurationStep> {
         const SizedBox(height: AppSpacing.xs),
         BusTypeDropdown(
           value: _busType,
-          onChanged: (v) => setState(() => _busType = v),
+          onChanged: (v) => setState(() {
+            _busType = v;
+            _busTypeError = null;
+          }),
+          errorText: _busTypeError,
         ),
         const SizedBox(height: AppSpacing.xl),
 
@@ -40,7 +57,11 @@ class _BusConfigurationStepState extends State<BusConfigurationStep> {
         const SizedBox(height: AppSpacing.sm),
         SeatLayoutSelector(
           selected: _seatLayout,
-          onChanged: (v) => setState(() => _seatLayout = v),
+          onChanged: (v) => setState(() {
+            _seatLayout = v;
+            _seatLayoutError = null;
+          }),
+          errorText: _seatLayoutError,
         ),
         const SizedBox(height: AppSpacing.xl),
 

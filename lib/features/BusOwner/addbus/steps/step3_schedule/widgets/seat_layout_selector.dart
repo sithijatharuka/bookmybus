@@ -17,10 +17,12 @@ class SeatLayoutSelector extends StatelessWidget {
     super.key,
     required this.selected,
     required this.onChanged,
+    this.errorText,
   });
 
   final String? selected;
   final ValueChanged<String> onChanged;
+  final String? errorText;
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +40,14 @@ class SeatLayoutSelector extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.xs),
+        if (errorText != null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+            child: Text(
+              errorText!,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.error, fontSize: 11),
+            ),
+          ),
         Row(
           children: [
             const Icon(Icons.info_outline_rounded,
