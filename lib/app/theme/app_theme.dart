@@ -8,6 +8,7 @@ class AppTheme {
 
   static ThemeData light = ThemeData(
     useMaterial3: true,
+    fontFamily: 'Poppins',
 
     scaffoldBackgroundColor: AppColors.scaffold,
 
