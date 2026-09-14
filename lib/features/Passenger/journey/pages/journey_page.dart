@@ -2,6 +2,9 @@ import 'package:bookmybus/app/theme/app_colors.dart';
 import 'package:bookmybus/app/theme/app_radius.dart';
 import 'package:bookmybus/app/theme/app_spacing.dart';
 import 'package:bookmybus/features/Passenger/home/models/bus_route_model.dart';
+import 'package:bookmybus/features/Passenger/journey/data/dummy_journey_bus_data.dart';
+import 'package:bookmybus/features/Passenger/journey/models/journey_bus_model.dart';
+import 'package:bookmybus/features/Passenger/journey/widgets/journey_bus_card.dart';
 import 'package:bookmybus/shared/widgets/common_app_bar.dart';
 import 'package:flutter/material.dart';
 
@@ -39,13 +42,11 @@ class _JourneyPageState extends State<JourneyPage> {
     }
   }
 
-  void _clearSearch() {
-    setState(() {
-      _from = null;
-      _to = null;
-      _date = DateTime.now();
-    });
-  }
+  void _clearSearch() => setState(() {
+        _from = null;
+        _to = null;
+        _date = DateTime.now();
+      });
 
   Future<void> _pickDate() async {
     final picked = await showDatePicker(
@@ -57,10 +58,16 @@ class _JourneyPageState extends State<JourneyPage> {
     if (picked != null) setState(() => _date = picked);
   }
 
-  @override
+  List<JourneyBusModel> get _results {
+    if (_from == null || _to == null) return [];
+    return DummyJourneyBusData.search(_from!, _to!);
+  }
+
+
   Widget build(BuildContext context) {
     final tt = Theme.of(context).textTheme;
     final hasSearch = _from != null && _to != null;
+    final results = _results;
 
     return Scaffold(
       backgroundColor: AppColors.scaffold,
@@ -70,11 +77,9 @@ class _JourneyPageState extends State<JourneyPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
-            Text(
-              'Find Your Perfect Journey',
-              style: tt.titleLarge?.copyWith(color: AppColors.primary),
-            ),
+            // ── Page header ──────────────────────────────────────────────────
+            Text('Find Your Perfect Journey',
+                style: tt.titleLarge?.copyWith(color: AppColors.primary)),
             const SizedBox(height: AppSpacing.xs),
             Text(
               'Search and book bus tickets across thousands of routes',
@@ -82,7 +87,7 @@ class _JourneyPageState extends State<JourneyPage> {
             ),
             const SizedBox(height: AppSpacing.xl),
 
-            // Search card
+            // ── Search card ──────────────────────────────────────────────────
             Container(
               padding: const EdgeInsets.all(AppSpacing.lg),
               decoration: BoxDecoration(
@@ -97,7 +102,9 @@ class _JourneyPageState extends State<JourneyPage> {
                     value: _from,
                     icon: Icons.trip_origin,
                     iconColor: AppColors.primary,
-                    onClear: _from != null ? () => setState(() => _from = null) : null,
+                    onClear: _from != null
+                        ? () => setState(() => _from = null)
+                        : null,
                   ),
                   const SizedBox(height: AppSpacing.md),
                   _SearchField(
@@ -105,15 +112,12 @@ class _JourneyPageState extends State<JourneyPage> {
                     value: _to,
                     icon: Icons.location_on,
                     iconColor: AppColors.error,
-                    onClear: _to != null ? () => setState(() => _to = null) : null,
+                    onClear:
+                        _to != null ? () => setState(() => _to = null) : null,
                   ),
                   const SizedBox(height: AppSpacing.md),
-                  _DateField(
-                    date: _date,
-                    onTap: _pickDate,
-                  ),
+                  _DateField(date: _date, onTap: _pickDate),
                   const SizedBox(height: AppSpacing.lg),
-                  // Clear Search button
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton.icon(
@@ -123,7 +127,8 @@ class _JourneyPageState extends State<JourneyPage> {
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.textSecondary,
                         side: const BorderSide(color: AppColors.border),
-                        padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: AppSpacing.md),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(AppRadius.md),
                         ),
@@ -134,14 +139,42 @@ class _JourneyPageState extends State<JourneyPage> {
               ),
             ),
 
+            // ── Results ──────────────────────────────────────────────────────
             if (hasSearch) ...[
               const SizedBox(height: AppSpacing.xl),
+
+              // Summary header
+              Text('Buses',
+                  style: tt.titleMedium
+                      ?.copyWith(color: AppColors.textPrimary)),
+              const SizedBox(height: AppSpacing.xs),
+              Text('Showing results for your selected route and date',
+                  style:
+                      tt.bodySmall?.copyWith(color: AppColors.textSecondary)),
+              const SizedBox(height: AppSpacing.xs),
               Text(
-                'Buses',
-                style: tt.titleMedium?.copyWith(color: AppColors.textPrimary),
+                results.isEmpty
+                    ? 'No buses found for this route'
+                    : 'Found ${results.length} ${results.length == 1 ? 'bus' : 'buses'} matching your search',
+                style: tt.bodySmall?.copyWith(
+                  color: results.isEmpty
+                      ? AppColors.error
+                      : AppColors.success,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               const SizedBox(height: AppSpacing.md),
-              _BusResultsPlaceholder(from: _from!, to: _to!),
+
+              if (results.isEmpty)
+                _EmptyResults(from: _from!, to: _to!)
+              else
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: results.length,
+                  itemBuilder: (_, i) =>
+                      JourneyBusCard(bus: results[i], date: _date),
+                ),
             ],
           ],
         ),
@@ -170,7 +203,6 @@ class _SearchField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tt = Theme.of(context).textTheme;
-
     return Container(
       padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.md, vertical: AppSpacing.sm),
@@ -188,8 +220,8 @@ class _SearchField extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(label,
-                    style: tt.bodySmall
-                        ?.copyWith(color: AppColors.textSecondary, fontSize: 11)),
+                    style: tt.bodySmall?.copyWith(
+                        color: AppColors.textSecondary, fontSize: 11)),
                 Text(
                   value ?? 'Select city',
                   style: tt.bodyMedium?.copyWith(
@@ -226,7 +258,6 @@ class _DateField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tt = Theme.of(context).textTheme;
-
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -258,8 +289,7 @@ class _DateField extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(Icons.arrow_drop_down,
-                color: AppColors.textSecondary),
+            const Icon(Icons.arrow_drop_down, color: AppColors.textSecondary),
           ],
         ),
       ),
@@ -267,19 +297,18 @@ class _DateField extends StatelessWidget {
   }
 }
 
-// ── Bus Results Placeholder ────────────────────────────────────────────────────
+// ── Empty Results ──────────────────────────────────────────────────────────────
 
-class _BusResultsPlaceholder extends StatelessWidget {
-  const _BusResultsPlaceholder({required this.from, required this.to});
-
+class _EmptyResults extends StatelessWidget {
+  const _EmptyResults({required this.from, required this.to});
   final String from;
   final String to;
 
   @override
   Widget build(BuildContext context) {
     final tt = Theme.of(context).textTheme;
-
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.xl),
       decoration: BoxDecoration(
         color: AppColors.white,
@@ -288,14 +317,15 @@ class _BusResultsPlaceholder extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const Icon(Icons.directions_bus_outlined,
-              size: 48, color: AppColors.textHint),
+          const Icon(Icons.search_off, size: 48, color: AppColors.textHint),
           const SizedBox(height: AppSpacing.md),
-          Text(
-            'Searching buses from $from to $to',
-            style: tt.bodyMedium?.copyWith(color: AppColors.textSecondary),
-            textAlign: TextAlign.center,
-          ),
+          Text('No buses available',
+              style: tt.titleSmall
+                  ?.copyWith(color: AppColors.textPrimary)),
+          const SizedBox(height: AppSpacing.xs),
+          Text('No buses found from $from to $to.\nTry a different route or date.',
+              style: tt.bodySmall?.copyWith(color: AppColors.textSecondary),
+              textAlign: TextAlign.center),
         ],
       ),
     );
