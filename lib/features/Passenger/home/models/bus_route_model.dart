@@ -1,6 +1,7 @@
 class BusRouteModel {
   const BusRouteModel({
-    required this.routeName,
+    required this.from,
+    required this.to,
     required this.operatorName,
     required this.busType,
     required this.frequency,
@@ -9,7 +10,11 @@ class BusRouteModel {
     this.imageUrl,
   });
 
-  final String routeName;
+  final String from;
+  final String to;
+
+  String get routeName => '$from ➔ $to';
+
   final String operatorName;
   final String busType;
   final String frequency;

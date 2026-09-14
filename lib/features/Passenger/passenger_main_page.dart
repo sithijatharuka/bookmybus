@@ -1,5 +1,6 @@
 import 'package:bookmybus/app/theme/app_colors.dart';
 import 'package:bookmybus/features/Passenger/booking_history/pages/passenger_booking_history_page.dart';
+import 'package:bookmybus/features/Passenger/home/models/bus_route_model.dart';
 import 'package:bookmybus/features/Passenger/home/pages/passenger_home_page.dart';
 import 'package:bookmybus/features/Passenger/journey/pages/journey_page.dart';
 import 'package:flutter/material.dart';
@@ -13,19 +14,27 @@ class PassengerMainPage extends StatefulWidget {
 
 class _PassengerMainPageState extends State<PassengerMainPage> {
   int _currentIndex = 0;
+  BusRouteModel? _selectedRoute;
 
-  final List<Widget> _pages = const [
-    PassengerHomePage(),
-    JourneyPage(),
-    PassengerBookingHistoryPage(),
-  ];
+  void _navigateToJourney(BusRouteModel route) {
+    setState(() {
+      _selectedRoute = route;
+      _currentIndex = 1;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    final pages = [
+      PassengerHomePage(onRouteSelected: _navigateToJourney),
+      JourneyPage(route: _selectedRoute),
+      const PassengerBookingHistoryPage(),
+    ];
+
     return Scaffold(
       body: IndexedStack(
         index: _currentIndex,
-        children: _pages,
+        children: pages,
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,

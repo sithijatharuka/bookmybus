@@ -10,7 +10,9 @@ import '../widgets/bus_route_card.dart';
 import '../widgets/bus_search_bar.dart';
 
 class PassengerHomePage extends StatefulWidget {
-  const PassengerHomePage({super.key});
+  const PassengerHomePage({super.key, this.onRouteSelected});
+
+  final void Function(BusRouteModel)? onRouteSelected;
 
   @override
   State<PassengerHomePage> createState() => _PassengerHomePageState();
@@ -60,7 +62,10 @@ class _PassengerHomePageState extends State<PassengerHomePage> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: _filteredRoutes.length,
-              itemBuilder: (_, i) => BusRouteCard(route: _filteredRoutes[i]),
+              itemBuilder: (_, i) => BusRouteCard(
+                route: _filteredRoutes[i],
+                onTap: widget.onRouteSelected,
+              ),
             ),
           ],
         ),

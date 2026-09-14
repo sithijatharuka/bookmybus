@@ -25,9 +25,10 @@ class _Resolved {
 // ── BusRouteCard ───────────────────────────────────────────────────────────────
 
 class BusRouteCard extends StatelessWidget {
-  const BusRouteCard({super.key, required this.route});
+  const BusRouteCard({super.key, required this.route, this.onTap});
 
   final BusRouteModel route;
+  final void Function(BusRouteModel)? onTap;
 
   /// Builds today's scheduled departure [DateTime] from [now].
   /// If that moment has already passed, the next run is tomorrow → [upcoming].
@@ -70,16 +71,18 @@ class BusRouteCard extends StatelessWidget {
     final resolved = _resolve(route, DateTime.now());
     final isUpcoming = resolved.variant == BusCardVariant.upcoming;
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: AppColors.border),
-        boxShadow: AppShadows.card,
-      ),
-      clipBehavior: Clip.hardEdge,
-      child: Column(
+    return GestureDetector(
+      onTap: onTap != null ? () => onTap!(route) : null,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: AppSpacing.md),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          border: Border.all(color: AppColors.border),
+          boxShadow: AppShadows.card,
+        ),
+        clipBehavior: Clip.hardEdge,
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _ImageHeader(route: route, resolved: resolved),
@@ -139,6 +142,7 @@ class BusRouteCard extends StatelessWidget {
           ),
         ],
       ),
+    ),
     );
   }
 }
