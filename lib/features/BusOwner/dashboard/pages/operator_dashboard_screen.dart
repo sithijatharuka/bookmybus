@@ -7,6 +7,7 @@ import '../../addbus/pages/add_bus_page.dart';
 import '../../booking_history/pages/booking_history_page.dart';
 import '../../manage_bus/pages/manage_bus_page.dart';
 import '../data/dummy_dashboard_data.dart';
+import '../widgets/analytics_filter_bottom_sheet.dart';
 import '../widgets/dashboard_header.dart';
 import '../widgets/dashboard_analytics_section.dart';
 import '../widgets/dashboard_navigation.dart';
@@ -22,63 +23,70 @@ class OperatorDashboardScreen extends StatefulWidget {
 }
 
 class _OperatorDashboardScreenState extends State<OperatorDashboardScreen> {
-  int _selectedFilter = 0;
   int _selectedNav = 0;
 
   Widget _buildDashboardTab() {
-    final filterLabel = DummyDashboardData.filters[_selectedFilter];
-    return Stack(
-      children: [
-        CustomScrollView(
-          slivers: [
-            SliverToBoxAdapter(
-              child: DashboardHeader(
-                greeting: 'Good Morning 👋',
-                operatorName: 'NCG Express',
-                totalRevenue: 'Rs 25,000.00',
-                onProfileTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const ProfilePage()),
-                  );
-                },
-              ),
-            ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.lg,
-                  0,
-                  AppSpacing.lg,
-                  AppSpacing.lg,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 36 + AppSpacing.lg),
-                    DashboardOverviewSection(
-                      filters: DummyDashboardData.filters,
-                      selectedFilter: _selectedFilter,
-                      filterLabel: filterLabel,
-                      metrics: DummyDashboardData.metrics,
-                      onFilterSelected: (i) =>
-                          setState(() => _selectedFilter = i),
-                    ),
-                    DashboardAnalyticsSection(
-                      bookingsTrend: DummyDashboardData.bookingsTrend,
-                      revenueTrend: DummyDashboardData.revenueTrend,
-                    ),
-                    DashboardTopListsSection(
-                      topRoutes: DummyDashboardData.topRoutes,
-                      topBuses: DummyDashboardData.topBuses,
-                      cancelledRoutes: DummyDashboardData.cancelledRoutes,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
+    return CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(
+          child: DashboardHeader(
+            greeting: 'Good Morning 👋',
+            operatorName: 'NCG Express',
+            totalRevenue: 'Rs 25,000.00',
+            onProfileTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const ProfilePage()),
+              );
+            },
+          ),
         ),
-        const DashboardFilterButton(),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              0,
+              AppSpacing.lg,
+              AppSpacing.lg,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 36 + AppSpacing.lg),
+                const DashboardInlineFilter(),
+              ],
+            ),
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: DashboardOverviewSection(
+            filterLabel: 'Today',
+            metrics: DummyDashboardData.metrics,
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              0,
+              AppSpacing.lg,
+              AppSpacing.lg,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                DashboardAnalyticsSection(
+                  bookingsTrend: DummyDashboardData.bookingsTrend,
+                  revenueTrend: DummyDashboardData.revenueTrend,
+                ),
+                DashboardTopListsSection(
+                  topRoutes: DummyDashboardData.topRoutes,
+                  topBuses: DummyDashboardData.topBuses,
+                  cancelledRoutes: DummyDashboardData.cancelledRoutes,
+                ),
+              ],
+            ),
+          ),
+        ),
       ],
     );
   }

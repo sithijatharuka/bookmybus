@@ -1,7 +1,5 @@
 import 'package:bookmybus/app/theme/app_colors.dart';
-import 'package:bookmybus/app/theme/app_spacing.dart';
 import 'package:flutter/material.dart';
-import 'analytics_filter_bottom_sheet.dart';
 
 class DashboardNavigation extends StatelessWidget {
   const DashboardNavigation({
@@ -50,28 +48,6 @@ class DashboardNavigation extends StatelessWidget {
           label: 'Call Booking',
         ),
       ],
-    );
-  }
-}
-
-class DashboardFilterButton extends StatelessWidget {
-  const DashboardFilterButton({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Positioned(
-      bottom: 70,
-      right: AppSpacing.lg,
-      child: FloatingActionButton(
-        backgroundColor: AppColors.primary,
-        onPressed: () => showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          backgroundColor: Colors.transparent,
-          builder: (_) => const FilterBottomSheet(),
-        ),
-        child: const Icon(Icons.tune, color: AppColors.white),
-      ),
     );
   }
 }

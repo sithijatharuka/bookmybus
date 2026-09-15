@@ -27,6 +27,7 @@ class FilterSummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.lg),
       margin: const EdgeInsets.symmetric(vertical: AppSpacing.md),
       decoration: BoxDecoration(

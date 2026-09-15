@@ -21,6 +21,7 @@ class DashboardMetricsGrid extends StatelessWidget {
       crossAxisCount: 2,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
+      padding: EdgeInsets.zero,
       crossAxisSpacing: AppSpacing.md,
       mainAxisSpacing: AppSpacing.md,
       childAspectRatio: 1.6,
