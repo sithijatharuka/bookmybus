@@ -1,6 +1,8 @@
 import 'package:bookmybus/app/theme/app_colors.dart';
 import 'package:bookmybus/app/theme/app_radius.dart';
 import 'package:bookmybus/app/theme/app_spacing.dart';
+import 'package:bookmybus/shared/widgets/bus_seat_layouts/bus_seat_layout.dart';
+import 'package:bookmybus/shared/widgets/bus_seat_layouts/two_by_two_45_seat_layout.dart';
 import 'package:flutter/material.dart';
 import '../models/booking_history_model.dart';
 
@@ -40,7 +42,42 @@ class BusSeatLayoutView extends StatefulWidget {
 class _BusSeatLayoutViewState extends State<BusSeatLayoutView> {
   int? _selectedSeat;
 
-  // Aggregate booked seats: seatNum → (gender, phone, isCall, passengerName)
+  // Aggregate booked seats → SeatStatus map and callBookingSeats map
+  Map<int, SeatStatus> get _seatStatuses {
+    final map = <int, SeatStatus>{};
+    for (final booking in widget.bookings) {
+      for (final s in booking.seats) {
+        final match = RegExp(r'(\d+)\s*\((Male|Female)\)', caseSensitive: false)
+            .firstMatch(s);
+        if (match != null) {
+          final seatNum = int.parse(match.group(1)!);
+          final isFemale = match.group(2)!.toLowerCase() == 'female';
+          map[seatNum] = isFemale ? SeatStatus.blockedFemale : SeatStatus.blockedMale;
+        }
+      }
+    }
+    return map;
+  }
+
+  Map<int, ({String gender, String phone})> get _callBookingSeats {
+    final map = <int, ({String gender, String phone})>{};
+    for (final booking in widget.bookings) {
+      if (!booking.isCallBooking) continue;
+      for (final s in booking.seats) {
+        final match = RegExp(r'(\d+)\s*\((Male|Female)\)', caseSensitive: false)
+            .firstMatch(s);
+        if (match != null) {
+          map[int.parse(match.group(1)!)] = (
+            gender: match.group(2)!.toLowerCase() == 'male' ? 'M' : 'F',
+            phone: booking.passengerPhone,
+          );
+        }
+      }
+    }
+    return map;
+  }
+
+  // Keep _bookedSeats for the detail card lookup
   Map<int, ({String gender, String phone, bool isCall, String name})> get _bookedSeats {
     final map = <int, ({String gender, String phone, bool isCall, String name})>{};
     for (final booking in widget.bookings) {
@@ -77,11 +114,12 @@ class _BusSeatLayoutViewState extends State<BusSeatLayoutView> {
   @override
   Widget build(BuildContext context) {
     final booked = _bookedSeats;
+    final seatStatuses = _seatStatuses;
     const totalSeats = 45;
-    final bookedCount = booked.length;
+    final bookedCount = seatStatuses.length;
     final availableCount = totalSeats - bookedCount;
-    final maleCount = booked.values.where((v) => v.gender == 'M').length;
-    final femaleCount = booked.values.where((v) => v.gender == 'F').length;
+    final maleCount = seatStatuses.values.where((v) => v == SeatStatus.blockedMale).length;
+    final femaleCount = seatStatuses.values.where((v) => v == SeatStatus.blockedFemale).length;
     final selectedInfo = _selectedSeat != null ? booked[_selectedSeat!] : null;
 
     return Dialog(
@@ -114,9 +152,9 @@ class _BusSeatLayoutViewState extends State<BusSeatLayoutView> {
                     const SizedBox(height: AppSpacing.md),
                     const _Legend(),
                     const SizedBox(height: AppSpacing.lg),
-                    _SeatGrid(
-                      bookedSeats: booked,
-                      selectedSeat: _selectedSeat,
+                    TwoByTwo45SeatLayout(
+                      seatStatuses: _seatStatuses,
+                      callBookingSeats: _callBookingSeats,
                       onSeatTapped: (seatNum) => setState(() {
                         _selectedSeat = _selectedSeat == seatNum ? null : seatNum;
                       }),
@@ -278,12 +316,12 @@ class _Legend extends StatelessWidget {
           tt: tt,
         ),
         _LegendItem(
-          child: _SeatBox(label: 'M', bg: AppColors.primary, fg: AppColors.white, size: 22),
+          child: _SeatSquare(color: AppColors.primary, label: 'M'),
           label: 'Male',
           tt: tt,
         ),
         _LegendItem(
-          child: _SeatBox(label: 'F', bg: const Color(0xFFFF4081), fg: AppColors.white, size: 22),
+          child: _SeatSquare(color: const Color(0xFFFF4081), label: 'F'),
           label: 'Female',
           tt: tt,
         ),
@@ -350,299 +388,19 @@ class _LegendItem extends StatelessWidget {
   }
 }
 
-// ─── Seat Grid ────────────────────────────────────────────────────────────────
-
-class _SeatGrid extends StatelessWidget {
-  const _SeatGrid({
-    required this.bookedSeats,
-    required this.selectedSeat,
-    required this.onSeatTapped,
-  });
-  final Map<int, ({String gender, String phone, bool isCall, String name})> bookedSeats;
-  final int? selectedSeat;
-  final ValueChanged<int> onSeatTapped;
-
-  // Seat numbering: rows 1-10 → seats 1-40 (left: odd cols, right: even cols)
-  // Row r, col c (0-indexed): seat = (r * 4) + c + 1
-  // Back row: seats 41-45
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        // FRONT label
-        Container(
-          padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.md, vertical: AppSpacing.xs),
-          decoration: BoxDecoration(
-            color: AppColors.section,
-            border: Border.all(color: AppColors.border),
-            borderRadius: BorderRadius.circular(AppRadius.xs),
-          ),
-          child: Text('FRONT',
-              style: Theme.of(context)
-                  .textTheme
-                  .labelSmall
-                  ?.copyWith(fontWeight: FontWeight.bold, letterSpacing: 1.5)),
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        // Rows 1–10
-        ...List.generate(10, (r) {
-          final rowNum = r + 1;
-          final seats = List.generate(4, (c) => (r * 4) + c + 1);
-          return Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-            child: Row(
-              children: [
-                SizedBox(
-                  width: 20,
-                  child: Text(
-                    '$rowNum',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodySmall
-                        ?.copyWith(color: AppColors.textHint),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.xs),
-                _SeatWidget(seatNum: seats[0], bookedSeats: bookedSeats, selectedSeat: selectedSeat, onTapped: onSeatTapped),
-                const SizedBox(width: AppSpacing.xs),
-                _SeatWidget(seatNum: seats[1], bookedSeats: bookedSeats, selectedSeat: selectedSeat, onTapped: onSeatTapped),
-                // Aisle
-                const Spacer(),
-                _SeatWidget(seatNum: seats[2], bookedSeats: bookedSeats, selectedSeat: selectedSeat, onTapped: onSeatTapped),
-                const SizedBox(width: AppSpacing.xs),
-                _SeatWidget(seatNum: seats[3], bookedSeats: bookedSeats, selectedSeat: selectedSeat, onTapped: onSeatTapped),
-              ],
-            ),
-          );
-        }),
-        // Back row (row 11) — 5 seats
-        Padding(
-          padding: const EdgeInsets.only(top: AppSpacing.xs),
-          child: Row(
-            children: [
-              SizedBox(
-                width: 20,
-                child: Text(
-                  '11',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodySmall
-                      ?.copyWith(color: AppColors.textHint),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.xs),
-              ...List.generate(5, (i) {
-                final seatNum = 41 + i;
-                return Padding(
-                  padding: EdgeInsets.only(right: i < 4 ? AppSpacing.xs : 0),
-                  child: _SeatWidget(seatNum: seatNum, bookedSeats: bookedSeats, selectedSeat: selectedSeat, onTapped: onSeatTapped),
-                );
-              }),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _SeatWidget extends StatelessWidget {
-  const _SeatWidget({
-    required this.seatNum,
-    required this.bookedSeats,
-    required this.selectedSeat,
-    required this.onTapped,
-  });
-  final int seatNum;
-  final Map<int, ({String gender, String phone, bool isCall, String name})> bookedSeats;
-  final int? selectedSeat;
-  final ValueChanged<int> onTapped;
-
-  @override
-  Widget build(BuildContext context) {
-    final info = bookedSeats[seatNum];
-    final isBooked = info != null;
-    final isSelected = selectedSeat == seatNum;
-
-    if (isBooked && info.isCall) {
-      return GestureDetector(
-        onTap: () => onTapped(seatNum),
-        child: _CallBookingSeat(
-          seatNum: seatNum,
-          gender: info.gender,
-          phone: info.phone,
-          isSelected: isSelected,
-        ),
-      );
-    }
-
-    final isFemale = info?.gender == 'F';
-    Color bg = isBooked
-        ? (isFemale ? const Color(0xFFFF4081) : AppColors.primary)
-        : AppColors.white;
-    if (isSelected) bg = bg.withOpacity(0.65);
-    final fg = isBooked ? AppColors.white : AppColors.textHint;
-    final borderColor = isSelected
-        ? const Color(0xFFFBBF24)
-        : (isBooked ? Colors.transparent : AppColors.border);
-
-    return GestureDetector(
-      onTap: isBooked ? () => onTapped(seatNum) : null,
-      child: _SeatBox(
-        label: isBooked ? info!.gender : '$seatNum',
-        bg: bg,
-        fg: fg,
-        borderColor: borderColor,
-        size: 36,
-        subLabel: isBooked ? '$seatNum' : null,
-      ),
-    );
-  }
-}
-
-class _CallBookingSeat extends StatelessWidget {
-  const _CallBookingSeat({
-    required this.seatNum,
-    required this.gender,
-    required this.phone,
-    this.isSelected = false,
-  });
-
-  final int seatNum;
-  final String gender;
-  final String phone;
-  final bool isSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 36,
-      height: 36,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: const Color(0xFF1E3A8A),
-              borderRadius: BorderRadius.circular(6),
-              border: isSelected
-                  ? Border.all(color: const Color(0xFFFBBF24), width: 2)
-                  : null,
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  gender,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 8,
-                    fontWeight: FontWeight.w500,
-                    height: 1.1,
-                  ),
-                ),
-                Text(
-                  '$seatNum',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    height: 1.1,
-                  ),
-                ),
-                Text(
-                  phone.length > 7 ? phone.substring(phone.length - 7) : phone,
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 6,
-                    height: 1.1,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // 'C' badge
-          Positioned(
-            top: -4,
-            right: -4,
-            child: Container(
-              width: 13,
-              height: 13,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-              ),
-              alignment: Alignment.center,
-              child: const Text(
-                'C',
-                style: TextStyle(
-                  color: Color(0xFF1E3A8A),
-                  fontSize: 7,
-                  fontWeight: FontWeight.bold,
-                  height: 1,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SeatBox extends StatelessWidget {
-  const _SeatBox({
-    required this.label,
-    required this.bg,
-    required this.fg,
-    this.borderColor = Colors.transparent,
-    required this.size,
-    this.subLabel,
-  });
-
+class _SeatSquare extends StatelessWidget {
+  const _SeatSquare({required this.color, required this.label});
+  final Color color;
   final String label;
-  final Color bg, fg;
-  final Color borderColor;
-  final double size;
-  final String? subLabel;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: bg,
-        border: Border.all(color: borderColor, width: 1.5),
-        borderRadius: BorderRadius.circular(AppRadius.xs),
-      ),
-      child: subLabel != null
-          ? Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(label,
-                    style: TextStyle(
-                        color: fg,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        height: 1.1)),
-                Text(subLabel!,
-                    style: TextStyle(color: fg, fontSize: 8, height: 1.1)),
-              ],
-            )
-          : Center(
-              child: Text(label,
-                  style: TextStyle(
-                      color: fg,
-                      fontSize: size > 24 ? 11 : 10,
-                      fontWeight: FontWeight.w600)),
-            ),
+      width: 22,
+      height: 22,
+      decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(AppRadius.xs)),
+      alignment: Alignment.center,
+      child: Text(label, style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
     );
   }
 }
