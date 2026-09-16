@@ -196,23 +196,7 @@ class JourneyBusCard extends StatelessWidget {
                                   style: tt.titleSmall?.copyWith(
                                       fontWeight: FontWeight.bold,
                                       color: AppColors.textPrimary)),
-                              if (arr.isNextDay) ...[
-                                const SizedBox(width: 4),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 5, vertical: 1),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.warningLight,
-                                    borderRadius:
-                                        BorderRadius.circular(AppRadius.round),
-                                  ),
-                                  child: Text('+1',
-                                      style: tt.bodySmall?.copyWith(
-                                          color: AppColors.warning,
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold)),
-                                ),
-                              ],
+
                             ],
                           ),
                           const SizedBox(height: 2),
