@@ -75,49 +75,119 @@ class JourneySearchField extends StatelessWidget {
 
 // ── City Picker ────────────────────────────────────────────────────────────────
 
-class JourneyCityPicker extends StatelessWidget {
+class JourneyCityPicker extends StatefulWidget {
   const JourneyCityPicker({super.key, required this.cities, this.exclude});
 
   final List<String> cities;
   final String? exclude;
 
   @override
+  State<JourneyCityPicker> createState() => _JourneyCityPickerState();
+}
+
+class _JourneyCityPickerState extends State<JourneyCityPicker> {
+  final _controller = TextEditingController();
+  String _query = '';
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final tt = Theme.of(context).textTheme;
-    final available = exclude != null
-        ? cities.where((c) => c != exclude).toList()
-        : cities;
+    final keyboardInset = MediaQuery.of(context).viewInsets.bottom;
+    final available = widget.cities
+        .where((c) => c != widget.exclude)
+        .where((c) => c.toLowerCase().contains(_query.toLowerCase()))
+        .toList();
+
     return SafeArea(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-                AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.sm),
-            child: Text('Select City',
-                style: tt.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-          ),
-          const Divider(height: 1),
-          Flexible(
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ...available.map(
-                    (city) => ListTile(
-                      leading: const Icon(Icons.location_city,
-                          color: AppColors.primary, size: 20),
-                      title: Text(city, style: tt.bodyMedium),
-                      onTap: () => Navigator.pop(context, city),
-                    ),
+      child: Padding(
+        padding: EdgeInsets.only(bottom: keyboardInset),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.sm),
+              child: Text('Select City',
+                  style: tt.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
+              child: TextField(
+                controller: _controller,
+                autofocus: true,
+                onChanged: (v) => setState(() => _query = v),
+                decoration: InputDecoration(
+                  hintText: 'Search city...',
+                  hintStyle: tt.bodyMedium?.copyWith(color: AppColors.textHint),
+                  prefixIcon: const Icon(Icons.search,
+                      color: AppColors.textSecondary, size: 20),
+                  suffixIcon: _query.isNotEmpty
+                      ? GestureDetector(
+                          onTap: () {
+                            _controller.clear();
+                            setState(() => _query = '');
+                          },
+                          child: const Icon(Icons.close,
+                              color: AppColors.textSecondary, size: 18),
+                        )
+                      : null,
+                  contentPadding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+                  filled: true,
+                  fillColor: AppColors.section,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                    borderSide: const BorderSide(color: AppColors.border),
                   ),
-                  const SizedBox(height: AppSpacing.sm),
-                ],
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                    borderSide: const BorderSide(color: AppColors.border),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                    borderSide: const BorderSide(color: AppColors.primary),
+                  ),
+                ),
               ),
             ),
-          ),
-        ],
+            const Divider(height: 1),
+            Flexible(
+              child: available.isEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.all(AppSpacing.xl),
+                      child: Center(
+                        child: Text('No cities found',
+                            style: tt.bodyMedium
+                                ?.copyWith(color: AppColors.textHint)),
+                      ),
+                    )
+                  : SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ...available.map(
+                            (city) => ListTile(
+                              leading: const Icon(Icons.location_city,
+                                  color: AppColors.primary, size: 20),
+                              title: Text(city, style: tt.bodyMedium),
+                              onTap: () => Navigator.pop(context, city),
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.sm),
+                        ],
+                      ),
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }

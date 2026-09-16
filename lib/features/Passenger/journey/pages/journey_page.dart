@@ -76,6 +76,7 @@ class _JourneyPageState extends State<JourneyPage> {
   Future<void> _pickCity({required bool isFrom}) async {
     final picked = await showModalBottomSheet<String>(
       context: context,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.lg)),
       ),
