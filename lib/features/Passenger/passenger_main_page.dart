@@ -15,10 +15,28 @@ class PassengerMainPage extends StatefulWidget {
 class _PassengerMainPageState extends State<PassengerMainPage> {
   int _currentIndex = 0;
   BusRouteModel? _selectedRoute;
+  DateTime _selectedDate = DateTime.now();
 
   void _navigateToJourney(BusRouteModel route) {
     setState(() {
       _selectedRoute = route;
+      _selectedDate = DateTime.now();
+      _currentIndex = 1;
+    });
+  }
+
+  void _navigateToJourneyWithSearch(String from, String to, DateTime date) {
+    setState(() {
+      _selectedRoute = BusRouteModel(
+        from: from,
+        to: to,
+        operatorName: '',
+        busType: '',
+        frequency: '',
+        departureHour: 0,
+        departureMinute: 0,
+      );
+      _selectedDate = date;
       _currentIndex = 1;
     });
   }
@@ -26,8 +44,11 @@ class _PassengerMainPageState extends State<PassengerMainPage> {
   @override
   Widget build(BuildContext context) {
     final pages = [
-      PassengerHomePage(onRouteSelected: _navigateToJourney),
-      JourneyPage(route: _selectedRoute),
+      PassengerHomePage(
+        onRouteSelected: _navigateToJourney,
+        onSearch: _navigateToJourneyWithSearch,
+      ),
+      JourneyPage(route: _selectedRoute, date: _selectedDate),
       const PassengerBookingHistoryPage(),
     ];
 

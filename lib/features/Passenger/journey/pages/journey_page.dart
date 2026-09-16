@@ -5,13 +5,16 @@ import 'package:bookmybus/features/Passenger/home/models/bus_route_model.dart';
 import 'package:bookmybus/features/Passenger/journey/data/dummy_journey_bus_data.dart';
 import 'package:bookmybus/features/Passenger/journey/models/journey_bus_model.dart';
 import 'package:bookmybus/features/Passenger/journey/widgets/journey_bus_card.dart';
+import 'package:bookmybus/features/Passenger/journey/widgets/journey_search_fields.dart';
 import 'package:bookmybus/shared/widgets/common_app_bar.dart';
 import 'package:flutter/material.dart';
 
 class JourneyPage extends StatefulWidget {
-  const JourneyPage({super.key, this.route});
+  const JourneyPage({super.key, this.route, DateTime? date})
+      : _date = date;
 
   final BusRouteModel? route;
+  final DateTime? _date;
 
   @override
   State<JourneyPage> createState() => _JourneyPageState();
@@ -27,7 +30,7 @@ class _JourneyPageState extends State<JourneyPage> {
     super.initState();
     _from = widget.route?.from;
     _to = widget.route?.to;
-    _date = DateTime.now();
+    _date = widget._date ?? DateTime.now();
   }
 
   @override
@@ -37,7 +40,7 @@ class _JourneyPageState extends State<JourneyPage> {
       setState(() {
         _from = widget.route!.from;
         _to = widget.route!.to;
-        _date = DateTime.now();
+        _date = widget._date ?? DateTime.now();
       });
     }
   }
@@ -59,14 +62,40 @@ class _JourneyPageState extends State<JourneyPage> {
   }
 
   List<JourneyBusModel> get _results {
+    if (_from == null && _to == null) return DummyJourneyBusData.buses;
     if (_from == null || _to == null) return [];
     return DummyJourneyBusData.search(_from!, _to!);
   }
 
 
+  static const List<String> _cities = [
+    'Colombo', 'Kandy', 'Jaffna', 'Mannar',
+    'Galle', 'Trincomalee', 'Anuradhapura',
+  ];
+
+  Future<void> _pickCity({required bool isFrom}) async {
+    final picked = await showModalBottomSheet<String>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.lg)),
+      ),
+      builder: (_) => JourneyCityPicker(
+        cities: _cities,
+        exclude: isFrom ? _to : _from,
+      ),
+    );
+    if (picked != null) {
+      setState(() {
+        if (isFrom) _from = picked;
+        else _to = picked;
+      });
+    }
+  }
+
   Widget build(BuildContext context) {
     final tt = Theme.of(context).textTheme;
-    final hasSearch = _from != null && _to != null;
+    final isFiltered = _from != null && _to != null;
+    final isCleared = _from == null && _to == null;
     final results = _results;
 
     return Scaffold(
@@ -97,26 +126,28 @@ class _JourneyPageState extends State<JourneyPage> {
               ),
               child: Column(
                 children: [
-                  _SearchField(
+                  JourneySearchField(
                     label: 'From',
                     value: _from,
                     icon: Icons.trip_origin,
                     iconColor: AppColors.primary,
+                    onTap: () => _pickCity(isFrom: true),
                     onClear: _from != null
                         ? () => setState(() => _from = null)
                         : null,
                   ),
                   const SizedBox(height: AppSpacing.md),
-                  _SearchField(
+                  JourneySearchField(
                     label: 'To',
                     value: _to,
                     icon: Icons.location_on,
                     iconColor: AppColors.error,
+                    onTap: () => _pickCity(isFrom: false),
                     onClear:
                         _to != null ? () => setState(() => _to = null) : null,
                   ),
                   const SizedBox(height: AppSpacing.md),
-                  _DateField(date: _date, onTap: _pickDate),
+                  JourneyDateField(date: _date, onTap: _pickDate),
                   const SizedBox(height: AppSpacing.lg),
                   SizedBox(
                     width: double.infinity,
@@ -140,7 +171,7 @@ class _JourneyPageState extends State<JourneyPage> {
             ),
 
             // ── Results ──────────────────────────────────────────────────────
-            if (hasSearch) ...[
+            if (isFiltered || isCleared) ...[
               const SizedBox(height: AppSpacing.xl),
 
               // Summary header
@@ -148,9 +179,12 @@ class _JourneyPageState extends State<JourneyPage> {
                   style: tt.titleMedium
                       ?.copyWith(color: AppColors.textPrimary)),
               const SizedBox(height: AppSpacing.xs),
-              Text('Showing results for your selected route and date',
-                  style:
-                      tt.bodySmall?.copyWith(color: AppColors.textSecondary)),
+              Text(
+                isCleared
+                    ? 'Showing all available buses'
+                    : 'Showing results for your selected route and date',
+                style: tt.bodySmall?.copyWith(color: AppColors.textSecondary),
+              ),
               const SizedBox(height: AppSpacing.xs),
               Text(
                 results.isEmpty
@@ -176,120 +210,6 @@ class _JourneyPageState extends State<JourneyPage> {
                       JourneyBusCard(bus: results[i], date: _date),
                 ),
             ],
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ── Search Field ───────────────────────────────────────────────────────────────
-
-class _SearchField extends StatelessWidget {
-  const _SearchField({
-    required this.label,
-    required this.value,
-    required this.icon,
-    required this.iconColor,
-    this.onClear,
-  });
-
-  final String label;
-  final String? value;
-  final IconData icon;
-  final Color iconColor;
-  final VoidCallback? onClear;
-
-  @override
-  Widget build(BuildContext context) {
-    final tt = Theme.of(context).textTheme;
-    return Container(
-      padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md, vertical: AppSpacing.sm),
-      decoration: BoxDecoration(
-        color: AppColors.section,
-        borderRadius: BorderRadius.circular(AppRadius.md),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: iconColor, size: 18),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(label,
-                    style: tt.bodySmall?.copyWith(
-                        color: AppColors.textSecondary, fontSize: 11)),
-                Text(
-                  value ?? 'Select city',
-                  style: tt.bodyMedium?.copyWith(
-                    color: value != null
-                        ? AppColors.textPrimary
-                        : AppColors.textHint,
-                    fontWeight:
-                        value != null ? FontWeight.w600 : FontWeight.normal,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          if (onClear != null)
-            GestureDetector(
-              onTap: onClear,
-              child: const Icon(Icons.close,
-                  size: 16, color: AppColors.textSecondary),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-// ── Date Field ─────────────────────────────────────────────────────────────────
-
-class _DateField extends StatelessWidget {
-  const _DateField({required this.date, required this.onTap});
-
-  final DateTime date;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final tt = Theme.of(context).textTheme;
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md, vertical: AppSpacing.sm),
-        decoration: BoxDecoration(
-          color: AppColors.section,
-          borderRadius: BorderRadius.circular(AppRadius.md),
-          border: Border.all(color: AppColors.border),
-        ),
-        child: Row(
-          children: [
-            const Icon(Icons.calendar_today,
-                color: AppColors.primary, size: 18),
-            const SizedBox(width: AppSpacing.sm),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Date',
-                      style: tt.bodySmall?.copyWith(
-                          color: AppColors.textSecondary, fontSize: 11)),
-                  Text(
-                    '${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}/${date.year}',
-                    style: tt.bodyMedium?.copyWith(
-                        color: AppColors.textPrimary,
-                        fontWeight: FontWeight.w600),
-                  ),
-                ],
-              ),
-            ),
-            const Icon(Icons.arrow_drop_down, color: AppColors.textSecondary),
           ],
         ),
       ),

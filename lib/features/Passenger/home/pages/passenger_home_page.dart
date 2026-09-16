@@ -10,9 +10,10 @@ import '../widgets/bus_route_card.dart';
 import '../widgets/bus_search_bar.dart';
 
 class PassengerHomePage extends StatefulWidget {
-  const PassengerHomePage({super.key, this.onRouteSelected});
+  const PassengerHomePage({super.key, this.onRouteSelected, this.onSearch});
 
   final void Function(BusRouteModel)? onRouteSelected;
+  final void Function(String from, String to, DateTime date)? onSearch;
 
   @override
   State<PassengerHomePage> createState() => _PassengerHomePageState();
@@ -44,7 +45,7 @@ class _PassengerHomePageState extends State<PassengerHomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const BookYourJourneyCard(),
+            BookYourJourneyCard(onSearch: widget.onSearch),
             const SizedBox(height: AppSpacing.xl),
 
             BusSearchBar(
