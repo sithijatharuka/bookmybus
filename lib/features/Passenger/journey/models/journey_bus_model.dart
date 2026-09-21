@@ -1,3 +1,5 @@
+enum BusLayoutType { twoByTwo45, twoByTwo51, unknown }
+
 class BoardingPoint {
   const BoardingPoint(this.location, this.time);
   final String location;
@@ -38,6 +40,12 @@ class JourneyBusModel {
   final List<BoardingPoint> boardingPoints;
 
   String get routeName => '$from ➔ $to';
+
+  BusLayoutType get layoutType => switch (totalSeats) {
+        45 => BusLayoutType.twoByTwo45,
+        51 => BusLayoutType.twoByTwo51,
+        _ => BusLayoutType.unknown,
+      };
 
   /// Returns arrival as (hour, minute, isNextDay)
   ({int hour, int minute, bool isNextDay}) get arrival {

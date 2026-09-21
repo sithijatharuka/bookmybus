@@ -2,6 +2,7 @@ import 'package:bookmybus/app/theme/app_colors.dart';
 import 'package:bookmybus/app/theme/app_spacing.dart';
 import 'package:bookmybus/features/Passenger/bus_booking/widgets/booking_header.dart';
 import 'package:bookmybus/features/Passenger/bus_booking/widgets/passenger_details_section.dart';
+import 'package:bookmybus/features/Passenger/bus_booking/widgets/seat_selection_section.dart';
 import 'package:bookmybus/features/Passenger/journey/models/journey_bus_model.dart';
 import 'package:bookmybus/shared/widgets/common_app_bar.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +24,7 @@ class BusBookingDashboard extends StatefulWidget {
 class _BusBookingDashboardState extends State<BusBookingDashboard> {
   final _phoneController = TextEditingController();
   bool _otpSent = false;
+  List<int> _selectedSeats = [];
 
   @override
   void dispose() {
@@ -54,6 +56,12 @@ class _BusBookingDashboardState extends State<BusBookingDashboard> {
               phoneController: _phoneController,
               otpSent: _otpSent,
               onSendOtp: _sendOtp,
+            ),
+            const SizedBox(height: AppSpacing.xl),
+            SeatSelectionSection(
+              bus: widget.bus,
+              selectedSeats: _selectedSeats,
+              onSeatsChanged: (seats) => setState(() => _selectedSeats = seats),
             ),
           ],
         ),
