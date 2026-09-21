@@ -1,3 +1,9 @@
+class BoardingPoint {
+  const BoardingPoint(this.location, this.time);
+  final String location;
+  final String time;
+}
+
 class JourneyBusModel {
   const JourneyBusModel({
     required this.from,
@@ -13,6 +19,7 @@ class JourneyBusModel {
     required this.availableSeats,
     required this.totalSeats,
     required this.ticketPrice,
+    this.boardingPoints = const [],
   });
 
   final String from;
@@ -28,6 +35,7 @@ class JourneyBusModel {
   final int availableSeats;
   final int totalSeats;
   final double ticketPrice;
+  final List<BoardingPoint> boardingPoints;
 
   String get routeName => '$from ➔ $to';
 

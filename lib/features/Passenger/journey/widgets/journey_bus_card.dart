@@ -2,8 +2,10 @@ import 'package:bookmybus/app/theme/app_colors.dart';
 import 'package:bookmybus/app/theme/app_radius.dart';
 import 'package:bookmybus/app/theme/app_shadows.dart';
 import 'package:bookmybus/app/theme/app_spacing.dart';
+import 'package:bookmybus/features/Passenger/bus_booking/pages/bus_booking_dashboard.dart';
 import 'package:flutter/material.dart';
 import '../models/journey_bus_model.dart';
+import 'bus_timetable_sheet.dart';
 
 class JourneyBusCard extends StatelessWidget {
   const JourneyBusCard({super.key, required this.bus, required this.date});
@@ -84,8 +86,8 @@ class JourneyBusCard extends StatelessWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.directions_bus,
-                        color: AppColors.primary, size: 20),
+                    // const Icon(Icons.directions_bus,
+                    //     color: AppColors.primary, size: 20),
                     const SizedBox(width: AppSpacing.sm),
                     Expanded(
                       child: Column(
@@ -269,7 +271,7 @@ class JourneyBusCard extends StatelessWidget {
                   children: [
                     Expanded(
                       child: OutlinedButton.icon(
-                        onPressed: () {},
+                        onPressed: () => BusTimetableSheet.show(context, bus.boardingPoints),
                         icon: const Icon(Icons.schedule, size: 16),
                         label: const Text('Timetable'),
                         style: OutlinedButton.styleFrom(
@@ -287,7 +289,15 @@ class JourneyBusCard extends StatelessWidget {
                     Expanded(
                       flex: 2,
                       child: ElevatedButton.icon(
-                        onPressed: () {},
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => BusBookingDashboard(
+                              bus: bus,
+                              date: date,
+                            ),
+                          ),
+                        ),
                         icon: const Icon(Icons.confirmation_number, size: 16),
                         label: const Text('Book Now'),
                         style: ElevatedButton.styleFrom(

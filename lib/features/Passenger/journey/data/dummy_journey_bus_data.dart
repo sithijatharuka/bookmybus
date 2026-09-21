@@ -1,5 +1,25 @@
 import '../models/journey_bus_model.dart';
 
+const _colomboToMannarStops = [
+  BoardingPoint('Colombo', '14:30 (2:30 PM)'),
+  BoardingPoint('Armour street', '14:35 (2:35 PM)'),
+  BoardingPoint('Katunayake', '15:15 (3:15 PM)'),
+  BoardingPoint('Negombo', '15:25 (3:25 PM)'),
+  BoardingPoint('Chilaw', '16:30 (4:30 PM)'),
+  BoardingPoint('Puttalam', '17:30 (5:30 PM)'),
+  BoardingPoint('Nochchiyagama', '18:15 (6:15 PM)'),
+  BoardingPoint('Anuradhapura', '18:45 (6:45 PM)'),
+  BoardingPoint('Rambewa', '19:05 (7:05 PM)'),
+  BoardingPoint('Medawachchiya', '19:25 (7:25 PM)'),
+  BoardingPoint('Yakawewa', '20:10 (8:10 PM)'),
+  BoardingPoint('Paraiyanalankulam', '20:35 (8:35 PM)'),
+  BoardingPoint('Madu road junction', '20:45 (8:45 PM)'),
+  BoardingPoint('Murunkan', '20:55 (8:55 PM)'),
+  BoardingPoint('Uyilankulam', '21:00 (9:00 PM)'),
+  BoardingPoint('Y junction', '21:20 (9:20 PM)'),
+  BoardingPoint('Mannar', '21:30 (9:30 PM)'),
+];
+
 class DummyJourneyBusData {
   DummyJourneyBusData._();
 
@@ -226,6 +246,40 @@ class DummyJourneyBusData {
       ticketPrice: 420,
     ),
 
+    // ── Colombo ➔ Mannar ─────────────────────────────────────────────────────
+    JourneyBusModel(
+      from: 'Colombo',
+      to: 'Mannar',
+      registrationNumber: 'NW-3300',
+      busName: 'Mannar Express',
+      busType: 'Super Luxury',
+      frequency: 'Daily',
+      departureHour: 14,
+      departureMinute: 30,
+      durationHours: 7,
+      durationMinutes: 0,
+      availableSeats: 24,
+      totalSeats: 45,
+      ticketPrice: 1050,
+      boardingPoints: _colomboToMannarStops,
+    ),
+    JourneyBusModel(
+      from: 'Colombo',
+      to: 'Mannar',
+      registrationNumber: 'NW-4411',
+      busName: 'Gulf Road Liner',
+      busType: 'Luxury',
+      frequency: 'Daily',
+      departureHour: 20,
+      departureMinute: 0,
+      durationHours: 7,
+      durationMinutes: 30,
+      availableSeats: 35,
+      totalSeats: 51,
+      ticketPrice: 900,
+      boardingPoints: _colomboToMannarStops,
+    ),
+
     // ── Colombo ➔ Jaffna ─────────────────────────────────────────────────────
     JourneyBusModel(
       from: 'Colombo',
@@ -241,6 +295,7 @@ class DummyJourneyBusData {
       availableSeats: 20,
       totalSeats: 45,
       ticketPrice: 1200,
+       boardingPoints: _colomboToMannarStops,
     ),
     JourneyBusModel(
       from: 'Colombo',
