@@ -1,11 +1,12 @@
 import 'package:bookmybus/app/theme/app_colors.dart';
 import 'package:bookmybus/app/theme/app_radius.dart';
 import 'package:bookmybus/app/theme/app_spacing.dart';
+import 'package:bookmybus/features/Passenger/bus_booking/widgets/add_passenger_form.dart';
 import 'package:bookmybus/features/Passenger/bus_booking/widgets/booking_section_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class PassengerDetailsSection extends StatelessWidget {
+class PassengerDetailsSection extends StatefulWidget {
   const PassengerDetailsSection({
     super.key,
     required this.phoneController,
@@ -16,6 +17,14 @@ class PassengerDetailsSection extends StatelessWidget {
   final TextEditingController phoneController;
   final bool otpSent;
   final VoidCallback onSendOtp;
+
+  @override
+  State<PassengerDetailsSection> createState() =>
+      _PassengerDetailsSectionState();
+}
+
+class _PassengerDetailsSectionState extends State<PassengerDetailsSection> {
+  bool _showAddForm = false;
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +86,6 @@ class PassengerDetailsSection extends StatelessWidget {
               const SizedBox(height: AppSpacing.xs),
               Row(
                 children: [
-                  // Country code badge
                   Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.md, vertical: AppSpacing.md),
@@ -94,7 +102,7 @@ class PassengerDetailsSection extends StatelessWidget {
                   const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: TextField(
-                      controller: phoneController,
+                      controller: widget.phoneController,
                       keyboardType: TextInputType.phone,
                       inputFormatters: [
                         FilteringTextInputFormatter.digitsOnly,
@@ -137,15 +145,16 @@ class PassengerDetailsSection extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
-                  onPressed: onSendOtp,
+                  onPressed: widget.onSendOtp,
                   icon: Icon(
-                    otpSent ? Icons.check_circle : Icons.send,
+                    widget.otpSent ? Icons.check_circle : Icons.send,
                     size: 16,
                   ),
-                  label: Text(otpSent ? 'OTP Sent' : 'Send OTP'),
+                  label: Text(widget.otpSent ? 'OTP Sent' : 'Send OTP'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        otpSent ? AppColors.success : AppColors.primary,
+                    backgroundColor: widget.otpSent
+                        ? AppColors.success
+                        : AppColors.primary,
                     foregroundColor: AppColors.white,
                     padding:
                         const EdgeInsets.symmetric(vertical: AppSpacing.md),
@@ -185,27 +194,36 @@ class PassengerDetailsSection extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.lg),
 
-              OutlinedButton.icon(
-                onPressed: () {},
-                icon: const Icon(Icons.add, size: 18),
-                label: const Text('Add Passenger Details'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.primary,
-                  side: const BorderSide(color: AppColors.primary),
-                  padding: const EdgeInsets.symmetric(
-                      vertical: AppSpacing.md, horizontal: AppSpacing.lg),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppRadius.md),
+              // ── Toggle: button or inline form ──────────────────────────
+              if (_showAddForm) ...[
+                const Divider(color: AppColors.divider, height: 1),
+                const SizedBox(height: AppSpacing.lg),
+                AddPassengerForm(
+                  onCancel: () => setState(() => _showAddForm = false),
+                  onSave: () => setState(() => _showAddForm = false),
+                ),
+              ] else ...[
+                OutlinedButton.icon(
+                  onPressed: () => setState(() => _showAddForm = true),
+                  icon: const Icon(Icons.add, size: 18),
+                  label: const Text('Add Passenger Details'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.primary,
+                    side: const BorderSide(color: AppColors.primary),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: AppSpacing.md, horizontal: AppSpacing.lg),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: AppSpacing.md),
-
-              const BookingInfoBanner(
-                icon: Icons.lightbulb_outline,
-                text:
-                    'You can save passenger profiles after verifying your phone number above. For now, continue with the Passenger Details form.',
-              ),
+                const SizedBox(height: AppSpacing.md),
+                const BookingInfoBanner(
+                  icon: Icons.lightbulb_outline,
+                  text:
+                      'You can save passenger profiles after verifying your phone number above. For now, continue with the Passenger Details form.',
+                ),
+              ],
             ],
           ),
         ),
