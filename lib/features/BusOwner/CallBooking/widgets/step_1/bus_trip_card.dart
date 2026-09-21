@@ -78,11 +78,14 @@ class BusTripCard extends StatelessWidget {
                   // Route
                   Row(
                     children: [
-                      Text(
-                        trip.from,
-                        style: tt.bodySmall?.copyWith(
-                          color: AppColors.textPrimary,
-                          fontWeight: FontWeight.w600,
+                      Flexible(
+                        child: Text(
+                          trip.from,
+                          overflow: TextOverflow.ellipsis,
+                          style: tt.bodySmall?.copyWith(
+                            color: AppColors.textPrimary,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                       Padding(
@@ -90,11 +93,14 @@ class BusTripCard extends StatelessWidget {
                         child: Icon(Icons.arrow_forward_rounded,
                             size: 12, color: AppColors.primary),
                       ),
-                      Text(
-                        trip.to,
-                        style: tt.bodySmall?.copyWith(
-                          color: AppColors.textPrimary,
-                          fontWeight: FontWeight.w600,
+                      Flexible(
+                        child: Text(
+                          trip.to,
+                          overflow: TextOverflow.ellipsis,
+                          style: tt.bodySmall?.copyWith(
+                            color: AppColors.textPrimary,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ],

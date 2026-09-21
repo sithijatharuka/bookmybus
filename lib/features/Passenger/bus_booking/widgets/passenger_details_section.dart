@@ -194,7 +194,7 @@ class _PassengerDetailsSectionState extends State<PassengerDetailsSection> {
               ),
               const SizedBox(height: AppSpacing.lg),
 
-              // ── Toggle: button or inline form ──────────────────────────
+        //       // ── Toggle: button or inline form ──────────────────────────
               if (_showAddForm) ...[
                 const Divider(color: AppColors.divider, height: 1),
                 const SizedBox(height: AppSpacing.lg),
