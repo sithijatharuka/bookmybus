@@ -2,6 +2,7 @@ import 'package:bookmybus/app/theme/app_colors.dart';
 import 'package:bookmybus/app/theme/app_spacing.dart';
 import 'package:bookmybus/features/Passenger/bus_booking/widgets/booking_header.dart';
 import 'package:bookmybus/features/Passenger/bus_booking/widgets/passenger_details_section.dart';
+import 'package:bookmybus/features/Passenger/bus_booking/widgets/passenger_form_section.dart';
 import 'package:bookmybus/features/Passenger/bus_booking/widgets/seat_selection_section.dart';
 import 'package:bookmybus/features/Passenger/journey/models/journey_bus_model.dart';
 import 'package:bookmybus/shared/widgets/common_app_bar.dart';
@@ -110,6 +111,8 @@ class _BusBookingDashboardState extends State<BusBookingDashboard> {
               otpSent: _otpSent,
               onSendOtp: _sendOtp,
             ),
+            const SizedBox(height: AppSpacing.xl),
+            const PassengerFormSection(),
             const SizedBox(height: AppSpacing.xl),
             SeatSelectionSection(
               bus: widget.bus,
