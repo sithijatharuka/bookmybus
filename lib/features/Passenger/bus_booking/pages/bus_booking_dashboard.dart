@@ -42,9 +42,62 @@ class _BusBookingDashboardState extends State<BusBookingDashboard> {
 
   @override
   Widget build(BuildContext context) {
+    final seatCount = _selectedSeats.length;
+    final total = seatCount * widget.bus.ticketPrice;
+
     return Scaffold(
       backgroundColor: AppColors.scaffold,
       appBar: const CommonAppBar(title: 'Book Bus'),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg, AppSpacing.md, AppSpacing.lg, AppSpacing.xl),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          border: Border(top: BorderSide(color: Color(0xFFE6E9F5))),
+        ),
+        child: Row(
+          children: [
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '$seatCount ${seatCount == 1 ? 'Seat' : 'Seats'}',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.w700,
+                      ),
+                ),
+                Text(
+                  'LKR ${total.toStringAsFixed(2)}',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                ),
+              ],
+            ),
+            const SizedBox(width: AppSpacing.lg),
+            Expanded(
+              child: FilledButton(
+                onPressed: seatCount > 0 ? () {} : null,
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  disabledBackgroundColor: const Color(0xFFD8DEEF),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: AppSpacing.md),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text(
+                  'Proceed to Checkout',
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(

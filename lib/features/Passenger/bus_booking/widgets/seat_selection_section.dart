@@ -2,12 +2,27 @@ import 'package:bookmybus/app/theme/app_colors.dart';
 import 'package:bookmybus/app/theme/app_radius.dart';
 import 'package:bookmybus/app/theme/app_spacing.dart';
 import 'package:bookmybus/features/Passenger/bus_booking/widgets/booking_section_card.dart';
+import 'package:bookmybus/features/Passenger/bus_booking/widgets/passenger_two_by_two_45_layout.dart';
 import 'package:bookmybus/features/Passenger/journey/models/journey_bus_model.dart';
 import 'package:bookmybus/shared/widgets/bus_seat_layouts/bus_seat_layout.dart';
-import 'package:bookmybus/shared/widgets/bus_seat_layouts/two_by_two_45_seat_layout.dart';
 import 'package:flutter/material.dart';
 
-class SeatSelectionSection extends StatelessWidget {
+const int _kMaxSeats = 10;
+
+// ── Legend definition ─────────────────────────────────────────────────────────
+
+const _legendItems = [
+  (label: 'Available',        fill: Color(0xFFFFFFFF), border: Color(0xFF2563EB)),
+  (label: 'Selected',         fill: Color(0xFF059669), border: Color(0xFF059669)),
+  (label: 'Booked (Male)',    fill: Color(0xFF1E3A8A), border: Color(0xFF1E3A8A)),
+  (label: 'Booked (Female)',  fill: Color(0xFF880E4F), border: Color(0xFF880E4F)),
+  (label: 'Pending',          fill: Color(0xFFD97706), border: Color(0xFFD97706)),
+  (label: 'Unavailable',      fill: Color(0xFF475569), border: Color(0xFF475569)),
+];
+
+// ── Public widget ─────────────────────────────────────────────────────────────
+
+class SeatSelectionSection extends StatefulWidget {
   const SeatSelectionSection({
     super.key,
     required this.bus,
@@ -20,19 +35,71 @@ class SeatSelectionSection extends StatelessWidget {
   final OnSeatSelected onSeatsChanged;
 
   @override
+  State<SeatSelectionSection> createState() => _SeatSelectionSectionState();
+}
+
+class _SeatSelectionSectionState extends State<SeatSelectionSection> {
+  /// seat → gender ('Male' | 'Female')
+  final Map<int, String> _seatGenders = {};
+
+  void _onSeatTappedForGender(int seat) async {
+    final gender = await showDialog<String>(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => _GenderPickerDialog(seatNumber: seat),
+    );
+
+    if (gender == null) return; // dismissed — don't add seat
+
+    setState(() => _seatGenders[seat] = gender);
+
+    final next = List<int>.from(widget.selectedSeats)..add(seat);
+    next.sort();
+    widget.onSeatsChanged(List.unmodifiable(next));
+  }
+
+  void _onSeatDeselected(int seat) {
+    setState(() => _seatGenders.remove(seat));
+    final next = List<int>.from(widget.selectedSeats)..remove(seat);
+    widget.onSeatsChanged(List.unmodifiable(next));
+  }
+
+  Map<int, SeatStatus> _buildSeatStatuses() {
+    final statuses = <int, SeatStatus>{};
+    for (final entry in _seatGenders.entries) {
+      statuses[entry.key] = entry.value == 'Male'
+          ? SeatStatus.blockedMale
+          : SeatStatus.blockedFemale;
+    }
+    return statuses;
+  }
+
+  @override
   Widget build(BuildContext context) {
     final tt = Theme.of(context).textTheme;
+    final selectedCount = widget.selectedSeats.length;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Seat Selection',
-            style: tt.titleMedium?.copyWith(
-                color: AppColors.textPrimary, fontWeight: FontWeight.w700)),
-        const SizedBox(height: AppSpacing.xs),
         Text(
-          'Select your preferred seat(s) from the layout below.',
-          style: tt.bodyMedium?.copyWith(color: AppColors.textSecondary),
+          'Seat Selection',
+          style: tt.titleMedium?.copyWith(
+              color: AppColors.textPrimary, fontWeight: FontWeight.w700),
+        ),
+        const SizedBox(height: AppSpacing.xs),
+        RichText(
+          text: TextSpan(
+            style: tt.bodyMedium?.copyWith(color: AppColors.textSecondary),
+            children: [
+              const TextSpan(text: 'Select your preferred seats. You can select up to '),
+              TextSpan(
+                text: '$_kMaxSeats seats',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const TextSpan(text: '.'),
+            ],
+          ),
         ),
         const SizedBox(height: AppSpacing.lg),
 
@@ -40,38 +107,81 @@ class SeatSelectionSection extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const BookingCardHeader(
-                icon: Icons.event_seat_outlined,
-                title: 'Bus Seat Layout',
+              // ── Card header + counter ───────────────────────────────────
+              Row(
+                children: [
+                  const Expanded(
+                    child: BookingCardHeader(
+                      icon: Icons.event_seat_outlined,
+                      title: 'Bus Seat Layout',
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.md, vertical: AppSpacing.xs),
+                    decoration: BoxDecoration(
+                      color: selectedCount > 0
+                          ? const Color(0xFF059669).withValues(alpha: 0.1)
+                          : AppColors.section,
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
+                      border: Border.all(
+                        color: selectedCount > 0
+                            ? const Color(0xFF059669)
+                            : AppColors.border,
+                      ),
+                    ),
+                    child: RichText(
+                      text: TextSpan(
+                        style: tt.bodySmall?.copyWith(
+                            color: AppColors.textSecondary, fontSize: 12),
+                        children: [
+                          TextSpan(
+                            text: '$selectedCount',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: selectedCount > 0
+                                  ? const Color(0xFF059669)
+                                  : AppColors.textPrimary,
+                            ),
+                          ),
+                          const TextSpan(text: ' / $_kMaxSeats seats selected'),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: AppSpacing.lg),
 
-              // ── Legend ─────────────────────────────────────────────────────
+              // ── Legend ──────────────────────────────────────────────────
               Wrap(
                 spacing: AppSpacing.md,
                 runSpacing: AppSpacing.sm,
-                children: const [
-                  _LegendItem(color: Colors.white, borderColor: Color(0xFF2ECC71), label: 'Available'),
-                  _LegendItem(color: Color(0xFF1E3A8A), borderColor: Color(0xFF1E3A8A), label: 'Booked'),
-                  _LegendItem(color: Color(0xFF64748B), borderColor: Color(0xFF64748B), label: 'Blocked'),
-                  _LegendItem(color: Color(0xFF2ECC71), borderColor: Color(0xFF2ECC71), label: 'Selected'),
-                ],
+                children: _legendItems
+                    .map((item) => _LegendItem(
+                          label: item.label,
+                          fill: item.fill,
+                          border: item.border,
+                        ))
+                    .toList(),
               ),
               const SizedBox(height: AppSpacing.lg),
               const Divider(color: AppColors.divider, height: 1),
               const SizedBox(height: AppSpacing.lg),
 
-              // ── Layout ─────────────────────────────────────────────────────
+              // ── Seat layout ─────────────────────────────────────────────
               _buildLayout(),
 
-              // ── Selected seats summary ─────────────────────────────────────
-              if (selectedSeats.isNotEmpty) ...[
+              // ── Selected seats summary ──────────────────────────────────
+              if (widget.selectedSeats.isNotEmpty) ...[
                 const SizedBox(height: AppSpacing.lg),
                 const Divider(color: AppColors.divider, height: 1),
                 const SizedBox(height: AppSpacing.md),
                 _SelectedSeatsSummary(
-                  selectedSeats: selectedSeats,
-                  ticketPrice: bus.ticketPrice,
+                  selectedSeats: widget.selectedSeats,
+                  seatGenders: _seatGenders,
+                  ticketPrice: widget.bus.ticketPrice,
+                  onRemove: _onSeatDeselected,
                 ),
               ],
             ],
@@ -82,34 +192,68 @@ class SeatSelectionSection extends StatelessWidget {
   }
 
   Widget _buildLayout() {
-    switch (bus.layoutType) {
-      case BusLayoutType.twoByTwo45:
-        return TwoByTwo45SeatLayout(
-          selectedSeats: Set<int>.from(selectedSeats),
-          onSeatSelected: onSeatsChanged,
-        );
-      case BusLayoutType.twoByTwo51:
-      case BusLayoutType.unknown:
-        return TwoByTwo45SeatLayout(
-          selectedSeats: Set<int>.from(selectedSeats),
-          onSeatSelected: onSeatsChanged,
-        );
-    }
+    final seatStatuses = _buildSeatStatuses();
+    // Confirmed (gender-assigned) seats are rendered via seatStatuses as
+    // blockedMale/blockedFemale (non-clickable). Only pending seats that
+    // haven't received a gender yet are passed as selectedSeats.
+    final selectedSet = widget.selectedSeats
+        .where((s) => !_seatGenders.containsKey(s))
+        .toSet();
+
+    // All layout types currently use the 45-seat layout.
+    // The passenger wrapper owns max-limit and gender-interception logic;
+    // the shared TwoByTwo45SeatLayout is not modified.
+    return PassengerTwoByTwo45Layout(
+      seatStatuses: seatStatuses,
+      selectedSeats: selectedSet,
+      maxSelectable: _kMaxSeats,
+      onSeatTappedForGender: _onSeatTappedForGender,
+      onSeatDeselected: _onSeatDeselected,
+    );
   }
 }
 
-// ── Legend item ────────────────────────────────────────────────────────────────
+// ── Gender picker dialog ──────────────────────────────────────────────────────
+
+class _GenderPickerDialog extends StatelessWidget {
+  const _GenderPickerDialog({required this.seatNumber});
+  final int seatNumber;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.lg)),
+      title: Text('Seat $seatNumber — Passenger Gender'),
+      content: const Text('Select the gender of the passenger for this seat.'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop('Male'),
+          child: const Text('Male',
+              style: TextStyle(color: Color(0xFF1E3A8A))),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop('Female'),
+          child: const Text('Female',
+              style: TextStyle(color: Color(0xFF880E4F))),
+        ),
+      ],
+    );
+  }
+}
+
+// ── Legend item ───────────────────────────────────────────────────────────────
 
 class _LegendItem extends StatelessWidget {
   const _LegendItem({
-    required this.color,
-    required this.borderColor,
     required this.label,
+    required this.fill,
+    required this.border,
   });
 
-  final Color color;
-  final Color borderColor;
   final String label;
+  final Color fill;
+  final Color border;
 
   @override
   Widget build(BuildContext context) {
@@ -120,9 +264,9 @@ class _LegendItem extends StatelessWidget {
           width: 16,
           height: 16,
           decoration: BoxDecoration(
-            color: color,
+            color: fill,
             borderRadius: BorderRadius.circular(AppRadius.xs),
-            border: Border.all(color: borderColor, width: 1.5),
+            border: Border.all(color: border, width: 1.5),
           ),
         ),
         const SizedBox(width: AppSpacing.xs),
@@ -136,60 +280,64 @@ class _LegendItem extends StatelessWidget {
   }
 }
 
-// ── Selected seats summary ─────────────────────────────────────────────────────
+// ── Selected seats summary ────────────────────────────────────────────────────
 
 class _SelectedSeatsSummary extends StatelessWidget {
   const _SelectedSeatsSummary({
     required this.selectedSeats,
+    required this.seatGenders,
     required this.ticketPrice,
+    required this.onRemove,
   });
 
   final List<int> selectedSeats;
+  final Map<int, String> seatGenders;
   final double ticketPrice;
+  final ValueChanged<int> onRemove;
 
   @override
   Widget build(BuildContext context) {
     final tt = Theme.of(context).textTheme;
     final total = ticketPrice * selectedSeats.length;
 
-    return Row(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          child: Wrap(
-            spacing: AppSpacing.xs,
-            runSpacing: AppSpacing.xs,
-            children: [
-              Text('Selected: ',
-                  style: tt.bodySmall?.copyWith(
-                      color: AppColors.textSecondary,
-                      fontWeight: FontWeight.w500)),
-              ...selectedSeats.map(
-                (s) => Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.sm, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(AppRadius.sm),
-                  ),
-                  child: Text('$s',
-                      style: tt.bodySmall?.copyWith(
-                          color: AppColors.white,
-                          fontWeight: FontWeight.w600)),
-                ),
+        Wrap(
+          spacing: AppSpacing.xs,
+          runSpacing: AppSpacing.xs,
+          children: selectedSeats.map((s) {
+            final gender = seatGenders[s];
+            final chipColor = gender == 'Male'
+                ? const Color(0xFF1E3A8A)
+                : gender == 'Female'
+                    ? const Color(0xFF880E4F)
+                    : AppColors.primary;
+            return Chip(
+              label: Text(
+                gender != null ? 'Seat $s · $gender' : 'Seat $s',
+                style: tt.bodySmall
+                    ?.copyWith(color: Colors.white, fontWeight: FontWeight.w600),
               ),
-            ],
-          ),
+              backgroundColor: chipColor,
+              deleteIconColor: Colors.white70,
+              onDeleted: () => onRemove(s),
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+            );
+          }).toList(),
         ),
-        const SizedBox(width: AppSpacing.md),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
+        const SizedBox(height: AppSpacing.sm),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Text('Total',
+            Text('Total  ',
                 style: tt.bodySmall?.copyWith(color: AppColors.textSecondary)),
-            Text('LKR ${total.toStringAsFixed(2)}',
-                style: tt.titleSmall?.copyWith(
-                    color: AppColors.primary, fontWeight: FontWeight.bold)),
+            Text(
+              'LKR ${total.toStringAsFixed(2)}',
+              style: tt.titleSmall?.copyWith(
+                  color: AppColors.primary, fontWeight: FontWeight.bold),
+            ),
           ],
         ),
       ],
