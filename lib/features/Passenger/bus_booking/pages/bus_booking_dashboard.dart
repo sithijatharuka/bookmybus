@@ -4,6 +4,7 @@ import 'package:bookmybus/features/Passenger/bus_booking/widgets/booking_header.
 import 'package:bookmybus/features/Passenger/bus_booking/widgets/passenger_details_section.dart';
 import 'package:bookmybus/features/Passenger/bus_booking/widgets/passenger_form_section.dart';
 import 'package:bookmybus/features/Passenger/bus_booking/widgets/seat_selection_section.dart';
+import 'package:bookmybus/features/Passenger/checkout_summary/page/checkout_summary.dart';
 import 'package:bookmybus/features/Passenger/journey/models/journey_bus_model.dart';
 import 'package:bookmybus/shared/widgets/common_app_bar.dart';
 import 'package:flutter/material.dart';
@@ -80,7 +81,23 @@ class _BusBookingDashboardState extends State<BusBookingDashboard> {
             const SizedBox(width: AppSpacing.lg),
             Expanded(
               child: FilledButton(
-                onPressed: seatCount > 0 ? () {} : null,
+                onPressed: seatCount > 0
+                    ? () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => CheckoutSummary(
+                              bus: widget.bus,
+                              date: widget.date,
+                              seatCount: seatCount,
+                              pickupPoint: widget.bus.boardingPoints.isNotEmpty
+                                  ? widget.bus.boardingPoints.first.location
+                                  : widget.bus.from,
+                              dropPoint: widget.bus.boardingPoints.length > 1
+                                  ? widget.bus.boardingPoints.last.location
+                                  : widget.bus.to,
+                            ),
+                          ),
+                        )
+                    : null,
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   disabledBackgroundColor: const Color(0xFFD8DEEF),
