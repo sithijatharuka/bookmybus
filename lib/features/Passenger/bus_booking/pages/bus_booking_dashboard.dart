@@ -27,6 +27,7 @@ class _BusBookingDashboardState extends State<BusBookingDashboard> {
   final _phoneController = TextEditingController();
   bool _otpSent = false;
   List<int> _selectedSeats = [];
+  Map<int, String> _seatGenders = {};
 
   @override
   void dispose() {
@@ -88,6 +89,10 @@ class _BusBookingDashboardState extends State<BusBookingDashboard> {
                               bus: widget.bus,
                               date: widget.date,
                               seatCount: seatCount,
+                              selectedSeats: _selectedSeats,
+                              seatGenders: _seatGenders,
+                              accountPhone:
+                                  '+94${_phoneController.text.trim()}',
                               pickupPoint: widget.bus.boardingPoints.isNotEmpty
                                   ? widget.bus.boardingPoints.first.location
                                   : widget.bus.from,
@@ -135,6 +140,8 @@ class _BusBookingDashboardState extends State<BusBookingDashboard> {
               bus: widget.bus,
               selectedSeats: _selectedSeats,
               onSeatsChanged: (seats) => setState(() => _selectedSeats = seats),
+              onGendersChanged: (genders) =>
+                  setState(() => _seatGenders = genders),
             ),
           ],
         ),

@@ -28,11 +28,13 @@ class SeatSelectionSection extends StatefulWidget {
     required this.bus,
     required this.selectedSeats,
     required this.onSeatsChanged,
+    this.onGendersChanged,
   });
 
   final JourneyBusModel bus;
   final List<int> selectedSeats;
   final OnSeatSelected onSeatsChanged;
+  final ValueChanged<Map<int, String>>? onGendersChanged;
 
   @override
   State<SeatSelectionSection> createState() => _SeatSelectionSectionState();
@@ -56,12 +58,14 @@ class _SeatSelectionSectionState extends State<SeatSelectionSection> {
     final next = List<int>.from(widget.selectedSeats)..add(seat);
     next.sort();
     widget.onSeatsChanged(List.unmodifiable(next));
+    widget.onGendersChanged?.call(Map.unmodifiable(_seatGenders));
   }
 
   void _onSeatDeselected(int seat) {
     setState(() => _seatGenders.remove(seat));
     final next = List<int>.from(widget.selectedSeats)..remove(seat);
     widget.onSeatsChanged(List.unmodifiable(next));
+    widget.onGendersChanged?.call(Map.unmodifiable(_seatGenders));
   }
 
   Map<int, SeatStatus> _buildSeatStatuses() {
