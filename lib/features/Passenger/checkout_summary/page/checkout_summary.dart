@@ -1,7 +1,10 @@
 import 'package:bookmybus/app/theme/app_colors.dart';
 import 'package:bookmybus/app/theme/app_spacing.dart';
+import 'package:bookmybus/features/Passenger/booking_history/data/passenger_booking_store.dart';
+import 'package:bookmybus/features/Passenger/booking_history/models/passenger_booking_model.dart';
 import 'package:bookmybus/features/Passenger/checkout_summary/widgets/bus_information_card.dart';
-import 'package:bookmybus/features/Passenger/checkout_summary/widgets/important_notes_footer.dart';
+import 'package:bookmybus/features/Passenger/checkout_summary/widgets/confirm_booking_dialog.dart';
+import 'package:bookmybus/features/Passenger/checkout_summary/widgets/dummy_payhere_widget.dart';
 import 'package:bookmybus/features/Passenger/checkout_summary/widgets/journey_details_card.dart';
 import 'package:bookmybus/features/Passenger/checkout_summary/widgets/passenger_details_card.dart';
 import 'package:bookmybus/features/Passenger/checkout_summary/widgets/payment_summary_card.dart';
@@ -10,6 +13,9 @@ import 'package:bookmybus/features/Passenger/checkout_summary/widgets/selected_s
 import 'package:bookmybus/features/Passenger/journey/models/journey_bus_model.dart';
 import 'package:bookmybus/shared/widgets/common_app_bar.dart';
 import 'package:flutter/material.dart';
+
+const double _kPlatformFee = 100.0;
+const double _kGatewayFeeRate = 0.031;
 
 class CheckoutSummary extends StatelessWidget {
   const CheckoutSummary({
@@ -33,6 +39,60 @@ class CheckoutSummary extends StatelessWidget {
   final String pickupPoint;
   final String dropPoint;
 
+  double get _total {
+    final subtotal = bus.ticketPrice * seatCount;
+    final gatewayFee = (subtotal + _kPlatformFee) * _kGatewayFeeRate;
+    return subtotal + _kPlatformFee + gatewayFee;
+  }
+
+  void _showConfirmDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => ConfirmBookingDialog(
+        seatCount: seatCount,
+        travelDate: date,
+        onConfirm: () => _createBookingAndPay(context),
+      ),
+    );
+  }
+
+  void _createBookingAndPay(BuildContext context) {
+    final ticketRef = PassengerBookingStore.generateTicketRef();
+    final booking = PassengerBookingModel(
+      ticketRef: ticketRef,
+      travelDate: date,
+      from: bus.from,
+      to: bus.to,
+      busName: bus.busName,
+      busNumber: bus.registrationNumber,
+      busType: bus.busType,
+      departureTime: bus.departureTime,
+      selectedSeats: selectedSeats,
+      seatGenders: seatGenders,
+      passengerName: '',
+      passengerPhone: accountPhone,
+      pickupPoint: pickupPoint,
+      dropPoint: dropPoint,
+      status: PassengerBookingStatus.pending,
+      bookedAt: DateTime.now(),
+      totalAmount: _total,
+      paymentStatus: 'Unpaid',
+    );
+
+    PassengerBookingStore.instance.addBooking(booking);
+
+    DummyPayhereWidget.show(
+      context,
+      ticketRef: ticketRef,
+      totalAmount: _total,
+      route: bus.routeName,
+      travelDate: date,
+      seatCount: seatCount,
+      passengerName: '',
+      passengerPhone: accountPhone,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,7 +107,6 @@ class CheckoutSummary extends StatelessWidget {
               padding: const EdgeInsets.all(AppSpacing.lg),
               child: Column(
                 children: [
-                  // 1. Journey Details
                   JourneyDetailsCard(
                     bus: bus,
                     date: date,
@@ -56,34 +115,22 @@ class CheckoutSummary extends StatelessWidget {
                     dropPoint: dropPoint,
                   ),
                   const SizedBox(height: AppSpacing.lg),
-
-                  // 2. Bus Information
                   BusInformationCard(bus: bus),
                   const SizedBox(height: AppSpacing.lg),
-
-                  // 3. Passenger Details
                   PassengerDetailsCard(accountPhone: accountPhone),
                   const SizedBox(height: AppSpacing.lg),
-
-                  // 4. Selected Seats
                   SelectedSeatsCard(
                     selectedSeats: selectedSeats,
                     seatGenders: seatGenders,
                     ticketPrice: bus.ticketPrice,
                   ),
                   const SizedBox(height: AppSpacing.lg),
-
-                  // 5. Payment Summary & Breakdown
                   PaymentSummaryCard(
                     ticketPrice: bus.ticketPrice,
                     seatCount: seatCount,
-                    onConfirm: () {},
+                    onConfirm: () => _showConfirmDialog(context),
                     onCancel: () => Navigator.of(context).pop(),
                   ),
-                  const SizedBox(height: AppSpacing.lg),
-
-                  // 6. Important Notes Footer
-                  // const ImportantNotesFooter(),
                   const SizedBox(height: AppSpacing.xl),
                 ],
               ),
