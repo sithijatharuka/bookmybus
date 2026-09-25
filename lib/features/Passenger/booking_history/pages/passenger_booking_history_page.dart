@@ -2,7 +2,7 @@ import 'package:bookmybus/app/theme/app_colors.dart';
 import 'package:bookmybus/app/theme/app_spacing.dart';
 import 'package:bookmybus/features/Passenger/booking_history/data/passenger_booking_store.dart';
 import 'package:bookmybus/features/Passenger/booking_history/models/passenger_booking_model.dart';
-import 'package:bookmybus/features/Passenger/booking_history/pages/passenger_booking_detail_page.dart';
+import 'package:bookmybus/features/Passenger/booking_history/widgets/booking_detail_bottom_sheet.dart';
 import 'package:bookmybus/features/Passenger/booking_history/widgets/booking_history_filters.dart';
 import 'package:bookmybus/features/Passenger/booking_history/widgets/booking_history_header.dart';
 import 'package:bookmybus/features/Passenger/booking_history/widgets/booking_history_list.dart';
@@ -99,10 +99,7 @@ class _PassengerBookingHistoryPageState extends State<PassengerBookingHistoryPag
             const SizedBox(height: AppSpacing.lg),
             BookingHistoryList(
               bookings: filtered,
-              onViewBooking: (b) => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => PassengerBookingDetailPage(booking: b)),
-              ),
+              onViewBooking: (b) => BookingDetailBottomSheet.show(context, b),
             ),
             const SizedBox(height: AppSpacing.xl),
           ],
