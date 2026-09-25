@@ -67,6 +67,11 @@ class _PaymentSummaryCardState extends State<PaymentSummaryCard> {
             selected: !_useWallet,
             onTap: () => setState(() => _useWallet = false),
           ),
+          const SizedBox(height: AppSpacing.md),
+          _AmountSummaryRow(
+            walletUsed: 0.0,
+            payhereAmount: total,
+          ),
           const SizedBox(height: AppSpacing.lg),
           const Divider(color: AppColors.divider, height: 1),
           const SizedBox(height: AppSpacing.lg),
@@ -203,6 +208,89 @@ class _PaymentOption extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _AmountSummaryRow extends StatelessWidget {
+  const _AmountSummaryRow({
+    required this.walletUsed,
+    required this.payhereAmount,
+  });
+
+  final double walletUsed;
+  final double payhereAmount;
+
+  @override
+  Widget build(BuildContext context) {
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            child: _AmountBox(
+              label: 'Wallet Used',
+              amount: 'LKR ${walletUsed.toStringAsFixed(2)}',
+            ),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: _AmountBox(
+              label: 'PayHere Amount',
+              amount: 'LKR ${payhereAmount.toStringAsFixed(2)}',
+              highlight: true,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AmountBox extends StatelessWidget {
+  const _AmountBox({
+    required this.label,
+    required this.amount,
+    this.highlight = false,
+  });
+
+  final String label;
+  final String amount;
+  final bool highlight;
+
+  Color get _bgColor => highlight
+      ? AppColors.primary.withValues(alpha: 0.05)
+      : AppColors.section;
+
+  Color get _borderColor => highlight
+      ? AppColors.primary.withValues(alpha: 0.2)
+      : AppColors.border;
+
+  Color get _amountColor =>
+      highlight ? AppColors.primary : AppColors.textPrimary;
+
+  @override
+  Widget build(BuildContext context) {
+    final tt = Theme.of(context).textTheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+      decoration: BoxDecoration(
+        color: _bgColor,
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        border: Border.all(color: _borderColor),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label,
+              style: tt.bodySmall?.copyWith(color: AppColors.textSecondary)),
+          const SizedBox(height: AppSpacing.xs),
+          Text(amount,
+              style: tt.bodyMedium?.copyWith(
+                  color: _amountColor, fontWeight: FontWeight.w700)),
+        ],
       ),
     );
   }

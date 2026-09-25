@@ -129,7 +129,7 @@ class CheckoutSummary extends StatelessWidget {
                     ticketPrice: bus.ticketPrice,
                     seatCount: seatCount,
                     onConfirm: () => _showConfirmDialog(context),
-                    onCancel: () => Navigator.of(context).pop(),
+                    onCancel: () => Navigator.of(context).popUntil((route) => route.isFirst),
                   ),
                   const SizedBox(height: AppSpacing.xl),
                 ],
