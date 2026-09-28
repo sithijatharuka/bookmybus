@@ -25,7 +25,9 @@ class _ReservationHoldBannerState extends State<ReservationHoldBanner> {
         _timer?.cancel();
         return;
       }
-      setState(() => _remaining -= const Duration(seconds: 1));
+      setState(() {
+        _remaining -= const Duration(seconds: 1);
+      });
     });
   }
 
@@ -41,11 +43,17 @@ class _ReservationHoldBannerState extends State<ReservationHoldBanner> {
     return '$m:$s';
   }
 
+  bool get _isExpired => _remaining.inSeconds <= 0;
+  bool get _isWarning => !_isExpired && _remaining.inSeconds <= 60;
+
   @override
   Widget build(BuildContext context) {
     final tt = Theme.of(context).textTheme;
+    final bannerColor = _isWarning ? const Color(0xFFFFE4E6) : AppColors.warningLight;
+    final badgeColor = _isWarning ? const Color(0xFFDC2626) : AppColors.warning;
+    final textColor = _isWarning ? const Color(0xFF991B1B) : const Color(0xFF92400E);
     return Container(
-      color: AppColors.warningLight,
+      color: bannerColor,
       padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.lg, vertical: AppSpacing.md),
       child: Row(
@@ -54,7 +62,7 @@ class _ReservationHoldBannerState extends State<ReservationHoldBanner> {
             padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.md, vertical: AppSpacing.xs),
             decoration: BoxDecoration(
-              color: AppColors.warning,
+              color: badgeColor,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
@@ -68,20 +76,28 @@ class _ReservationHoldBannerState extends State<ReservationHoldBanner> {
           ),
           const SizedBox(width: AppSpacing.md),
           Expanded(
-            child: RichText(
-              text: TextSpan(
-                style: tt.bodySmall?.copyWith(color: const Color(0xFF92400E)),
-                children: const [
-                  TextSpan(
-                    text: 'Your seats are reserved',
-                    style: TextStyle(fontWeight: FontWeight.w700),
+            child: _isExpired
+                ? Text(
+                    'Seat reservation window closed — please confirm your booking now to secure your seats.',
+                    style: tt.bodySmall?.copyWith(
+                      color: textColor,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  )
+                : RichText(
+                    text: TextSpan(
+                      style: tt.bodySmall?.copyWith(color: textColor),
+                      children: const [
+                        TextSpan(
+                          text: 'Your seats are reserved',
+                          style: TextStyle(fontWeight: FontWeight.w700),
+                        ),
+                        TextSpan(
+                          text: ' — complete checkout before the timer runs out.',
+                        ),
+                      ],
+                    ),
                   ),
-                  TextSpan(
-                    text: ' — complete checkout before the timer runs out.',
-                  ),
-                ],
-              ),
-            ),
           ),
         ],
       ),
