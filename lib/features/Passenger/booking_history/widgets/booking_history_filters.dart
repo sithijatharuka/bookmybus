@@ -21,7 +21,7 @@ class BookingHistoryFilters extends StatelessWidget {
   final ValueChanged<String> onStatusChanged;
   final ValueChanged<String> onSearchChanged;
 
-  static const _statuses = ['All', 'Pending', 'Confirmed', 'Cancelled'];
+  static const _statuses = ['All', 'Pending', 'Confirmed', 'Cancelled', 'Expired'];
 
   Future<void> _pickDate(BuildContext context) async {
     final picked = await showDatePicker(

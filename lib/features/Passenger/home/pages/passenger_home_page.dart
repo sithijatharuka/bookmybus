@@ -1,5 +1,6 @@
 import 'package:bookmybus/app/theme/app_colors.dart';
 import 'package:bookmybus/app/theme/app_spacing.dart';
+import 'package:bookmybus/features/Passenger/passenger_profile/pages/passenger_profile_page.dart';
 import 'package:bookmybus/shared/widgets/common_app_bar.dart';
 import 'package:flutter/material.dart';
 import '../data/dummy_bus_route_data.dart';
@@ -39,7 +40,18 @@ class _PassengerHomePageState extends State<PassengerHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.scaffold,
-      appBar: const CommonAppBar(title: 'Home'),
+      appBar: CommonAppBar(
+        title: 'Home',
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.person_outline, color: AppColors.textSecondary),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const PassengerProfilePage()),
+            ),
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(
