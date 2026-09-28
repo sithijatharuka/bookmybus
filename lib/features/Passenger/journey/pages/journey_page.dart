@@ -4,14 +4,15 @@ import 'package:bookmybus/app/theme/app_spacing.dart';
 import 'package:bookmybus/features/Passenger/home/models/bus_route_model.dart';
 import 'package:bookmybus/features/Passenger/journey/data/dummy_journey_bus_data.dart';
 import 'package:bookmybus/features/Passenger/journey/models/journey_bus_model.dart';
-import 'package:bookmybus/features/Passenger/journey/widgets/journey_bus_card.dart';
+import 'package:bookmybus/features/Passenger/journey/widgets/journey_page_header.dart';
+import 'package:bookmybus/features/Passenger/journey/widgets/journey_results_section.dart';
+import 'package:bookmybus/features/Passenger/journey/widgets/journey_search_card.dart';
 import 'package:bookmybus/features/Passenger/journey/widgets/journey_search_fields.dart';
 import 'package:bookmybus/shared/widgets/common_app_bar.dart';
 import 'package:flutter/material.dart';
 
 class JourneyPage extends StatefulWidget {
-  const JourneyPage({super.key, this.route, DateTime? date})
-      : _date = date;
+  const JourneyPage({super.key, this.route, DateTime? date}) : _date = date;
 
   final BusRouteModel? route;
   final DateTime? _date;
@@ -67,7 +68,6 @@ class _JourneyPageState extends State<JourneyPage> {
     return DummyJourneyBusData.search(_from!, _to!);
   }
 
-
   static const List<String> _cities = [
     'Colombo', 'Kandy', 'Jaffna', 'Mannar',
     'Galle', 'Trincomalee', 'Anuradhapura',
@@ -93,8 +93,8 @@ class _JourneyPageState extends State<JourneyPage> {
     }
   }
 
+  @override
   Widget build(BuildContext context) {
-    final tt = Theme.of(context).textTheme;
     final isFiltered = _from != null && _to != null;
     final isCleared = _from == null && _to == null;
     final results = _results;
@@ -107,147 +107,31 @@ class _JourneyPageState extends State<JourneyPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Page header ──────────────────────────────────────────────────
-            Text('Find Your Perfect Journey',
-                style: tt.titleLarge?.copyWith(color: AppColors.primary)),
-            const SizedBox(height: AppSpacing.xs),
-            Text(
-              'Search and book bus tickets across thousands of routes',
-              style: tt.bodyMedium?.copyWith(color: AppColors.textSecondary),
-            ),
+            const JourneyPageHeader(),
             const SizedBox(height: AppSpacing.xl),
-
-            // ── Search card ──────────────────────────────────────────────────
-            Container(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              decoration: BoxDecoration(
-                color: AppColors.white,
-                borderRadius: BorderRadius.circular(AppRadius.lg),
-                border: Border.all(color: AppColors.border),
-              ),
-              child: Column(
-                children: [
-                  JourneySearchField(
-                    label: 'From',
-                    value: _from,
-                    icon: Icons.trip_origin,
-                    iconColor: AppColors.primary,
-                    onTap: () => _pickCity(isFrom: true),
-                    onClear: _from != null
-                        ? () => setState(() => _from = null)
-                        : null,
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  JourneySearchField(
-                    label: 'To',
-                    value: _to,
-                    icon: Icons.location_on,
-                    iconColor: AppColors.error,
-                    onTap: () => _pickCity(isFrom: false),
-                    onClear:
-                        _to != null ? () => setState(() => _to = null) : null,
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  JourneyDateField(date: _date, onTap: _pickDate),
-                  const SizedBox(height: AppSpacing.lg),
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      onPressed: _clearSearch,
-                      icon: const Icon(Icons.clear, size: 16),
-                      label: const Text('Clear Search'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.textSecondary,
-                        side: const BorderSide(color: AppColors.border),
-                        padding: const EdgeInsets.symmetric(
-                            vertical: AppSpacing.md),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(AppRadius.md),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+            JourneySearchCard(
+              from: _from,
+              to: _to,
+              date: _date,
+              onFromTap: () => _pickCity(isFrom: true),
+              onToTap: () => _pickCity(isFrom: false),
+              onDateTap: _pickDate,
+              onClearFrom: _from != null ? () => setState(() => _from = null) : null,
+              onClearTo: _to != null ? () => setState(() => _to = null) : null,
+              onClearSearch: _clearSearch,
             ),
-
-            // ── Results ──────────────────────────────────────────────────────
             if (isFiltered || isCleared) ...[
               const SizedBox(height: AppSpacing.xl),
-
-              // Summary header
-              Text('Buses',
-                  style: tt.titleMedium
-                      ?.copyWith(color: AppColors.textPrimary)),
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                isCleared
-                    ? 'Showing all available buses'
-                    : 'Showing results for your selected route and date',
-                style: tt.bodySmall?.copyWith(color: AppColors.textSecondary),
+              JourneyResultsSection(
+                results: results,
+                isCleared: isCleared,
+                from: _from,
+                to: _to,
+                date: _date,
               ),
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                results.isEmpty
-                    ? 'No buses found for this route'
-                    : 'Found ${results.length} ${results.length == 1 ? 'bus' : 'buses'} matching your search',
-                style: tt.bodySmall?.copyWith(
-                  color: results.isEmpty
-                      ? AppColors.error
-                      : AppColors.success,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.md),
-
-              if (results.isEmpty)
-                _EmptyResults(from: _from!, to: _to!)
-              else
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: results.length,
-                  itemBuilder: (_, i) =>
-                      JourneyBusCard(bus: results[i], date: _date),
-                ),
             ],
           ],
         ),
-      ),
-    );
-  }
-}
-
-// ── Empty Results ──────────────────────────────────────────────────────────────
-
-class _EmptyResults extends StatelessWidget {
-  const _EmptyResults({required this.from, required this.to});
-  final String from;
-  final String to;
-
-  @override
-  Widget build(BuildContext context) {
-    final tt = Theme.of(context).textTheme;
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(AppSpacing.xl),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Column(
-        children: [
-          const Icon(Icons.search_off, size: 48, color: AppColors.textHint),
-          const SizedBox(height: AppSpacing.md),
-          Text('No buses available',
-              style: tt.titleSmall
-                  ?.copyWith(color: AppColors.textPrimary)),
-          const SizedBox(height: AppSpacing.xs),
-          Text('No buses found from $from to $to.\nTry a different route or date.',
-              style: tt.bodySmall?.copyWith(color: AppColors.textSecondary),
-              textAlign: TextAlign.center),
-        ],
       ),
     );
   }
