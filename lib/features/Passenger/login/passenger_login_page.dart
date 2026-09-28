@@ -9,34 +9,80 @@ class PassengerLoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tt = Theme.of(context).textTheme;
-    final width = MediaQuery.of(context).size.width;
-    final isWide = width >= 768;
+    final size = MediaQuery.of(context).size;
 
     return Scaffold(
       backgroundColor: AppColors.scaffold,
-      body: Center(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(
-            horizontal: isWide ? 0 : AppSpacing.lg,
-            vertical: AppSpacing.xxxl,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // ── Header ───────────────────────────────────────────────
-              Text('Welcome', style: tt.headlineMedium),
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                'Sign in to book your next journey',
-                style: tt.bodyMedium,
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // ── Hero Header ───────────────────────────────────────────
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.only(
+                top: MediaQuery.of(context).padding.top + AppSpacing.xxxl,
+                bottom: AppSpacing.huge + AppSpacing.xl,
+                left: AppSpacing.lg,
+                right: AppSpacing.lg,
               ),
-              const SizedBox(height: AppSpacing.xxxl),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFFEEF3FF), Color(0xFFE8ECF8)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(40),
+                  bottomRight: Radius.circular(40),
+                ),
+              ),
+              child: Column(                
+                children: [
+                  // Welcome To text
+                  const Text(
+                    'Welcome To',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryDark,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.huge),
+                  // Bus logo
+                  SizedBox(
+                    width: size.width * 0.7,
+                    child: Image.asset(
+                      'assets/images/bus-logo.png',
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.xl),
+                  const Text(
+                    'Sign in to book your next journey',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 13,
+                      color: AppColors.primaryDark,
+                    ),
+                  ),
+                ],
+              ),
+            ),
 
-              // ── OTP Auth Card ─────────────────────────────────────────
-              const Center(child: PhoneOtpAuthCard()),
-            ],
-          ),
+            // ── OTP Auth Card ─────────────────────────────────────────
+            Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: size.width >= 768
+                    ? size.width * 0.15
+                    : AppSpacing.lg,
+                vertical: AppSpacing.xxxl,
+              ),
+              child: const PhoneOtpAuthCard(),
+            ),
+          ],
         ),
       ),
     );

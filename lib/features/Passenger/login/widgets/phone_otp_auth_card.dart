@@ -7,6 +7,25 @@ import 'package:bookmybus/app/theme/app_spacing.dart';
 import 'package:bookmybus/features/auth/login/widgets/auth_form_field.dart';
 import 'package:flutter/material.dart';
 
+class _Country {
+  const _Country(this.name, this.flag, this.code);
+  final String name;
+  final String flag;
+  final String code;
+}
+
+const _countries = [
+  _Country('Sri Lanka', '🇱🇰', '+94'),
+  _Country('India', '🇮🇳', '+91'),
+  _Country('United Kingdom', '🇬🇧', '+44'),
+  _Country('United States', '🇺🇸', '+1'),
+  _Country('Australia', '🇦🇺', '+61'),
+  _Country('Canada', '🇨🇦', '+1'),
+  _Country('Singapore', '🇸🇬', '+65'),
+  _Country('Malaysia', '🇲🇾', '+60'),
+  _Country('United Arab Emirates', '🇦🇪', '+971'),
+];
+
 class PhoneOtpAuthCard extends StatefulWidget {
   const PhoneOtpAuthCard({super.key});
 
@@ -18,6 +37,7 @@ class _PhoneOtpAuthCardState extends State<PhoneOtpAuthCard> {
   final _phone = TextEditingController();
   final _otp = TextEditingController();
 
+  _Country _selectedCountry = _countries.first; // Sri Lanka default
   bool _submitted = false;
   bool _otpSent = false;
   int _countdown = 0;
@@ -26,7 +46,7 @@ class _PhoneOtpAuthCardState extends State<PhoneOtpAuthCard> {
   static const _sendColor = Color(0xFF1E3A8A);
   static const _resendColor = Color(0xFF5B73B4);
   static const _errorBorder = Color(0xFFFCA5A5);
-  static const _focusBorder = Color(0xFF3B82F6);
+  static const _fillColor = Color(0xFFF8FAFC);
 
   String? get _phoneError {
     if (!_submitted) return null;
@@ -69,6 +89,12 @@ class _PhoneOtpAuthCardState extends State<PhoneOtpAuthCard> {
     super.dispose();
   }
 
+  OutlineInputBorder _border(Color color, {double width = 1.0}) =>
+      OutlineInputBorder(
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        borderSide: BorderSide(color: color, width: width),
+      );
+
   @override
   Widget build(BuildContext context) {
     final tt = Theme.of(context).textTheme;
@@ -86,89 +112,119 @@ class _PhoneOtpAuthCardState extends State<PhoneOtpAuthCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // ── Phone label ──────────────────────────────────────────────
+          // ── Section title ────────────────────────────────────────────
+          Text(
+            'Passenger Login',
+            style: tt.titleMedium?.copyWith(color: AppColors.primary),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            'Enter your mobile number to continue',
+            style: tt.bodyMedium,
+          ),
+          const SizedBox(height: AppSpacing.xxl),
+
+          // ── Country dropdown ─────────────────────────────────────────
+          const AuthFieldLabel('Country'),
+          Container(
+            decoration: BoxDecoration(
+              color: _fillColor,
+              borderRadius: BorderRadius.circular(AppRadius.md),
+              border: Border.all(color: AppColors.border),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<_Country>(
+                value: _selectedCountry,
+                isExpanded: true,
+                icon: const Icon(Icons.keyboard_arrow_down_rounded,
+                    color: AppColors.textSecondary),
+                style: tt.bodyLarge?.copyWith(color: AppColors.textPrimary),
+                dropdownColor: AppColors.white,
+                borderRadius: BorderRadius.circular(AppRadius.md),
+                items: _countries
+                    .map(
+                      (c) => DropdownMenuItem(
+                        value: c,
+                        child: Row(
+                          children: [
+                            Text(c.flag,
+                                style: const TextStyle(fontSize: 20)),
+                            const SizedBox(width: AppSpacing.sm),
+                            Expanded(
+                              child: Text(
+                                '${c.name}  (${c.code})',
+                                style: tt.bodyMedium?.copyWith(
+                                  color: AppColors.textPrimary,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (c) {
+                  if (c != null) setState(() => _selectedCountry = c);
+                },
+              ),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+
+          // ── Phone number input ───────────────────────────────────────
           const AuthFieldLabel('Phone Number'),
-
-          // ── Country + phone row ──────────────────────────────────────
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Static country selector
-              Container(
-                height: 48,
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+          TextField(
+            controller: _phone,
+            keyboardType: TextInputType.phone,
+            onChanged: (_) {
+              if (_submitted) setState(() {});
+            },
+            style: tt.bodyLarge?.copyWith(
+              color: AppColors.textPrimary,
+              fontSize: 16,
+            ),
+            decoration: InputDecoration(
+              hintText: 'Enter your phone number',
+              hintStyle: tt.bodyMedium?.copyWith(color: AppColors.textHint),
+              errorText: _phoneError,
+              errorStyle: const TextStyle(color: AppColors.error),
+              filled: true,
+              fillColor: _fillColor,
+              prefixIcon: Container(
+                margin: const EdgeInsets.only(
+                    left: AppSpacing.md, right: AppSpacing.sm),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.sm, vertical: AppSpacing.sm),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),
-                  borderRadius: BorderRadius.circular(AppRadius.md),
-                  border: Border.all(
-                    color: hasError ? _errorBorder : AppColors.border,
-                  ),
+                  color: AppColors.section,
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text('🇱🇰', style: TextStyle(fontSize: 16)),
-                    const SizedBox(width: AppSpacing.xs),
-                    Text(
-                      'Sri Lanka (+94)',
-                      style: tt.bodyMedium?.copyWith(
-                        color: AppColors.textPrimary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: AppSpacing.sm),
-
-              // Phone number input
-              Expanded(
-                child: TextField(
-                  controller: _phone,
-                  keyboardType: TextInputType.phone,
-                  onChanged: (_) { if (_submitted) setState(() {}); },
-                  style: tt.bodyLarge?.copyWith(color: AppColors.textPrimary),
-                  decoration: InputDecoration(
-                    hintText: '77XXXXXXX (no leading 0)',
-                    hintStyle: tt.bodyMedium?.copyWith(color: AppColors.textHint),
-                    errorText: _phoneError,
-                    errorStyle: const TextStyle(color: Colors.red),
-                    filled: true,
-                    fillColor: const Color(0xFFF8FAFC),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.lg,
-                      vertical: AppSpacing.md,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppRadius.md),
-                      borderSide: BorderSide(
-                          color: hasError ? _errorBorder : AppColors.border),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppRadius.md),
-                      borderSide: BorderSide(
-                          color: hasError ? _errorBorder : AppColors.border),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppRadius.md),
-                      borderSide: BorderSide(
-                        color: hasError ? _errorBorder : AppColors.primary,
-                        width: 1.5,
-                      ),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppRadius.md),
-                      borderSide: const BorderSide(color: _errorBorder),
-                    ),
-                    focusedErrorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppRadius.md),
-                      borderSide:
-                          const BorderSide(color: _errorBorder, width: 1.5),
-                    ),
+                child: Text(
+                  _selectedCountry.code,
+                  style: tt.bodyMedium?.copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
                   ),
                 ),
               ),
-            ],
+              prefixIconConstraints: const BoxConstraints(minWidth: 0),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.lg,
+                vertical: AppSpacing.lg,
+              ),
+              border: _border(hasError ? _errorBorder : AppColors.border),
+              enabledBorder:
+                  _border(hasError ? _errorBorder : AppColors.border),
+              focusedBorder: _border(
+                  hasError ? _errorBorder : AppColors.primary,
+                  width: 1.5),
+              errorBorder: _border(_errorBorder),
+              focusedErrorBorder: _border(_errorBorder, width: 1.5),
+            ),
           ),
           const SizedBox(height: AppSpacing.xl),
 
@@ -179,7 +235,7 @@ class _PhoneOtpAuthCardState extends State<PhoneOtpAuthCard> {
               style: FilledButton.styleFrom(
                 backgroundColor: _sendColor,
                 padding:
-                    const EdgeInsets.symmetric(vertical: AppSpacing.md),
+                    const EdgeInsets.symmetric(vertical: AppSpacing.lg),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppRadius.md),
                 ),
@@ -199,7 +255,7 @@ class _PhoneOtpAuthCardState extends State<PhoneOtpAuthCard> {
                     _countdown == 0 ? _sendColor : _resendColor,
                 disabledBackgroundColor: _resendColor,
                 padding:
-                    const EdgeInsets.symmetric(vertical: AppSpacing.md),
+                    const EdgeInsets.symmetric(vertical: AppSpacing.lg),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppRadius.md),
                 ),
@@ -223,39 +279,28 @@ class _PhoneOtpAuthCardState extends State<PhoneOtpAuthCard> {
                   child: TextField(
                     controller: _otp,
                     keyboardType: TextInputType.number,
-                    style:
-                        tt.bodyLarge?.copyWith(color: AppColors.textPrimary),
+                    style: tt.bodyLarge
+                        ?.copyWith(color: AppColors.textPrimary),
                     decoration: InputDecoration(
                       hintText: 'Enter OTP',
                       hintStyle: tt.bodyMedium
                           ?.copyWith(color: AppColors.textHint),
                       filled: true,
-                      fillColor: const Color(0xFFF8FAFC),
+                      fillColor: _fillColor,
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.lg,
-                        vertical: AppSpacing.md,
+                        vertical: AppSpacing.lg,
                       ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(AppRadius.md),
-                        borderSide:
-                            const BorderSide(color: AppColors.border),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(AppRadius.md),
-                        borderSide:
-                            const BorderSide(color: AppColors.border),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(AppRadius.md),
-                        borderSide: const BorderSide(
-                            color: _focusBorder, width: 1.5),
-                      ),
+                      border: _border(AppColors.border),
+                      enabledBorder: _border(AppColors.border),
+                      focusedBorder:
+                          _border(AppColors.info, width: 1.5),
                     ),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 SizedBox(
-                  height: 48,
+                  height: 56,
                   child: FilledButton(
                     onPressed: _verify,
                     style: FilledButton.styleFrom(
