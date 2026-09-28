@@ -178,55 +178,55 @@ class _PassengerDetailsSectionState extends State<PassengerDetailsSection> {
         const SizedBox(height: AppSpacing.lg),
 
         // ── Passenger Profiles card ────────────────────────────────────────
-        BookingSectionCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const BookingCardHeader(
-                icon: Icons.people_outline,
-                title: 'Passenger Profiles',
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                'Save frequent travellers (e.g. Me, Father, Friend) to quickly fill details for future bookings. You can still book without saving.',
-                style:
-                    tt.bodySmall?.copyWith(color: AppColors.textSecondary),
-              ),
-              const SizedBox(height: AppSpacing.lg),
+        // BookingSectionCard(
+        //   child: Column(
+        //     crossAxisAlignment: CrossAxisAlignment.start,
+        //     children: [
+        //       const BookingCardHeader(
+        //         icon: Icons.people_outline,
+        //         title: 'Passenger Profiles',
+        //       ),
+        //       const SizedBox(height: AppSpacing.xs),
+        //       Text(
+        //         'Save frequent travellers (e.g. Me, Father, Friend) to quickly fill details for future bookings. You can still book without saving.',
+        //         style:
+        //             tt.bodySmall?.copyWith(color: AppColors.textSecondary),
+        //       ),
+        //       const SizedBox(height: AppSpacing.lg),
 
-        //       // ── Toggle: button or inline form ──────────────────────────
-              if (_showAddForm) ...[
-                const Divider(color: AppColors.divider, height: 1),
-                const SizedBox(height: AppSpacing.lg),
-                AddPassengerForm(
-                  onCancel: () => setState(() => _showAddForm = false),
-                  onSave: () => setState(() => _showAddForm = false),
-                ),
-              ] else ...[
-                OutlinedButton.icon(
-                  onPressed: () => setState(() => _showAddForm = true),
-                  icon: const Icon(Icons.add, size: 18),
-                  label: const Text('Add Passenger Details'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.primary,
-                    side: const BorderSide(color: AppColors.primary),
-                    padding: const EdgeInsets.symmetric(
-                        vertical: AppSpacing.md, horizontal: AppSpacing.lg),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppRadius.md),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.md),
-                const BookingInfoBanner(
-                  icon: Icons.lightbulb_outline,
-                  text:
-                      'You can save passenger profiles after verifying your phone number above. For now, continue with the Passenger Details form.',
-                ),
-              ],
-            ],
-          ),
-        ),
+        // //       // ── Toggle: button or inline form ──────────────────────────
+        //       if (_showAddForm) ...[
+        //         const Divider(color: AppColors.divider, height: 1),
+        //         const SizedBox(height: AppSpacing.lg),
+        //         AddPassengerForm(
+        //           onCancel: () => setState(() => _showAddForm = false),
+        //           onSave: () => setState(() => _showAddForm = false),
+        //         ),
+        //       ] else ...[
+        //         OutlinedButton.icon(
+        //           onPressed: () => setState(() => _showAddForm = true),
+        //           icon: const Icon(Icons.add, size: 18),
+        //           label: const Text('Add Passenger Details'),
+        //           style: OutlinedButton.styleFrom(
+        //             foregroundColor: AppColors.primary,
+        //             side: const BorderSide(color: AppColors.primary),
+        //             padding: const EdgeInsets.symmetric(
+        //                 vertical: AppSpacing.md, horizontal: AppSpacing.lg),
+        //             shape: RoundedRectangleBorder(
+        //               borderRadius: BorderRadius.circular(AppRadius.md),
+        //             ),
+        //           ),
+        //         ),
+        //         const SizedBox(height: AppSpacing.md),
+        //         const BookingInfoBanner(
+        //           icon: Icons.lightbulb_outline,
+        //           text:
+        //               'You can save passenger profiles after verifying your phone number above. For now, continue with the Passenger Details form.',
+        //         ),
+        //       ],
+        //     ],
+        //   ),
+        // ),
       ],
     );
   }
