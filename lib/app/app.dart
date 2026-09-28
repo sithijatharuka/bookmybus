@@ -15,7 +15,7 @@ class App extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       home: const PassengerMainPage(),
-      // home: const PassengerLoginPage(),
+      // home: const OperatorDashboardScreen(),
     );
   }
 }
