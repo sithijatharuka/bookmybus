@@ -22,7 +22,7 @@ class PassengerLoginPage extends StatelessWidget {
               width: double.infinity,
               padding: EdgeInsets.only(
                 top: MediaQuery.of(context).padding.top + AppSpacing.xxxl,
-                bottom: AppSpacing.huge + AppSpacing.xl,
+                bottom: AppSpacing.huge,
                 left: AppSpacing.lg,
                 right: AppSpacing.lg,
               ),
@@ -50,7 +50,7 @@ class PassengerLoginPage extends StatelessWidget {
                       letterSpacing: 1.2,
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.huge),
+                  const SizedBox(height: AppSpacing.lg),
                   // Bus logo
                   SizedBox(
                     width: size.width * 0.7,
@@ -59,7 +59,7 @@ class PassengerLoginPage extends StatelessWidget {
                       fit: BoxFit.contain,
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.xl),
+                  const SizedBox(height: AppSpacing.lg),
                   const Text(
                     'Sign in to book your next journey',
                     style: TextStyle(

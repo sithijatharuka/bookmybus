@@ -15,6 +15,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       backgroundColor: AppColors.white,
+      iconTheme: const IconThemeData(color: Colors.black),
       titleSpacing: 15,
        elevation: 10,
       actions: actions,
