@@ -1,5 +1,6 @@
 import 'package:bookmybus/app/theme/app_colors.dart';
 import 'package:bookmybus/app/theme/app_spacing.dart';
+import 'package:bookmybus/features/Passenger/passenger_profile/pages/contact_us_page.dart';
 import 'package:flutter/material.dart';
 
 class ProfileHelpSupport extends StatelessWidget {
@@ -16,7 +17,10 @@ class ProfileHelpSupport extends StatelessWidget {
           style: tt.bodySmall?.copyWith(color: AppColors.textSecondary),
         ),
         GestureDetector(
-          onTap: () {},
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const ContactUsPage()),
+          ),
           child: Row(
             children: [
               Text(
