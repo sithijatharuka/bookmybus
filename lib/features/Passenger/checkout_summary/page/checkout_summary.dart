@@ -3,6 +3,7 @@ import 'package:bookmybus/app/theme/app_spacing.dart';
 import 'package:bookmybus/features/Passenger/booking_history/data/passenger_booking_store.dart';
 import 'package:bookmybus/features/Passenger/booking_history/models/passenger_booking_model.dart';
 import 'package:bookmybus/features/Passenger/checkout_summary/widgets/bus_information_card.dart';
+import 'package:bookmybus/features/Passenger/checkout_summary/widgets/cancel_booking_dialog.dart';
 import 'package:bookmybus/features/Passenger/checkout_summary/widgets/confirm_booking_dialog.dart';
 import 'package:bookmybus/features/Passenger/checkout_summary/widgets/dummy_payhere_widget.dart';
 import 'package:bookmybus/features/Passenger/checkout_summary/widgets/journey_details_card.dart';
@@ -41,6 +42,15 @@ class CheckoutSummary extends StatelessWidget {
         ticketPrice: bus.ticketPrice,
         seatCount: seatCount,
       ).total;
+
+  void _showCancelDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => CancelBookingDialog(
+        onConfirm: () => Navigator.of(context).popUntil((route) => route.isFirst),
+      ),
+    );
+  }
 
   void _showConfirmDialog(BuildContext context) {
     showDialog(
@@ -126,7 +136,7 @@ class CheckoutSummary extends StatelessWidget {
                     ticketPrice: bus.ticketPrice,
                     seatCount: seatCount,
                     onConfirm: () => _showConfirmDialog(context),
-                    onCancel: () => Navigator.of(context).popUntil((route) => route.isFirst),
+                    onCancel: () => _showCancelDialog(context),
                   ),
                   const SizedBox(height: AppSpacing.xl),
                 ],
