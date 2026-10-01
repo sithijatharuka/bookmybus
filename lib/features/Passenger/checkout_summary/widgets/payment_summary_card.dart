@@ -3,10 +3,8 @@ import 'package:bookmybus/app/theme/app_radius.dart';
 import 'package:bookmybus/app/theme/app_shadows.dart';
 import 'package:bookmybus/app/theme/app_spacing.dart';
 import 'package:bookmybus/features/Passenger/bus_booking/widgets/booking_section_card.dart';
+import 'package:bookmybus/features/Passenger/checkout_summary/utils/booking_price_calculator.dart';
 import 'package:flutter/material.dart';
-
-const double _kPlatformFee = 100.0;
-const double _kGatewayFeeRate = 0.031;
 
 class PaymentSummaryCard extends StatefulWidget {
   const PaymentSummaryCard({
@@ -32,9 +30,13 @@ class _PaymentSummaryCardState extends State<PaymentSummaryCard> {
   @override
   Widget build(BuildContext context) {
     final tt = Theme.of(context).textTheme;
-    final subtotal = widget.ticketPrice * widget.seatCount;
-    final gatewayFee = (subtotal + _kPlatformFee) * _kGatewayFeeRate;
-    final total = subtotal + _kPlatformFee + gatewayFee;
+    final calc = BookingPriceCalculator(
+      ticketPrice: widget.ticketPrice,
+      seatCount: widget.seatCount,
+    );
+    final subtotal = calc.subtotal;
+    final gatewayFee = calc.gatewayFee;
+    final total = calc.total;
 
     return Container(
       decoration: BoxDecoration(
@@ -85,13 +87,13 @@ class _PaymentSummaryCardState extends State<PaymentSummaryCard> {
           const SizedBox(height: AppSpacing.sm),
           _PriceRow(
             label: 'Platform Fee',
-            value: 'LKR ${_kPlatformFee.toStringAsFixed(2)}',
+            value: 'LKR ${kPlatformFee.toStringAsFixed(2)}',
           ),
           const SizedBox(height: AppSpacing.sm),
           _PriceRow(
             label: 'Payment Gateway Fee',
             value:
-                '${(_kGatewayFeeRate * 100).toStringAsFixed(1)}% = LKR ${gatewayFee.toStringAsFixed(2)}',
+                '${(kGatewayFeeRate * 100).toStringAsFixed(1)}% = LKR ${gatewayFee.toStringAsFixed(2)}',
           ),
           const SizedBox(height: AppSpacing.lg),
           const Divider(color: AppColors.divider, height: 1),

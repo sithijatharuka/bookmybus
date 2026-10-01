@@ -12,10 +12,8 @@ import 'package:bookmybus/features/Passenger/checkout_summary/widgets/reservatio
 import 'package:bookmybus/features/Passenger/checkout_summary/widgets/selected_seats_card.dart';
 import 'package:bookmybus/features/Passenger/journey/models/journey_bus_model.dart';
 import 'package:bookmybus/shared/widgets/common_app_bar.dart';
+import 'package:bookmybus/features/Passenger/checkout_summary/utils/booking_price_calculator.dart';
 import 'package:flutter/material.dart';
-
-const double _kPlatformFee = 100.0;
-const double _kGatewayFeeRate = 0.031;
 
 class CheckoutSummary extends StatelessWidget {
   const CheckoutSummary({
@@ -39,11 +37,10 @@ class CheckoutSummary extends StatelessWidget {
   final String pickupPoint;
   final String dropPoint;
 
-  double get _total {
-    final subtotal = bus.ticketPrice * seatCount;
-    final gatewayFee = (subtotal + _kPlatformFee) * _kGatewayFeeRate;
-    return subtotal + _kPlatformFee + gatewayFee;
-  }
+  double get _total => BookingPriceCalculator(
+        ticketPrice: bus.ticketPrice,
+        seatCount: seatCount,
+      ).total;
 
   void _showConfirmDialog(BuildContext context) {
     showDialog(
